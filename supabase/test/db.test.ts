@@ -49,7 +49,7 @@ describe('migrations and seed', () => {
       facilities: 12,
       rain_stations: 18,
       water_level_stations: 8,
-      settings: 8,
+      settings: 9,
     });
   });
 
@@ -549,5 +549,101 @@ describe('hospital portal: edit requests and profile', () => {
     await expect(
       asRole(db, 'anon', null, () => db.query('select * from my_portal_profile()')),
     ).rejects.toThrow(/permission denied/);
+  });
+});
+
+describe('admin RPCs', () => {
+  it('only admins can list users, and see emails', async () => {
+    const res = await asRole(db, 'authenticated', adminId, () =>
+      db.query<{ email: string; role: string }>('select email, role from admin_list_users()'),
+    );
+    expect(res.rows.find((r) => r.email === 'staff@example.test')?.role).toBe('hospital_staff');
+    await expect(
+      asRole(db, 'authenticated', staffId, () => db.query('select * from admin_list_users()')),
+    ).rejects.toThrow(/Admins only/);
+  });
+
+  it('approving a proposed facility creates it verified and makes the user staff', async () => {
+    const newcomer = await createUser(db, 'nurse@example.test');
+    await asRole(db, 'authenticated', newcomer, () =>
+      db.query(`insert into facility_join_requests (user_id, proposed_facility) values ($1, $2)`, [
+        newcomer,
+        JSON.stringify({
+          name: 'Klinik Kesihatan Sungai Siput',
+          type: 'clinic',
+          district: 'Kuala Kangsar',
+          state: 'PRK',
+        }),
+      ]),
+    );
+    const req = await db.query<{ id: string }>(
+      `select id from facility_join_requests where user_id = $1`,
+      [newcomer],
+    );
+    await asRole(db, 'authenticated', adminId, () =>
+      db.query('select admin_review_join($1, true)', [req.rows[0]!.id]),
+    );
+    const profile = await db.query<{ role: string; verified: boolean; has_location: boolean }>(
+      `select p.role, f.verified, f.location is not null has_location from profiles p join facilities f on f.id = p.facility_id where p.id = $1`,
+      [newcomer],
+    );
+    expect(profile.rows[0]).toEqual({ role: 'hospital_staff', verified: true, has_location: true });
+    // The audit log records the admin as the actor.
+    const audit = await db.query<{ n: number }>(
+      `select count(*)::int n from audit_log where actor = $1 and entity = 'facility_join_requests'`,
+      [adminId],
+    );
+    expect(audit.rows[0]!.n).toBeGreaterThan(0);
+  });
+
+  it('admin_set_user changes roles but never removes your own admin access', async () => {
+    await asRole(db, 'authenticated', adminId, () =>
+      db.query(`select admin_set_user($1, 'user', null, false)`, [userB]),
+    );
+    const b = await db.query<{ role: string; active: boolean }>(
+      'select role, active from profiles where id = $1',
+      [userB],
+    );
+    expect(b.rows[0]).toEqual({ role: 'user', active: false });
+    await expect(
+      asRole(db, 'authenticated', adminId, () =>
+        db.query(`select admin_set_user($1, 'user', null, true)`, [adminId]),
+      ),
+    ).rejects.toThrow(/own admin access/);
+    await db.query('update profiles set active = true where id = $1', [userB]);
+  });
+
+  it('approving a late edit applies it to the report', async () => {
+    const edit = await db.query<{ id: string; report_id: string }>(
+      `select id, report_id from case_report_edits where status = 'pending' limit 1`,
+    );
+    await asRole(db, 'authenticated', adminId, () =>
+      db.query('select admin_review_edit($1, true)', [edit.rows[0]!.id]),
+    );
+    const r = await db.query<{ new_cases: number }>(
+      'select new_cases from case_reports where id = $1',
+      [edit.rows[0]!.report_id],
+    );
+    expect(r.rows[0]!.new_cases).toBe(3);
+  });
+
+  it('broadcast targets devices inside the chosen districts', async () => {
+    await db.query(
+      `update user_devices set last_lat = 4.6, last_lon = 101.09, last_seen_at = now() where install_id = 'install-a'`,
+    );
+    const res = await asRole(db, 'authenticated', adminId, () =>
+      db.query<{ user_id: string }>(`select user_id from broadcast_targets('PRK', array['Kinta'])`),
+    );
+    expect(res.rows.map((r) => r.user_id)).toEqual([userA]);
+    const id = await asRole(db, 'authenticated', adminId, () =>
+      db.query<{ id: string }>(
+        `select admin_create_broadcast('PRK', array['Kinta'], 'high', 'Test', null, 'Body', null) id`,
+      ),
+    );
+    const b = await db.query<{ has_geom: boolean }>(
+      'select target_geom is not null has_geom from admin_broadcasts where id = $1',
+      [id.rows[0]!.id],
+    );
+    expect(b.rows[0]!.has_geom).toBe(true);
   });
 });

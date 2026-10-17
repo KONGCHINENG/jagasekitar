@@ -49,12 +49,15 @@ interface SourceStatus {
   refresh_minutes: number;
   last_success_at: string | null;
   last_error_at: string | null;
+  refresh_requested_at: string | null;
 }
 
 async function loadStatus(ctx: SourceContext): Promise<Map<string, SourceStatus>> {
   const { data, error } = await ctx.db
     .from('data_source_status')
-    .select('source, enabled, refresh_minutes, last_success_at, last_error_at');
+    .select(
+      'source, enabled, refresh_minutes, last_success_at, last_error_at, refresh_requested_at',
+    );
   if (error) throw new Error(`data_source_status lookup failed: ${error.message}`);
   return new Map((data as SourceStatus[]).map((s) => [s.source, s]));
 }
@@ -65,7 +68,24 @@ function isDue(s: SourceStatus | undefined, now: Date): boolean {
     Date.parse(s.last_success_at ?? '') || 0,
     Date.parse(s.last_error_at ?? '') || 0,
   );
+  // "Refresh now" from the admin panel: run if requested since the last attempt.
+  if (s.refresh_requested_at && Date.parse(s.refresh_requested_at) > last) return true;
   return now.getTime() - last >= s.refresh_minutes * 60_000;
+}
+
+/** "Re-run prediction" from the admin panel: requested after the latest prediction run started. */
+async function predictionRequested(ctx: SourceContext): Promise<boolean> {
+  const req = await getSetting<{ predict_at: string | null }>(ctx.db, 'worker_requests', {
+    predict_at: null,
+  });
+  if (!req.predict_at) return false;
+  const { data } = await ctx.db
+    .from('prediction_runs')
+    .select('started_at')
+    .order('started_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return !data || Date.parse(req.predict_at) > Date.parse(data.started_at);
 }
 
 interface TickResult {
@@ -121,8 +141,11 @@ async function tick(force: boolean): Promise<TickResult> {
       log.error('stations', err instanceof Error ? err.message : String(err));
     }
   }
-  // Re-predict whenever new data landed.
-  const predictions = results.some((r) => r.written > 0) ? await runPredictions(ctx) : [];
+  // Re-predict whenever new data landed, or when an admin asked for it.
+  const predictions =
+    results.some((r) => r.written > 0) || (await predictionRequested(ctx))
+      ? await runPredictions(ctx)
+      : [];
   if (predictions.length) await notifySafely(ctx);
   return { sources: results, predictions };
 }

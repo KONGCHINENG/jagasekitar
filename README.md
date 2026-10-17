@@ -18,7 +18,7 @@ check risk at a destination and along the route.
 | 5     | User app: main map, haze/flood/illness maps, zone sheet    | ✅ Done |
 | 6     | User app: location, destination, notifications             | ✅ Done |
 | 7     | Hospital portal                                            | ✅ Done |
-| 8     | Admin panel                                                | ⏳      |
+| 8     | Admin panel (`/admin`)                                     | ✅ Done |
 | 9–10  | Demo mode polish, hardening, docs                          | ⏳      |
 
 ## Repo layout
