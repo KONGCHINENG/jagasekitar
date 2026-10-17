@@ -1,0 +1,30 @@
+{
+  "name": "jagasekitar",
+  "private": true,
+  "version": "0.1.0",
+  "description": "JagaSekitar — multi-hazard (haze, flood, disease) early warning for Malaysia",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "worker"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w @jagasekitar/web",
+    "dev:mobile": "npm run start -w @jagasekitar/mobile",
+    "worker:once": "npm run once -w @jagasekitar/worker",
+    "worker:dev": "npm run dev -w @jagasekitar/worker",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint -w @jagasekitar/web",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10",
+    "supabase": "^2.121.0",
+    "typescript": "~6.0.3"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

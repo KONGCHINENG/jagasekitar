@@ -1,0 +1,22 @@
+{
+  "name": "@jagasekitar/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "once": "tsx src/index.ts --once",
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@jagasekitar/engine": "*",
+    "@jagasekitar/shared": "*",
+    "dotenv": "^18.0.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.5"
+  }
+}
