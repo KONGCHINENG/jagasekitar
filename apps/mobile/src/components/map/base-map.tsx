@@ -1,7 +1,7 @@
 // MapView with a basemap that loads everywhere. On Android, Expo Go's Google Maps tiles can fail to
 // load (the map renders black with only overlays), so we draw free OpenStreetMap raster tiles
 // instead. iOS keeps Apple Maps. Every map screen uses this so they all look the same.
-import type { Ref } from 'react';
+import { useState, type Ref } from 'react';
 import { Platform, StyleSheet, Text } from 'react-native';
 import MapView, { UrlTile, type MapViewProps } from 'react-native-maps';
 
@@ -10,7 +10,16 @@ const ANDROID = Platform.OS === 'android';
 // zones. CARTO now needs a key, and tile.openstreetmap.org blocks the Android default user agent.
 const TILES = 'https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
 
-export function BaseMap({ ref, children, ...props }: MapViewProps & { ref?: Ref<MapView> }) {
+export function BaseMap({
+  ref,
+  children,
+  mapPadding,
+  onMapReady,
+  ...props
+}: MapViewProps & { ref?: Ref<MapView> }) {
+  // Android: changing mapPadding before Google Maps is ready crashes natively ("setMapPadding on
+  // a null object reference"), e.g. when a card measures itself right after mount. Hold it back.
+  const [ready, setReady] = useState(false);
   return (
     <MapView
       ref={ref}
@@ -18,6 +27,11 @@ export function BaseMap({ ref, children, ...props }: MapViewProps & { ref?: Ref<
       toolbarEnabled={false}
       showsMyLocationButton={false}
       {...props}
+      mapPadding={ready ? mapPadding : undefined}
+      onMapReady={(e) => {
+        setReady(true);
+        onMapReady?.(e);
+      }}
     >
       {ANDROID && <UrlTile urlTemplate={TILES} maximumZ={19} tileSize={256} zIndex={-1} />}
       {children}
