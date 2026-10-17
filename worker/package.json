@@ -7,12 +7,15 @@
     "once": "tsx src/index.ts --once",
     "dev": "tsx watch src/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "seed:accounts": "tsx scripts/create-demo-accounts.ts",
+    "seed:districts": "tsx scripts/load-districts.ts"
   },
   "dependencies": {
     "@jagasekitar/engine": "*",
     "@jagasekitar/shared": "*",
-    "dotenv": "^18.0.8"
+    "dotenv": "^18.0.8",
+    "@supabase/supabase-js": "^2.118.0"
   },
   "devDependencies": {
     "@types/node": "^22",

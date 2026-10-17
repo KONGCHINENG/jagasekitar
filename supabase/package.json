@@ -1,0 +1,17 @@
+{
+  "name": "@jagasekitar/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "gen:stations": "node scripts/gen-stations-seed.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.10",
+    "@electric-sql/pglite-postgis": "0.2.10",
+    "vitest": "^5.0.5",
+    "@types/node": "^22"
+  }
+}

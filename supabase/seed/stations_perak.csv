@@ -1,0 +1,27 @@
+station_id,name,district,lat,lon,kind,river
+SEED-RF-PRK-01,Parit Buntar,Kerian,5.1250,100.4930,rain,
+SEED-RF-PRK-02,Bagan Serai,Kerian,5.0100,100.5420,rain,
+SEED-RF-PRK-03,Selama,Larut Matang dan Selama,5.2190,100.6900,rain,
+SEED-RF-PRK-04,Taiping,Larut Matang dan Selama,4.8510,100.7410,rain,
+SEED-RF-PRK-05,Kuala Kangsar,Kuala Kangsar,4.7720,100.9370,rain,
+SEED-RF-PRK-06,Sungai Siput,Kuala Kangsar,4.8240,101.0670,rain,
+SEED-RF-PRK-07,Gerik,Hulu Perak,5.4290,101.1270,rain,
+SEED-RF-PRK-08,Lenggong,Hulu Perak,5.1050,100.9690,rain,
+SEED-RF-PRK-09,Ipoh,Kinta,4.5970,101.0900,rain,
+SEED-RF-PRK-10,Batu Gajah,Kinta,4.4690,101.0410,rain,
+SEED-RF-PRK-11,Kampar,Kampar,4.3080,101.1530,rain,
+SEED-RF-PRK-12,Tapah,Batang Padang,4.1980,101.2610,rain,
+SEED-RF-PRK-13,Tanjung Malim,Muallim,3.6850,101.5180,rain,
+SEED-RF-PRK-14,Seri Manjung,Manjung,4.2120,100.6620,rain,
+SEED-RF-PRK-15,Seri Iskandar,Perak Tengah,4.3620,100.9810,rain,
+SEED-RF-PRK-16,Bota,Perak Tengah,4.3480,100.8860,rain,
+SEED-RF-PRK-17,Teluk Intan,Hilir Perak,4.0250,101.0210,rain,
+SEED-RF-PRK-18,Hutan Melintang,Bagan Datuk,3.8790,100.9330,rain,
+SEED-WL-PRK-01,Sungai Kurau at Bagan Serai,Kerian,5.0090,100.5390,water_level,Sungai Kurau
+SEED-WL-PRK-02,Sungai Kerian at Parit Buntar,Kerian,5.1260,100.4970,water_level,Sungai Kerian
+SEED-WL-PRK-03,Sungai Perak at Kuala Kangsar,Kuala Kangsar,4.7700,100.9450,water_level,Sungai Perak
+SEED-WL-PRK-04,Sungai Perak at Bota,Perak Tengah,4.3470,100.8890,water_level,Sungai Perak
+SEED-WL-PRK-05,Sungai Perak at Teluk Intan,Hilir Perak,4.0230,101.0170,water_level,Sungai Perak
+SEED-WL-PRK-06,Sungai Kinta at Ipoh,Kinta,4.5960,101.0800,water_level,Sungai Kinta
+SEED-WL-PRK-07,Sungai Bidor at Bidor,Batang Padang,4.1130,101.2870,water_level,Sungai Bidor
+SEED-WL-PRK-08,Sungai Larut at Taiping,Larut Matang dan Selama,4.8570,100.7330,water_level,Sungai Larut

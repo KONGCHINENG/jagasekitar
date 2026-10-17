@@ -6,7 +6,8 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "worker"
+    "worker",
+    "supabase"
   ],
   "scripts": {
     "dev:web": "npm run dev -w @jagasekitar/web",
@@ -17,7 +18,11 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint -w @jagasekitar/web",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:db": "npm run test -w @jagasekitar/db",
+    "seed:accounts": "npm run seed:accounts -w @jagasekitar/worker",
+    "seed:districts": "npm run seed:districts -w @jagasekitar/worker",
+    "db:push": "supabase db push --workdir . --include-seed"
   },
   "devDependencies": {
     "prettier": "^3.9.10",
