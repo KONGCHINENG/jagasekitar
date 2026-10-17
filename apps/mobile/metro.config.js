@@ -20,11 +20,21 @@ const SINGLETONS = [
 const fromApp = path.join(__dirname, 'package.json');
 const isSingleton = (name) => SINGLETONS.some((s) => name === s || name.startsWith(`${s}/`));
 
-config.resolver.resolveRequest = (context, moduleName, platform) =>
-  context.resolveRequest(
+// See shims/expo-notifications-topic-subscription.js.
+const topicShim = path.join(__dirname, 'shims', 'expo-notifications-topic-subscription.js');
+const isTopicModule = (context, moduleName) =>
+  moduleName === './TopicSubscriptionModule' &&
+  /[\\/]expo-notifications[\\/]/.test(context.originModulePath);
+
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (platform === 'android' && isTopicModule(context, moduleName)) {
+    return { type: 'sourceFile', filePath: topicShim };
+  }
+  return context.resolveRequest(
     isSingleton(moduleName) ? { ...context, originModulePath: fromApp } : context,
     moduleName,
     platform,
   );
+};
 
 module.exports = config;
