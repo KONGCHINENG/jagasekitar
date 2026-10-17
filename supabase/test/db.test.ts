@@ -372,3 +372,36 @@ describe('engine RPCs', () => {
     expect(Date.parse(precip[0]!.validAt)).toBe(Date.parse('2026-10-17T03:00:00Z'));
   });
 });
+
+describe('map layers', () => {
+  it('anon can read latest station readings, hotspot cells, wind and PM2.5', async () => {
+    await db.exec(`
+      insert into fire_hotspots (source, lat, lon, frp, confidence, acquired_at) values
+        ('mock', 0.51, 101.52, 10, 'n', now() - interval '1 hour'),
+        ('mock', 0.53, 101.49, 20, 'h', now() - interval '2 hours');
+      insert into weather_grid (lat, lon, valid_at, wind_speed_850, wind_dir_850, pm2_5) values
+        (1, 101, now(), 20, 210, 40), (1.25, 101, now(), 20, 210, null);`);
+    const res = await asRole(db, 'anon', null, async () => ({
+      rain: (
+        await db.query<{ station_id: string; rain_3h: number }>(
+          'select station_id, rain_3h from v_rain_stations_latest',
+        )
+      ).rows,
+      cells: (
+        await db.query<{ hotspots: number; frp_sum: number }>(
+          'select hotspots, frp_sum from v_hotspot_cells',
+        )
+      ).rows,
+      wind: (
+        await db.query<{ lat: number; dir_from: number }>(
+          'select lat, dir_from from map_wind(now(), 95, -6, 110, 8)',
+        )
+      ).rows,
+      pm: (await db.query<{ pm2_5: number }>('select pm2_5 from pm25_at(1.1, 101.1)')).rows,
+    }));
+    expect(res.rain.find((r) => r.station_id === 'SEED-RF-PRK-05')?.rain_3h).toBe(72);
+    expect(res.cells).toEqual([{ hotspots: 2, frp_sum: 30 }]);
+    expect(res.wind).toEqual([{ lat: 1, dir_from: 210 }]); // whole-degree points only
+    expect(res.pm[0]?.pm2_5).toBe(40);
+  });
+});

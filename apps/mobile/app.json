@@ -32,6 +32,13 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      "expo-localization",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "JagaSekitar uses your location to show haze, flood and disease risk where you are."
+        }
       ]
     ],
     "experiments": {

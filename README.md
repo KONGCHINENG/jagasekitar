@@ -15,7 +15,8 @@ check risk at a destination and along the route.
 | 2     | Database: migrations, PostGIS, RLS, seed                   | ✅ Done |
 | 3     | Data adapters + worker (FIRMS, Open-Meteo, Infobanjir)     | ✅ Done |
 | 4     | Prediction engines + tests                                 | ✅ Done |
-| 5–6   | User app: maps, location, destination, notifications       | ⏳      |
+| 5     | User app: main map, haze/flood/illness maps, zone sheet    | ✅ Done |
+| 6     | User app: location, destination, notifications             | ⏳      |
 | 7–8   | Hospital portal, admin panel                               | ⏳      |
 | 9–10  | Demo mode polish, hardening, docs                          | ⏳      |
 
@@ -159,6 +160,43 @@ replaces that hazard's zones atomically (`replace_hazard_zones`) and is logged i
 - **`assessPoint(lat, lon, zones, { time })`** (`assess.ts`) returns the worst level per hazard at
   that point and time, plus bilingual advice (EN/BM). The notification job, the "Your area" card
   and the destination check all use it.
+
+## User app (Expo)
+
+`apps/mobile` uses Expo SDK 58 and Expo Router, and runs in **Expo Go**.
+
+```bash
+npm run dev:mobile
+```
+
+Scan the QR code with Expo Go. The phone must be on the same Wi-Fi as the PC; if it can't
+connect, run `npx expo start --tunnel` from `apps/mobile` instead. The app reads
+`EXPO_PUBLIC_SUPABASE_*` from the root `.env` (via `app.config.ts`).
+
+- **Main map** (Map tab): full-screen map at your location (Ipoh if location is denied). The
+  "Your area" card shows the overall risk badge plus Haze / Flood / Illness chips, worked out on
+  the device with the engine's `assessPoint`. Tapping a chip opens that hazard's map. All active
+  zones are drawn with neutral outlines, with a legend, the search bar and the disclaimer.
+- **Haze map**: grey, amber and purple palette under a haze tint. Fire-hotspot icons (🔥, 0.1°
+  cells from the last 48 h), wind arrows, and animated drift particles that follow the wind near
+  the centre of the map and stay still when the phone's reduce-motion setting is on. Time slider
+  for Now / +12h / +24h / +48h / +72h, PM2.5 at your location as a Malaysian API-style band, and
+  a "why" panel.
+- **Flood map**: blue and teal palette. Rain stations coloured by JPS intensity, with a 1 h / 24 h
+  toggle. River gauges coloured by Normal / Alert / Warning / Danger, with a trend arrow. Flood
+  zones, a station detail sheet, and a link to the official JPS alerts page.
+- **Illness map**: red and pink palette. District choropleth, filter chips per disease, and
+  facility pins showing the number of reports (never patients). The district sheet has a 14-day
+  sparkline per disease and the linked-hazard notes ("Flooding in Kerian → higher leptospirosis
+  risk").
+- **Zone detail sheet** (tap any zone): hazard, level, valid time, confidence, why, bilingual
+  advice, sources and last updated.
+- **EN / BM** via i18next. The language follows the device and can be switched in Settings.
+  Every risk level is shown as colour + icon + text.
+- **Offline**: every layer keeps its last copy in AsyncStorage and shows "Offline: showing saved
+  data". Data older than 2 h gets a stale warning, and mock-backed data is labelled
+  "Simulated data".
+- Alerts, Places and destination search are placeholders until Phase 6.
 
 ## Run
 
