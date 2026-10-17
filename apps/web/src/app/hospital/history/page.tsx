@@ -3,6 +3,7 @@ import { Card, PageTitle, Skeleton } from '@/components/ui';
 import { requireReportingStaff } from '@/lib/auth';
 import { todayMyt } from '@/lib/reports';
 import { createClient } from '@/lib/supabase/server';
+import { requestTime } from '@/lib/time';
 import { HistoryTable, type HistoryRow } from './history-table';
 
 export const metadata = { title: 'History · Hospital portal' };
@@ -23,7 +24,7 @@ export default function HistoryPage() {
 async function HistoryBody() {
   const user = await requireReportingStaff();
   const supabase = await createClient();
-  const since = new Date(Date.parse(`${todayMyt()}T00:00:00Z`) - 60 * 86_400_000)
+  const since = new Date(Date.parse(`${todayMyt(await requestTime())}T00:00:00Z`) - 60 * 86_400_000)
     .toISOString()
     .slice(0, 10);
   const [{ data: reports }, { data: types }, { data: edits }] = await Promise.all([

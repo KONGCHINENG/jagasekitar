@@ -35,7 +35,7 @@ const HAZARDS: { key: Hazard; label: string; icon: string }[] = [
 async function OverviewBody() {
   await requireAdmin();
   const supabase = await createClient();
-  const now = requestTime();
+  const now = await requestTime();
   const since = new Date(now.getTime() - 24 * 3600_000).toISOString();
   const nowIso = now.toISOString();
   const count = async (q: PromiseLike<{ count: number | null }>) => (await q).count ?? 0;

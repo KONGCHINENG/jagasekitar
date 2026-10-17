@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { Card, PageTitle, Skeleton } from '@/components/ui';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { requestTime } from '@/lib/time';
 import { SettingForm } from './setting-form';
 import { ZonePreview } from './zone-preview';
 
@@ -25,7 +26,7 @@ export default function ThresholdsPage() {
 async function ThresholdsBody() {
   await requireAdmin();
   const supabase = await createClient();
-  const nowIso = new Date().toISOString();
+  const nowIso = (await requestTime()).toISOString();
   const [{ data: settings }, { data: zones }] = await Promise.all([
     supabase.from('settings').select('key, value, description').in('key', ORDER),
     supabase

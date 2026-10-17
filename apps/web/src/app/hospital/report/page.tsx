@@ -3,6 +3,7 @@ import { Card, PageTitle, Skeleton } from '@/components/ui';
 import { requireReportingStaff } from '@/lib/auth';
 import { todayMyt } from '@/lib/reports';
 import { createClient } from '@/lib/supabase/server';
+import { requestTime } from '@/lib/time';
 import { ReportGrid } from './report-grid';
 
 export const metadata = { title: 'Report cases · Hospital portal' };
@@ -32,7 +33,7 @@ async function ReportBody() {
     <Card title={user.facility.name}>
       <ReportGrid
         diseases={(data ?? []).map((d) => ({ code: d.code, name: d.name_en }))}
-        today={todayMyt()}
+        today={todayMyt(await requestTime())}
       />
     </Card>
   );

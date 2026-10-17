@@ -5,6 +5,7 @@ import { Card, PageTitle, Skeleton, buttonClass } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
 import { todayMyt } from '@/lib/reports';
 import { createClient } from '@/lib/supabase/server';
+import { requestTime } from '@/lib/time';
 import { JoinRequestForm } from './join-request-form';
 
 export const metadata = { title: 'Dashboard · Hospital portal' };
@@ -70,7 +71,7 @@ async function DashboardBody() {
     );
   }
 
-  const today = todayMyt();
+  const today = todayMyt(await requestTime());
   const from = new Date(Date.parse(`${today}T00:00:00Z`) - 13 * 86_400_000)
     .toISOString()
     .slice(0, 10);
