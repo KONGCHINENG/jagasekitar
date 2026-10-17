@@ -405,3 +405,100 @@ describe('map layers', () => {
     expect(res.pm[0]?.pm2_5).toBe(40);
   });
 });
+
+describe('devices, places and notification candidates', () => {
+  it('users save places by lat/lon and only see their own', async () => {
+    await asRole(db, 'authenticated', userA, () =>
+      db.query(`select save_place('Home', 4.772, 100.937)`),
+    );
+    const mine = await asRole(db, 'authenticated', userA, () =>
+      db.query<{ label: string; lat: number }>('select label, lat from v_my_places'),
+    );
+    expect(mine.rows).toEqual([{ label: 'Home', lat: 4.772 }]);
+    const theirs = await asRole(db, 'authenticated', userB, () =>
+      db.query('select * from v_my_places'),
+    );
+    expect(theirs.rows).toHaveLength(0);
+  });
+
+  it('devices register without a push token', async () => {
+    await asRole(db, 'authenticated', userB, () =>
+      db.query(
+        `insert into user_devices (user_id, install_id, last_lat, last_lon, last_seen_at) values ($1, 'install-b', 4.35, 100.89, now())`,
+        [userB],
+      ),
+    );
+    const res = await db.query<{ n: number }>(
+      `select count(*)::int n from user_devices where install_id = 'install-b' and expo_push_token is null`,
+    );
+    expect(res.rows[0]!.n).toBe(1);
+  });
+
+  it('notify_candidates finds devices and saved places inside zones (service only)', async () => {
+    await db.query(
+      `insert into user_devices (user_id, install_id, last_lat, last_lon, last_seen_at) values ($1, 'install-a', 2.0, 103.0, now())`,
+      [userA],
+    );
+    await db.query(`select replace_hazard_zones('flood', null, $1::jsonb)`, [
+      JSON.stringify([
+        {
+          id: 'flood:Kuala Kangsar:high',
+          level: 'high',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [100.9, 4.7],
+                [101.0, 4.7],
+                [101.0, 4.8],
+                [100.9, 4.8],
+                [100.9, 4.7],
+              ],
+            ],
+          },
+          validFrom: new Date(Date.now() - 3600_000).toISOString(),
+          validTo: new Date(Date.now() + 3600_000).toISOString(),
+          confidence: 0.8,
+          reason: 'why',
+          sourceRefs: [],
+          district: 'Kuala Kangsar',
+        },
+        {
+          id: 'flood:Perak Tengah:moderate',
+          level: 'moderate',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [100.85, 4.3],
+                [100.95, 4.3],
+                [100.95, 4.4],
+                [100.85, 4.4],
+                [100.85, 4.3],
+              ],
+            ],
+          },
+          validFrom: new Date(Date.now() - 3600_000).toISOString(),
+          validTo: new Date(Date.now() + 3600_000).toISOString(),
+          confidence: 0.8,
+          reason: 'why',
+          sourceRefs: [],
+          district: 'Perak Tengah',
+        },
+      ]),
+    ]);
+    const res = await db.query<{ install: string; place_label: string | null; zone_key: string }>(
+      `select d.install_id install, c.place_label, c.zone_key
+       from notify_candidates() c join user_devices d on d.id = c.device_id order by 1`,
+    );
+    expect(res.rows).toEqual([
+      // userA's device is far away, but their saved "Home" is in Kuala Kangsar.
+      { install: 'install-a', place_label: 'Home', zone_key: 'flood:Kuala Kangsar:high' },
+      // userB's device itself is in Perak Tengah.
+      { install: 'install-b', place_label: null, zone_key: 'flood:Perak Tengah:moderate' },
+    ]);
+    await expect(
+      asRole(db, 'authenticated', userA, () => db.query('select * from notify_candidates()')),
+    ).rejects.toThrow(/permission denied/);
+  });
+});

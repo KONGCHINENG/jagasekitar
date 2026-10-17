@@ -8,3 +8,4 @@ export * from './flood';
 export * from './disease';
 export * from './advice';
 export * from './assess';
+export * from './route';

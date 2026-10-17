@@ -1,17 +1,19 @@
-// Foreground location for centring the map. Falls back to Ipoh when denied or unavailable.
-// (Background location for alerts is requested separately, with its own explanation.)
+// Foreground location: a first fix, then updates while the app is open (300 m steps).
+// Falls back to Ipoh when denied or unavailable. Background location is separate and opt-in.
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
 import { IPOH } from '@/lib/data';
 
 export type LocationStatus = 'locating' | 'granted' | 'denied';
 
-export function useUserLocation() {
+export function useUserLocation(enabled = true) {
   const [coords, setCoords] = useState(IPOH);
   const [status, setStatus] = useState<LocationStatus>('locating');
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
+    let sub: Location.LocationSubscription | null = null;
     (async () => {
       try {
         const { status: perm } = await Location.requestForegroundPermissionsAsync();
@@ -19,25 +21,29 @@ export function useUserLocation() {
           if (!cancelled) setStatus('denied');
           return;
         }
-        // A cached fix is fast; a fresh one follows.
         const last = await Location.getLastKnownPositionAsync();
-        if (last && !cancelled)
+        if (last && !cancelled) {
           setCoords({ latitude: last.coords.latitude, longitude: last.coords.longitude });
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-        if (!cancelled) {
-          setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
           setStatus('granted');
         }
+        sub = await Location.watchPositionAsync(
+          { accuracy: Location.Accuracy.Balanced, distanceInterval: 300, timeInterval: 60_000 },
+          (pos) => {
+            if (cancelled) return;
+            setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+            setStatus('granted');
+          },
+        );
+        if (cancelled) sub.remove();
       } catch {
         if (!cancelled) setStatus('denied');
       }
     })();
     return () => {
       cancelled = true;
+      sub?.remove();
     };
-  }, []);
+  }, [enabled]);
 
   return { coords, status };
 }

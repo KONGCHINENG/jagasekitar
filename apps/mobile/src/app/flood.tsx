@@ -8,6 +8,7 @@ import { Card, LegendRow, RiskLegend, StatusLine, Toggle } from '@/components/ma
 import { ZoneLayer } from '@/components/map/zone-layer';
 import { Sheet } from '@/components/sheet';
 import { ZoneSheet, sheetStyles } from '@/components/zone-sheet';
+import { useFocusRegion } from '@/hooks/use-focus-region';
 import { useRemote } from '@/hooks/use-remote';
 import { useZones } from '@/hooks/use-zones';
 import { useLang } from '@/i18n';
@@ -50,6 +51,12 @@ export default function FloodMap() {
   const [station, setStation] = useState<Selected>(null);
 
   const zones = useZones('flood');
+  const region = useFocusRegion({
+    latitude: 4.6,
+    longitude: 100.95,
+    latitudeDelta: 2,
+    longitudeDelta: 2,
+  });
   const rain = useRemote('rain-stations', fetchRainStations, { refreshMs: FIFTEEN_MIN });
   const water = useRemote('water-stations', fetchWaterStations, { refreshMs: FIFTEEN_MIN });
   const rainPins = useMemo(() => spreadDuplicates(rain.data ?? []), [rain.data]);
@@ -64,7 +71,7 @@ export default function FloodMap() {
     <View style={styles.root}>
       <MapView
         style={StyleSheet.absoluteFill}
-        initialRegion={{ latitude: 4.6, longitude: 100.95, latitudeDelta: 2, longitudeDelta: 2 }}
+        initialRegion={region}
         showsUserLocation
         toolbarEnabled={false}
       >

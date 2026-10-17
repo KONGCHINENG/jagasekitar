@@ -16,7 +16,7 @@ check risk at a destination and along the route.
 | 3     | Data adapters + worker (FIRMS, Open-Meteo, Infobanjir)     | ✅ Done |
 | 4     | Prediction engines + tests                                 | ✅ Done |
 | 5     | User app: main map, haze/flood/illness maps, zone sheet    | ✅ Done |
-| 6     | User app: location, destination, notifications             | ⏳      |
+| 6     | User app: location, destination, notifications             | ✅ Done |
 | 7–8   | Hospital portal, admin panel                               | ⏳      |
 | 9–10  | Demo mode polish, hardening, docs                          | ⏳      |
 
@@ -196,7 +196,55 @@ connect, run `npx expo start --tunnel` from `apps/mobile` instead. The app reads
 - **Offline**: every layer keeps its last copy in AsyncStorage and shows "Offline: showing saved
   data". Data older than 2 h gets a stale warning, and mock-backed data is labelled
   "Simulated data".
-- Alerts, Places and destination search are placeholders until Phase 6.
+- **Onboarding** (3 swipes): what the app does; location and notification permissions, with an
+  explanation that background location is only for alerts; language. No account is needed:
+  the app signs in anonymously, and Settings → Delete my data removes everything.
+- **Destination check**: Nominatim search (Malaysia only, debounced, cached) → risk at the
+  destination now or at a chosen arrival time (+1h … +48h) → OSRM route from your location,
+  coloured by risk, with "Along your route: flood risk near Kuala Kangsar (high)". Then
+  **Save place** or **Notify me about this place**.
+- **Places**: saved places with their current risk, a per-place alert switch, and remove.
+- **Alerts**: your alert history (tap to open the map at that zone), active official JPS alerts,
+  and admin announcements.
+- **Settings**: language, hazards to notify, minimum level, quiet hours, saved-place alerts,
+  background location, delete my data. Tap the version 5 times to reveal **Simulate my location
+  at…** (Perak districts), for demos.
+
+### Notifications
+
+After every prediction run the worker runs `notify_affected_users` (`npm run notify` runs it on
+its own):
+
+1. `notify_candidates()` (PostGIS `ST_Intersects`) finds devices whose last location, or whose
+   owner's saved places, are inside zones that are active or start within 24 h.
+2. Rules (`worker/src/notify/decide.ts`, unit-tested): the hazard must be switched on and at least
+   the user's minimum level. One alert per device per hazard per run. No repeat of the same hazard
+   and target within 6 h unless the level rises. Quiet hours (Malaysia time) hold everything except
+   **severe**.
+3. Delivery: **Expo push** in batches of 100 when the device has a push token. Dead tokens
+   (`DeviceNotRegistered`) are removed. Otherwise the alert is **in-app**: the worker inserts the
+   `notifications` row, and the app receives it over Supabase Realtime and shows a local
+   notification. Every alert is logged in `notifications`.
+4. Tapping an alert opens the hazard map centred on the zone (`/flood?lat=…&lon=…`).
+
+**Push needs a development build.** Expo Go on Android can't receive remote push (SDK 53+), and
+push tokens need an EAS project ID. In Expo Go, alerts arrive in-app, which works for the demo
+while the app is open or in the background. For real push and background location:
+
+```bash
+npx eas-cli@latest init
+```
+
+```bash
+npx eas-cli@latest build --profile development --platform android
+```
+
+Background location (opt-in in Settings) also only runs in a development build. It stores only the
+last known location, never a history.
+
+`scripts/e2e-notify.ts` checks the whole pipeline against the real database. It attaches a
+temporary device with a fake push token to the demo admin user inside a live zone, runs the job
+twice (alert, then dedupe), checks that the dead token is cleared, and deletes the test rows.
 
 ## Run
 
@@ -207,6 +255,7 @@ connect, run `npx expo start --tunnel` from `apps/mobile` instead. The app reads
 | `npm run worker:once` | Run all data jobs once, then predictions       |
 | `npm run worker:dev`  | Worker in watch mode                           |
 | `npm run predict`     | Run the haze, flood and disease engines only   |
+| `npm run notify`      | Run the notification job only                  |
 | `npm test`            | Unit tests (all workspaces)                    |
 | `npm run typecheck`   | TypeScript strict checks (all workspaces)      |
 | `npm run format`      | Prettier                                       |

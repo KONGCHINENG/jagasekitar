@@ -94,13 +94,89 @@ const ms: Strings = {
   settings: {
     language: 'Bahasa',
     about: 'Perihal',
-    comingSoon:
-      'Lebih banyak tetapan (amaran, waktu senyap, padam data saya) akan tiba bersama notifikasi.',
+    alerts: 'Amaran',
+    hazards: 'Maklumkan saya tentang',
+    minLevel: 'Tahap minimum',
+    quietHours: 'Waktu senyap (amaran teruk tetap dihantar)',
+    quietOff: 'Tutup',
+    savedPlaceAlerts: 'Amaran untuk tempat tersimpan saya',
+    background: 'Lokasi latar belakang',
+    backgroundHelp:
+      'Membolehkan amaran mengikut anda walaupun aplikasi ditutup. Hanya lokasi terakhir anda disimpan.',
+    backgroundUnsupported:
+      'Memerlukan aplikasi yang dipasang (development build); tidak tersedia dalam Expo Go.',
+    backgroundDenied: 'Kebenaran lokasi tidak diberikan.',
+    delivery: 'Penghantaran',
+    deliveryPush: 'Notifikasi tolak dihidupkan.',
+    deliveryInApp:
+      'Amaran dipaparkan semasa aplikasi dibuka atau di latar belakang (notifikasi tolak memerlukan aplikasi yang dipasang).',
+    deliveryDenied: 'Notifikasi dimatikan. Hidupkan untuk menerima amaran.',
+    enableNotifications: 'Hidupkan notifikasi',
+    privacy: 'Privasi',
+    privacyText:
+      'Kami hanya menyimpan lokasi terakhir anda (tiada sejarah) untuk menghantar amaran. Anda boleh memadam semuanya pada bila-bila masa.',
+    deleteData: 'Padam data saya',
+    deleteConfirmTitle: 'Padam data anda?',
+    deleteConfirmBody:
+      'Ini akan membuang peranti, tempat tersimpan dan sejarah amaran anda, dan menetapkan semula aplikasi.',
+    cancel: 'Batal',
+    delete: 'Padam',
+    version: 'Versi {{v}}',
+    developer: 'Pembangun',
+    simulate: 'Simulasi lokasi saya di…',
+    simulateOff: 'Guna lokasi sebenar',
+    simulating: 'Simulasi lokasi: {{name}}',
   },
-  placeholder: {
-    alerts: 'Sejarah amaran anda dan amaran rasmi akan dipaparkan di sini.',
-    places: 'Tempat tersimpan (Rumah, Kerja, Kampung) dan risikonya akan dipaparkan di sini.',
-    destination: 'Carian destinasi dan risiko laluan akan datang seterusnya.',
+  onboarding: {
+    next: 'Seterusnya',
+    start: 'Mula',
+    p1Title: 'Ketahui apa yang mendatang',
+    p1Body:
+      'JagaSekitar memberi amaran tentang jerebu, banjir dan wabak penyakit di sekitar anda, bermula dengan Perak.',
+    p1Points:
+      '🌫️ Jerebu daripada kebakaran hutan\n🌊 Risiko banjir daripada data hujan dan sungai JPS\n🦠 Kawasan panas penyakit daripada laporan hospital',
+    p2Title: 'Amaran di tempat anda',
+    p2Body:
+      'Kami menggunakan lokasi anda untuk menunjukkan risiko di sekitar anda dan memberi amaran. Lokasi latar belakang hanya digunakan untuk amaran, dan hanya jika anda menghidupkannya kemudian dalam Tetapan.',
+    allowLocation: 'Benarkan lokasi',
+    allowNotifications: 'Benarkan notifikasi',
+    granted: 'Dibenarkan ✓',
+    p3Title: 'Pilih bahasa anda',
+    p3Body:
+      'Tiada akaun diperlukan. Aplikasi mencipta ID tanpa nama yang boleh anda padam pada bila-bila masa dalam Tetapan.',
+  },
+  destination: {
+    placeholder: 'Cari bandar, alamat atau tempat di Malaysia',
+    searching: 'Mencari…',
+    noResults: 'Tiada tempat ditemui',
+    arrival: 'Tiba',
+    now: 'Sekarang',
+    inHours: 'dalam {{h}} jam',
+    atDestination: 'Di destinasi anda',
+    route: 'Sepanjang laluan anda',
+    routeClear: 'Tiada bahaya sepanjang laluan ini.',
+    routeUnavailable: 'Laluan tidak tersedia buat masa ini. Memaparkan destinasi sahaja.',
+    near: 'Risiko {{hazard}} berhampiran {{place}} ({{level}})',
+    duration: '{{km}} km · kira-kira {{min}} min',
+    save: 'Simpan tempat',
+    notify: 'Maklumkan saya tentang tempat ini',
+    saved: 'Disimpan ke Tempat',
+    labels: { home: 'Rumah', work: 'Kerja', kampung: 'Kampung' },
+    attribution: 'Carian © penyumbang OpenStreetMap · Laluan © OSRM',
+  },
+  places: {
+    empty: 'Tiada tempat tersimpan lagi. Cari tempat dan tekan "Simpan tempat".',
+    add: 'Tambah tempat',
+    alertsOn: 'Amaran hidup',
+    alertsOff: 'Amaran mati',
+    remove: 'Buang',
+  },
+  alerts: {
+    mine: 'Amaran anda',
+    none: 'Tiada amaran lagi. Anda akan dimaklumkan apabila bahaya sampai ke kawasan anda.',
+    official: 'Amaran rasmi JPS',
+    noOfficial: 'Tiada amaran rasmi buat masa ini.',
+    announcements: 'Pengumuman',
   },
 };
 

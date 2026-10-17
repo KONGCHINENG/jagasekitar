@@ -4,6 +4,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { restoreLanguage, useLang } from '@/i18n';
+// Registers the background-location task at module load (required by TaskManager).
+import '@/lib/background-location';
+import { AppProvider, useApp } from '@/providers/app-provider';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -14,17 +17,20 @@ const hazardHeader = (color: string) => ({
   headerTitleStyle: { fontWeight: '700' as const },
 });
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootStack() {
   const { t } = useLang();
+  const { onboarded } = useApp();
 
   useEffect(() => {
-    restoreLanguage().finally(() => SplashScreen.hideAsync());
-  }, []);
+    if (onboarded !== null) void SplashScreen.hideAsync();
+  }, [onboarded]);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={onboarded === false}>
+        <Stack.Screen name="onboarding" />
+      </Stack.Protected>
+      <Stack.Protected guard={onboarded === true}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="haze"
@@ -42,7 +48,23 @@ export default function RootLayout() {
           name="destination"
           options={{ presentation: 'modal', headerShown: true, title: t('home.search') }}
         />
-      </Stack>
+      </Stack.Protected>
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
+  const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    void restoreLanguage();
+  }, []);
+
+  return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <AppProvider>
+        <RootStack />
+      </AppProvider>
     </ThemeProvider>
   );
 }

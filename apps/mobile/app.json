@@ -37,7 +37,16 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "JagaSekitar uses your location to show haze, flood and disease risk where you are."
+          "locationWhenInUsePermission": "JagaSekitar uses your location to show haze, flood and disease risk where you are.",
+          "locationAlwaysAndWhenInUsePermission": "If you turn on background alerts, JagaSekitar checks your location in the background only to warn you when a hazard reaches your area.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isIosBackgroundLocationEnabled": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#0E7490"
         }
       ]
     ],

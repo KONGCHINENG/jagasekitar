@@ -13,5 +13,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ...config.extra,
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
+    osrmBaseUrl: process.env.OSRM_BASE_URL || 'https://router.project-osrm.org',
   },
 });

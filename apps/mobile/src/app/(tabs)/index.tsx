@@ -11,7 +11,7 @@ import { ZoneLayer } from '@/components/map/zone-layer';
 import { HazardChip, RiskBadge } from '@/components/risk';
 import { ZoneSheet } from '@/components/zone-sheet';
 import { BottomTabInset } from '@/constants/theme';
-import { useUserLocation } from '@/hooks/use-user-location';
+import { useApp } from '@/providers/app-provider';
 import { useZones } from '@/hooks/use-zones';
 import { useLang } from '@/i18n';
 import type { AppZone } from '@/lib/data';
@@ -27,7 +27,8 @@ export default function HomeMap() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const map = useRef<MapView>(null);
-  const { coords, status } = useUserLocation();
+  const { location, error: appError } = useApp();
+  const { coords, status, simulated } = location;
   const zones = useZones();
   const [selected, setSelected] = useState<AppZone | null>(null);
 
@@ -48,7 +49,7 @@ export default function HomeMap() {
         ref={map}
         style={StyleSheet.absoluteFill}
         initialRegion={{ ...coords, latitudeDelta: 0.8, longitudeDelta: 0.8 }}
-        showsUserLocation={status === 'granted'}
+        showsUserLocation={status === 'granted' && !simulated}
         showsMyLocationButton={false}
         toolbarEnabled={false}
         mapPadding={{ top: 200, bottom: BottomTabInset + 60, left: 0, right: 0 }}
@@ -77,6 +78,10 @@ export default function HomeMap() {
           {here.overall === 'none' && <Text style={styles.hint}>{t('home.allClear')}</Text>}
           {status === 'locating' && <Text style={styles.hint}>{t('home.locating')}</Text>}
           {status === 'denied' && <Text style={styles.hint}>{t('home.defaultArea')}</Text>}
+          {simulated && (
+            <Text style={styles.sim}>{t('settings.simulating', { name: simulated.name })}</Text>
+          )}
+          {appError && <Text style={styles.sim}>{appError}</Text>}
           <StatusLine updatedAt={zones.updatedAt} fromCache={zones.fromCache} error={zones.error} />
         </Card>
 
@@ -118,6 +123,7 @@ const styles = StyleSheet.create({
   areaTitle: { fontSize: 20, fontWeight: '700', color: '#111' },
   chips: { flexDirection: 'row', gap: 8 },
   hint: { fontSize: 13, color: '#444' },
+  sim: { fontSize: 13, color: '#9a3412', fontWeight: '600' },
   search: {
     backgroundColor: '#fff',
     borderRadius: 999,

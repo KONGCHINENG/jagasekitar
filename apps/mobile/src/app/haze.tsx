@@ -18,8 +18,9 @@ import { WindParticles } from '@/components/map/wind-particles';
 import { ZoneLayer } from '@/components/map/zone-layer';
 import { RiskBadge } from '@/components/risk';
 import { ZoneSheet } from '@/components/zone-sheet';
+import { useFocusRegion } from '@/hooks/use-focus-region';
 import { useRemote } from '@/hooks/use-remote';
-import { useUserLocation } from '@/hooks/use-user-location';
+import { useApp } from '@/providers/app-provider';
 import { useZones } from '@/hooks/use-zones';
 import { useNow } from '@/hooks/use-now';
 import { useLang } from '@/i18n';
@@ -38,7 +39,13 @@ const BAND_COLORS = {
 export default function HazeMap() {
   const { t, lang, pick } = useLang();
   const insets = useSafeAreaInsets();
-  const { coords } = useUserLocation();
+  const { coords } = useApp().location;
+  const region = useFocusRegion({
+    latitude: 2.6,
+    longitude: 101.0,
+    latitudeDelta: 7,
+    longitudeDelta: 7,
+  });
   const [slice, setSlice] = useState(0);
   const [selected, setSelected] = useState<AppZone | null>(null);
   const [center, setCenter] = useState({ latitude: 2.6, longitude: 101.0 });
@@ -83,7 +90,7 @@ export default function HazeMap() {
     <View style={styles.root}>
       <MapView
         style={StyleSheet.absoluteFill}
-        initialRegion={{ latitude: 2.6, longitude: 101.0, latitudeDelta: 7, longitudeDelta: 7 }}
+        initialRegion={region}
         onRegionChangeComplete={(r) => setCenter({ latitude: r.latitude, longitude: r.longitude })}
         showsUserLocation
         toolbarEnabled={false}

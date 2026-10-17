@@ -16,6 +16,7 @@ import {
   openMeteoWindSource,
 } from '../sources/open-meteo';
 import { createServiceClient, getSetting } from './core/db';
+import { runNotifications } from './notify';
 import { runPredictions, type PredictionSummary } from './predict';
 import { log } from './core/log';
 import { runSource, type SourceContext, type SourceDef, type SourceRunResult } from './core/source';
@@ -40,6 +41,7 @@ const args = process.argv.slice(2);
 const once = args.includes('--once');
 const only = args.find((a) => a.startsWith('--source='))?.split('=')[1];
 const predictOnly = args.includes('--predict');
+const notifyOnly = args.includes('--notify');
 
 interface SourceStatus {
   source: string;
@@ -89,7 +91,15 @@ async function tick(force: boolean): Promise<TickResult> {
     );
     return { sources: [], predictions: [] };
   }
-  if (predictOnly) return { sources: [], predictions: await runPredictions(ctx) };
+  if (notifyOnly) {
+    await notifySafely(ctx);
+    return { sources: [], predictions: [] };
+  }
+  if (predictOnly) {
+    const predictions = await runPredictions(ctx);
+    await notifySafely(ctx);
+    return { sources: [], predictions };
+  }
 
   const status = await loadStatus(ctx);
   const results: SourceRunResult[] = [];
@@ -113,7 +123,17 @@ async function tick(force: boolean): Promise<TickResult> {
   }
   // Re-predict whenever new data landed.
   const predictions = results.some((r) => r.written > 0) ? await runPredictions(ctx) : [];
+  if (predictions.length) await notifySafely(ctx);
   return { sources: results, predictions };
+}
+
+/** Alert devices and saved places inside new or upgraded zones; never fails the tick. */
+async function notifySafely(ctx: SourceContext): Promise<void> {
+  try {
+    await runNotifications(ctx);
+  } catch (err) {
+    log.error('notify', err instanceof Error ? err.message : String(err));
+  }
 }
 
 function printSummary({ sources: results, predictions }: TickResult): void {

@@ -6,7 +6,7 @@
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { pointWkt } from '../../src/core/db';
-import { DEFAULT_USER_AGENT, HttpError, fetchJson, userAgent } from '../../src/core/http';
+import { HttpError, fetchJson } from '../../src/core/http';
 import { log } from '../../src/core/log';
 import type { SourceContext } from '../../src/core/source';
 import { jpsGridCoords } from './parse';
@@ -78,15 +78,8 @@ export async function resolveStationCoords(ctx: SourceContext): Promise<void> {
   );
 
   const cache = readGeocodeCache();
-  // Nominatim's policy requires a real contact in the User-Agent; it answers 403 to placeholders.
-  const contactSet = !/example\.com/i.test(userAgent()) && userAgent() !== DEFAULT_USER_AGENT;
-  if (!contactSet && !ctx.useMocks) {
-    log.warn(
-      'stations',
-      'NOMINATIM_USER_AGENT has no real contact; skipping geocoding (using approximate coordinates)',
-    );
-  }
-  let budget = contactSet ? NOMINATIM_BUDGET : 0;
+  // userAgent() identifies the app (plus the operator's contact when NOMINATIM_USER_AGENT is set).
+  let budget = NOMINATIM_BUDGET;
   let updated = 0;
   let calls = 0;
 

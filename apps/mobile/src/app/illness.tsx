@@ -10,6 +10,7 @@ import { RiskBadge, zoneFill } from '@/components/risk';
 import { Sheet } from '@/components/sheet';
 import { Sparkline } from '@/components/sparkline';
 import { sheetStyles } from '@/components/zone-sheet';
+import { useFocusRegion } from '@/hooks/use-focus-region';
 import { useRemote } from '@/hooks/use-remote';
 import { useZones } from '@/hooks/use-zones';
 import { useLang } from '@/i18n';
@@ -31,6 +32,12 @@ export default function IllnessMap() {
   const [district, setDistrict] = useState<DistrictShape | null>(null);
 
   const zones = useZones('disease');
+  const region = useFocusRegion({
+    latitude: 4.65,
+    longitude: 101.0,
+    latitudeDelta: 2.4,
+    longitudeDelta: 2.4,
+  });
   const districts = useRemote('districts', fetchDistricts);
   const types = useRemote('disease-types', fetchDiseaseTypes);
   const summary = useRemote('disease-summary', fetchDiseaseSummary, { refreshMs: HOUR });
@@ -56,16 +63,7 @@ export default function IllnessMap() {
 
   return (
     <View style={styles.root}>
-      <MapView
-        style={StyleSheet.absoluteFill}
-        initialRegion={{
-          latitude: 4.65,
-          longitude: 101.0,
-          latitudeDelta: 2.4,
-          longitudeDelta: 2.4,
-        }}
-        toolbarEnabled={false}
-      >
+      <MapView style={StyleSheet.absoluteFill} initialRegion={region} toolbarEnabled={false}>
         {(districts.data ?? []).map((d) =>
           d.geometry ? (
             <Fragment key={d.name}>

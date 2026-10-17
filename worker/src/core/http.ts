@@ -2,8 +2,10 @@
 
 export const DEFAULT_USER_AGENT = 'JagaSekitar-Hackathon/1.0';
 
+/** The configured User-Agent, unless it is still the .env.example placeholder (Nominatim 403s it). */
 export function userAgent(): string {
-  return process.env.NOMINATIM_USER_AGENT?.trim() || DEFAULT_USER_AGENT;
+  const configured = process.env.NOMINATIM_USER_AGENT?.trim();
+  return configured && !/example\.com/i.test(configured) ? configured : DEFAULT_USER_AGENT;
 }
 
 export class HttpError extends Error {
