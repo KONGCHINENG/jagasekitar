@@ -9,15 +9,15 @@ check risk at a destination and along the route.
 
 ## Status
 
-| Phase | What                                                       | State                                           |
-| ----- | ---------------------------------------------------------- | ----------------------------------------------- |
-| 1     | Scaffold: monorepo, Expo app, Next.js app, shared + engine | ✅ Done                                         |
-| 2     | Database: migrations, PostGIS, RLS, seed                   | ✅ Done (tested locally; push to cloud pending) |
-| 3     | Data adapters + worker (FIRMS, Open-Meteo, Infobanjir)     | ⏳                                              |
-| 4     | Prediction engines + tests                                 | ⏳                                              |
-| 5–6   | User app: maps, location, destination, notifications       | ⏳                                              |
-| 7–8   | Hospital portal, admin panel                               | ⏳                                              |
-| 9–10  | Demo mode polish, hardening, docs                          | ⏳                                              |
+| Phase | What                                                       | State   |
+| ----- | ---------------------------------------------------------- | ------- |
+| 1     | Scaffold: monorepo, Expo app, Next.js app, shared + engine | ✅ Done |
+| 2     | Database: migrations, PostGIS, RLS, seed                   | ✅ Done |
+| 3     | Data adapters + worker (FIRMS, Open-Meteo, Infobanjir)     | ⏳      |
+| 4     | Prediction engines + tests                                 | ⏳      |
+| 5–6   | User app: maps, location, destination, notifications       | ⏳      |
+| 7–8   | Hospital portal, admin panel                               | ⏳      |
+| 9–10  | Demo mode polish, hardening, docs                          | ⏳      |
 
 ## Repo layout
 
