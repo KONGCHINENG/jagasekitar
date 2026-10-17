@@ -5,7 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 
 export type AuthState = { error?: string; info?: string } | undefined;
 
-// Sign-in accepts any existing password (Supabase decides); the 8-character rule is for new accounts.
+// Sign-in accepts any existing password (accounts created elsewhere may follow Supabase's
+// 6-character default); the 8-character rule applies only to new accounts.
 const credentials = z.object({
   email: z.email('Enter a valid email'),
   password: z.string().min(1, 'Enter your password'),
