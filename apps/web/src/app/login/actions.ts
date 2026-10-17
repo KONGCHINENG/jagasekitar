@@ -5,10 +5,12 @@ import { createClient } from '@/lib/supabase/server';
 
 export type AuthState = { error?: string; info?: string } | undefined;
 
+// Sign-in accepts any existing password (Supabase decides); the 8-character rule is for new accounts.
 const credentials = z.object({
   email: z.email('Enter a valid email'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(1, 'Enter your password'),
 });
+const newPassword = z.string().min(8, 'Password must be at least 8 characters');
 
 /** Only allow redirects within the portal. */
 function safeNext(next: FormDataEntryValue | null): string {
@@ -32,7 +34,7 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
 
 export async function signUp(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = credentials
-    .extend({ fullName: z.string().trim().min(2, 'Enter your name') })
+    .extend({ password: newPassword, fullName: z.string().trim().min(2, 'Enter your name') })
     .safeParse({
       email: formData.get('email'),
       password: formData.get('password'),
