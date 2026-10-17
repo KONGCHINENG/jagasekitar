@@ -33,5 +33,15 @@
   },
   "engines": {
     "node": ">=22.13.0"
+  },
+  "//overrides": "One copy of React / React Native across the monorepo, matching the Expo SDK the app uses (57, what Expo Go supports). Keep in sync with apps/mobile/package.json.",
+  "overrides": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-worklets": "0.10.1",
+    "@types/react": "~19.2.4"
   }
 }

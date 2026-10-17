@@ -2,15 +2,7 @@
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { useRef, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-  type ScrollViewInstance,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toggle } from '@/components/map/overlays';
 import { setLanguage, useLang, type Language } from '@/i18n';
@@ -24,7 +16,7 @@ export default function Onboarding() {
   const { completeOnboarding, refreshPush } = useApp();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const scroller = useRef<ScrollViewInstance>(null);
+  const scroller = useRef<ScrollView>(null);
   const [page, setPage] = useState(0);
   const [locationOk, setLocationOk] = useState(false);
   const [notifyOk, setNotifyOk] = useState(false);

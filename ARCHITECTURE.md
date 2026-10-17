@@ -59,7 +59,7 @@ flowchart LR
 | `packages/engine` | Pure functions: haze plume model, flood rules, disease outbreak ratio, `assessPoint`, route risk. No I/O, so the app runs the same `assessPoint` on the phone. Vitest-tested. |
 | `worker`          | Ingestion (adapters per source), the prediction job, the notification job, and demo replay. Runs as `npm run worker:dev` (30-second loop) or `worker:once`.                   |
 | `supabase`        | Migrations (schema, RLS, views, RPCs), seed data, demo scenarios, and DB tests that run the real migrations on PGlite + PostGIS.                                              |
-| `apps/mobile`     | Expo SDK 58 user app: main map, haze/flood/illness maps, destination check, places, alerts, settings, onboarding. EN/BM.                                                      |
+| `apps/mobile`     | Expo SDK 57 user app: main map, haze/flood/illness maps, destination check, places, alerts, settings, onboarding. EN/BM.                                                      |
 | `apps/web`        | Next.js 16 portal: `/hospital` for staff, `/admin` for administrators. Supabase SSR auth, Server Actions, MapLibre maps.                                                      |
 
 ## Key decisions

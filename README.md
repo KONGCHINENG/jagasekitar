@@ -29,7 +29,7 @@ built / mocked checklist.
 ## Repo layout
 
 ```
-apps/mobile        Expo (SDK 58) user app, Expo Router
+apps/mobile        Expo (SDK 57) user app, Expo Router
 apps/web           Next.js 16 hospital (/hospital) + admin (/admin) portal, Tailwind
 packages/shared    Shared types, risk levels, colour tokens, zod schemas
 packages/engine    Prediction logic (pure functions + Vitest tests)
@@ -41,10 +41,10 @@ npm workspaces; workspace packages ship TypeScript source (no build step).
 
 ## Requirements
 
-- **Node.js 22.13+** (Expo SDK 58 and Vitest 5 need it). Node 22 LTS recommended.
+- **Node.js 22.13+** (Vitest 5 needs it). Node 22 or 24 LTS recommended.
 - npm 10+
 - A free [Supabase](https://supabase.com) cloud project (from Phase 2)
-- Expo Go on your phone (SDK 58). Note: remote push notifications on **Android** need a
+- Expo Go on your phone with **SDK 57** support (Expo Go → Settings → Supported SDK). Note: remote push notifications on **Android** need a
   development build, not Expo Go; iOS Expo Go works.
 
 ## Setup
@@ -169,7 +169,7 @@ replaces that hazard's zones atomically (`replace_hazard_zones`) and is logged i
 
 ## User app (Expo)
 
-`apps/mobile` uses Expo SDK 58 and Expo Router, and runs in **Expo Go**.
+`apps/mobile` uses Expo SDK 57 and Expo Router, and runs in **Expo Go**. (It was built on SDK 58 and moved back to 57 because the store version of Expo Go only supports 57. To upgrade later: `npx expo install expo@^58 --fix` in `apps/mobile`, update the root `overrides` in `package.json`, and switch the tabs import back to `expo-router/native-tabs`.)
 
 ```bash
 npm run dev:mobile
