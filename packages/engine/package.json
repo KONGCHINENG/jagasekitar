@@ -13,7 +13,14 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@jagasekitar/shared": "*"
+    "@jagasekitar/shared": "*",
+    "@turf/boolean-point-in-polygon": "^7.4.0",
+    "@turf/circle": "^7.4.0",
+    "@turf/helpers": "^7.4.0",
+    "@turf/intersect": "^7.4.0",
+    "@turf/isobands": "^7.4.0",
+    "@turf/simplify": "^7.4.0",
+    "@turf/union": "^7.4.0"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.16",

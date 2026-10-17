@@ -22,7 +22,8 @@
     "test:db": "npm run test -w @jagasekitar/db",
     "seed:accounts": "npm run seed:accounts -w @jagasekitar/worker",
     "seed:districts": "npm run seed:districts -w @jagasekitar/worker",
-    "db:push": "supabase db push --workdir . --include-seed"
+    "db:push": "supabase db push --workdir . --include-seed",
+    "predict": "npm run predict -w @jagasekitar/worker"
   },
   "devDependencies": {
     "prettier": "^3.9.10",

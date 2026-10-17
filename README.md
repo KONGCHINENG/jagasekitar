@@ -14,7 +14,7 @@ check risk at a destination and along the route.
 | 1     | Scaffold: monorepo, Expo app, Next.js app, shared + engine | ✅ Done |
 | 2     | Database: migrations, PostGIS, RLS, seed                   | ✅ Done |
 | 3     | Data adapters + worker (FIRMS, Open-Meteo, Infobanjir)     | ✅ Done |
-| 4     | Prediction engines + tests                                 | ⏳      |
+| 4     | Prediction engines + tests                                 | ✅ Done |
 | 5–6   | User app: maps, location, destination, notifications       | ⏳      |
 | 7–8   | Hospital portal, admin panel                               | ⏳      |
 | 9–10  | Demo mode polish, hardening, docs                          | ⏳      |
@@ -136,14 +136,39 @@ FIRMS without `FIRMS_MAP_KEY` uses `firms/mock.json`: synthetic hotspots in Riau
 Sumatra and Kalimantan, tagged `source = 'mock'`. The FIRMS parser fixtures are hand-written in
 the documented FIRMS CSV format, because no key was available when they were written.
 
+## Prediction engines
+
+`packages/engine` has pure functions (data in, `HazardZone[]` out) with Vitest tests. The worker
+re-runs them after every ingest that wrote data, or on demand with `npm run predict`. Each run
+replaces that hazard's zones atomically (`replace_hazard_zones`) and is logged in
+`prediction_runs`. Every threshold comes from the admin-editable `settings` rows.
+
+- **Haze** (`haze.ts`): hotspots are clustered (10 km, FRP-weighted), then emit smoke puffs every
+  6 h from 48 h ago to +72 h. Puffs are carried hourly by a blend of 850 hPa and 10 m winds
+  (meteorological "from" direction converted to travel bearing), spread and decay with age, and
+  are summed on a 5 km grid over the Peninsula. The grid is contoured into risk bands for the
+  slices now, +12h, +24h, +48h and +72h, each valid until the next slice. The Open-Meteo PM2.5
+  forecast only adjusts confidence. Every simplifying assumption is listed at the top of the file.
+- **Flood** (`flood.ts`): JPS water-level status, observed 1/3/72 h rain, the next-24 h forecast
+  and official JPS alerts (always at least `high`) are scored per station by the rules in the
+  spec. Stale gauges are ignored. Stations are buffered by level, clipped to their district, and
+  merged per district and level.
+- **Disease** (`disease.ts`): the 7-day count vs. the 28-day baseline, and cases per 100k. An
+  outbreak needs count ≥ min and ratio ≥ 2×. Active flood or haze zones raise linked diseases one
+  level, and the "why" text says so.
+- **`assessPoint(lat, lon, zones, { time })`** (`assess.ts`) returns the worst level per hazard at
+  that point and time, plus bilingual advice (EN/BM). The notification job, the "Your area" card
+  and the destination check all use it.
+
 ## Run
 
 | Command               | What                                           |
 | --------------------- | ---------------------------------------------- |
 | `npm run dev:web`     | Portal at http://localhost:3000                |
 | `npm run dev:mobile`  | Expo dev server; scan the QR code with Expo Go |
-| `npm run worker:once` | Run all data jobs once                         |
+| `npm run worker:once` | Run all data jobs once, then predictions       |
 | `npm run worker:dev`  | Worker in watch mode                           |
+| `npm run predict`     | Run the haze, flood and disease engines only   |
 | `npm test`            | Unit tests (all workspaces)                    |
 | `npm run typecheck`   | TypeScript strict checks (all workspaces)      |
 | `npm run format`      | Prettier                                       |

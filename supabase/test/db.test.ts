@@ -254,3 +254,121 @@ describe('views and RPCs', () => {
     expect(outside.rows).toHaveLength(0);
   });
 });
+
+describe('engine RPCs', () => {
+  const square = (lon: number, lat: number) => ({
+    type: 'Polygon',
+    coordinates: [
+      [
+        [lon, lat],
+        [lon + 0.1, lat],
+        [lon + 0.1, lat + 0.1],
+        [lon, lat + 0.1],
+        [lon, lat],
+      ],
+    ],
+  });
+  // A self-intersecting "bow tie" that PostGIS must repair.
+  const bowTie = {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [101, 4],
+        [101.2, 4.2],
+        [101.2, 4],
+        [101, 4.2],
+        [101, 4],
+      ],
+    ],
+  };
+  const zone = (id: string, geometry: object) => ({
+    id,
+    level: 'high',
+    geometry,
+    validFrom: new Date(Date.now() - 3600_000).toISOString(),
+    validTo: new Date(Date.now() + 3600_000).toISOString(),
+    confidence: 0.7,
+    reason: 'why',
+    reasonMs: 'kenapa',
+    sourceRefs: ['test'],
+    district: 'Kinta',
+  });
+
+  it('replace_hazard_zones swaps a hazard’s zones and repairs invalid geometry', async () => {
+    const first = await db.query<{ n: number }>(
+      `select replace_hazard_zones('flood', null, $1::jsonb) n`,
+      [
+        JSON.stringify([
+          zone('flood:Kinta:high', square(101, 4.5)),
+          zone('flood:Kinta:bow', bowTie),
+        ]),
+      ],
+    );
+    expect(first.rows[0]!.n).toBe(2);
+    const second = await db.query<{ n: number }>(
+      `select replace_hazard_zones('flood', null, $1::jsonb) n`,
+      [JSON.stringify([zone('flood:Manjung:high', square(100.6, 4.2))])],
+    );
+    expect(second.rows[0]!.n).toBe(1);
+    const rows = await db.query<{ zone_key: string; valid: boolean }>(
+      `select zone_key, st_isvalid(geom::geometry) valid from hazard_zones where hazard = 'flood'`,
+    );
+    expect(rows.rows).toEqual([{ zone_key: 'flood:Manjung:high', valid: true }]);
+    // Other hazards are untouched.
+    const haze = await db.query<{ n: number }>(
+      `select count(*)::int n from hazard_zones where hazard = 'haze'`,
+    );
+    expect(haze.rows[0]!.n).toBe(1);
+  });
+
+  it('engine RPCs are not callable by app users', async () => {
+    await expect(
+      asRole(db, 'authenticated', userA, () =>
+        db.query(`select replace_hazard_zones('flood', null, '[]')`),
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asRole(db, 'anon', null, () => db.query(`select engine_rain_latest('PRK')`)),
+    ).rejects.toThrow(/permission denied/);
+  });
+
+  it('engine_rain_latest returns the newest reading per active station', async () => {
+    await db.query(`
+      insert into rain_readings (station_id, observed_at, rain_1h, rain_3h) values
+        ('SEED-RF-PRK-05', now() - interval '2 hours', 1, 2),
+        ('SEED-RF-PRK-05', now() - interval '15 minutes', 30, 72)`);
+    const res = await db.query<{ j: { stationId: string; rain3h: number; lat: number }[] }>(
+      `select engine_rain_latest('PRK') j`,
+    );
+    const kk = res.rows[0]!.j.find((s) => s.stationId === 'SEED-RF-PRK-05')!;
+    expect(kk.rain3h).toBe(72);
+    expect(kk.lat).toBeCloseTo(4.772, 3);
+    expect(res.rows[0]!.j).toHaveLength(1); // stations without readings are skipped
+  });
+
+  it('engine_weather thins by hour and filters by kind and bbox', async () => {
+    await db.query(`
+      insert into weather_grid (lat, lon, valid_at, wind_speed_850, wind_dir_850, precip) values
+        (4, 101, '2026-10-17T00:00:00Z', 20, 200, null),
+        (4, 101, '2026-10-17T01:00:00Z', 20, 200, null),
+        (4, 101, '2026-10-17T03:00:00Z', 20, 200, null),
+        (4.5, 101, '2026-10-17T03:00:00Z', null, null, 5),
+        (9, 110, '2026-10-17T03:00:00Z', null, null, 5)`);
+    const q = (kind: string, step: number, bbox: number[] | null) =>
+      db
+        .query<{ j: unknown[] }>(
+          `select engine_weather($1, '2026-10-16T00:00:00Z', '2026-10-18T00:00:00Z', $2, $3) j`,
+          [kind, step, bbox],
+        )
+        .then((r) => r.rows[0]!.j);
+    expect(await q('wind', 3, null)).toHaveLength(2);
+    const precip = (await q('precip', 1, [100, 3, 102, 6])) as {
+      lat: number;
+      validAt: string;
+      precip: number;
+    }[];
+    expect(precip).toHaveLength(1);
+    expect(precip[0]).toMatchObject({ lat: 4.5, lon: 101, precip: 5 });
+    expect(Date.parse(precip[0]!.validAt)).toBe(Date.parse('2026-10-17T03:00:00Z'));
+  });
+});

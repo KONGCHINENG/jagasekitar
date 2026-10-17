@@ -2,6 +2,8 @@
 //   npm run worker:once                       run every enabled source once, then exit
 //   npm run worker:once -- --source=firms     run one source
 //   npm run worker:dev                        keep running; each source refreshes on its own interval
+//   npm run predict                           run the prediction engines only
+// After any source writes data, the haze/flood/disease engines re-run.
 // Intervals and enable flags come from data_source_status (editable in the admin panel).
 import { config } from 'dotenv';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +16,7 @@ import {
   openMeteoWindSource,
 } from '../sources/open-meteo';
 import { createServiceClient, getSetting } from './core/db';
+import { runPredictions, type PredictionSummary } from './predict';
 import { log } from './core/log';
 import { runSource, type SourceContext, type SourceDef, type SourceRunResult } from './core/source';
 
@@ -36,6 +39,7 @@ const TICK_MS = 60_000;
 const args = process.argv.slice(2);
 const once = args.includes('--once');
 const only = args.find((a) => a.startsWith('--source='))?.split('=')[1];
+const predictOnly = args.includes('--predict');
 
 interface SourceStatus {
   source: string;
@@ -62,7 +66,12 @@ function isDue(s: SourceStatus | undefined, now: Date): boolean {
   return now.getTime() - last >= s.refresh_minutes * 60_000;
 }
 
-async function tick(force: boolean): Promise<SourceRunResult[]> {
+interface TickResult {
+  sources: SourceRunResult[];
+  predictions: PredictionSummary[];
+}
+
+async function tick(force: boolean): Promise<TickResult> {
   const db = createServiceClient();
   const now = new Date();
   const ctx: SourceContext = {
@@ -78,8 +87,9 @@ async function tick(force: boolean): Promise<SourceRunResult[]> {
       'worker',
       'demo mode is on: live adapters paused (scenario replay arrives in Phase 9)',
     );
-    return [];
+    return { sources: [], predictions: [] };
   }
+  if (predictOnly) return { sources: [], predictions: await runPredictions(ctx) };
 
   const status = await loadStatus(ctx);
   const results: SourceRunResult[] = [];
@@ -101,10 +111,23 @@ async function tick(force: boolean): Promise<SourceRunResult[]> {
       log.error('stations', err instanceof Error ? err.message : String(err));
     }
   }
-  return results;
+  // Re-predict whenever new data landed.
+  const predictions = results.some((r) => r.written > 0) ? await runPredictions(ctx) : [];
+  return { sources: results, predictions };
 }
 
-function printSummary(results: SourceRunResult[]): void {
+function printSummary({ sources: results, predictions }: TickResult): void {
+  if (predictions.length) {
+    console.table(
+      predictions.map((p) => ({
+        hazard: p.hazard,
+        status: p.status,
+        zones: p.zones,
+        ms: p.ms,
+        error: p.error?.slice(0, 80) ?? '',
+      })),
+    );
+  }
   if (!results.length) return;
   console.table(
     results.map((r) => ({
@@ -120,10 +143,14 @@ function printSummary(results: SourceRunResult[]): void {
 }
 
 if (once) {
-  const results = await tick(true);
-  printSummary(results);
-  // Exit non-zero only if something could not be written; mock fallbacks are expected.
-  process.exitCode = results.some((r) => r.written === 0 && r.records > 0) ? 1 : 0;
+  const result = await tick(true);
+  printSummary(result);
+  // Exit non-zero only if data could not be written or an engine failed; mock fallbacks are expected.
+  process.exitCode =
+    result.sources.some((r) => r.written === 0 && r.records > 0) ||
+    result.predictions.some((p) => p.status === 'failed')
+      ? 1
+      : 0;
 } else {
   log.info('worker', `watching sources every ${TICK_MS / 1000}s (Ctrl+C to stop)`);
   let running = false;

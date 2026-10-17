@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "seed:accounts": "tsx scripts/create-demo-accounts.ts",
-    "seed:districts": "tsx scripts/load-districts.ts"
+    "seed:districts": "tsx scripts/load-districts.ts",
+    "predict": "tsx src/index.ts --once --predict"
   },
   "dependencies": {
     "@jagasekitar/engine": "*",
