@@ -66,6 +66,21 @@ describe('migrations and seed', () => {
     expect(res.rows[0]!.role).toBe('user');
   });
 
+  it('loads valid polygons for all 12 Perak districts', async () => {
+    const res = await db.query<{ n: number }>(
+      `select count(*)::int n from districts
+       where state = 'PRK' and geom is not null and st_isvalid(geom::geometry)`,
+    );
+    expect(res.rows[0]!.n).toBe(12);
+  });
+
+  it('district_at uses polygons (Selama is part of Larut Matang dan Selama)', async () => {
+    const selama = await db.query<{ name: string }>('select name from district_at(5.22, 100.70)');
+    expect(selama.rows[0]!.name).toBe('Larut Matang dan Selama');
+    const bota = await db.query<{ name: string }>('select name from district_at(4.348, 100.886)');
+    expect(bota.rows[0]!.name).toBe('Perak Tengah');
+  });
+
   it('district_at falls back to nearest centroid', async () => {
     const res = await db.query<{ name: string }>('select name from district_at(4.59, 101.08)');
     expect(res.rows[0]!.name).toBe('Kinta');
