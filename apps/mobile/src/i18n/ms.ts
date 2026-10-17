@@ -17,6 +17,7 @@ const ms: Strings = {
     stale: 'Data berusia lebih 2 jam. Muat semula atau semak sambungan anda.',
     notConfigured: 'Tidak bersambung ke pelayan data. Memaparkan data tersimpan sahaja.',
     simulated: 'Data simulasi',
+    demo: 'Senario demo sedang berjalan: zon dan amaran adalah simulasi',
     disclaimer:
       'Ramalan ini adalah anggaran. Sentiasa ikut nasihat rasmi JPS, MetMalaysia, NADMA dan KKM.',
     noData: 'Tiada data lagi',

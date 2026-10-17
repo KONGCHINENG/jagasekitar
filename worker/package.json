@@ -11,7 +11,8 @@
     "seed:accounts": "tsx scripts/create-demo-accounts.ts",
     "seed:districts": "tsx scripts/load-districts.ts",
     "predict": "tsx src/index.ts --once --predict",
-    "notify": "tsx src/index.ts --once --notify"
+    "notify": "tsx src/index.ts --once --notify",
+    "demo:check": "tsx scripts/demo-check.ts"
   },
   "dependencies": {
     "@jagasekitar/engine": "*",

@@ -16,6 +16,8 @@ import {
   openMeteoWindSource,
 } from '../sources/open-meteo';
 import { createServiceClient, getSetting } from './core/db';
+import { endDemoIfNeeded, runDemoTick } from './demo';
+import type { DemoState } from './demo/scenarios';
 import { runNotifications } from './notify';
 import { runPredictions, type PredictionSummary } from './predict';
 import { log } from './core/log';
@@ -35,13 +37,16 @@ const SOURCES: SourceDef<any>[] = [
   alertsSource,
 ];
 const INFOBANJIR = new Set([rainSource.name, waterLevelSource.name, alertsSource.name]);
-const TICK_MS = 60_000;
+// 30 s: demo scenarios advance every tick; live sources still run only when due.
+const TICK_MS = 30_000;
 
 const args = process.argv.slice(2);
 const once = args.includes('--once');
 const only = args.find((a) => a.startsWith('--source='))?.split('=')[1];
 const predictOnly = args.includes('--predict');
 const notifyOnly = args.includes('--notify');
+// Skip alerts (e.g. when testing scenarios without pinging real phones).
+const noNotify = args.includes('--no-notify');
 
 interface SourceStatus {
   source: string;
@@ -103,14 +108,19 @@ async function tick(force: boolean): Promise<TickResult> {
     useMocks: process.env.USE_MOCKS?.trim().toLowerCase() === 'true',
   };
 
-  const demo = await getSetting(db, 'demo_mode', { enabled: false });
+  const demo = await getSetting<DemoState>(db, 'demo_mode', {
+    enabled: false,
+    scenario: null,
+    speed: 1,
+    started_at: null,
+    offset_minutes: 0,
+  });
   if (demo.enabled) {
-    log.info(
-      'worker',
-      'demo mode is on: live adapters paused (scenario replay arrives in Phase 9)',
-    );
-    return { sources: [], predictions: [] };
+    // Live adapters pause; the scenario replays instead.
+    const res = await runDemoTick(ctx, demo, { notify: !noNotify });
+    return { sources: [], predictions: res?.predictions ?? [] };
   }
+  await endDemoIfNeeded(ctx);
   if (notifyOnly) {
     await notifySafely(ctx);
     return { sources: [], predictions: [] };

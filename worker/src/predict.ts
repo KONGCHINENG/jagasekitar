@@ -130,13 +130,14 @@ async function writeZones(
 
 async function withRun(
   ctx: SourceContext,
+  demo: boolean,
   hazard: Hazard,
   run: (runId: string) => Promise<{ zones: number; stats: unknown }>,
 ): Promise<PredictionSummary> {
   const started = Date.now();
   const { data, error } = await ctx.db
     .from('prediction_runs')
-    .insert({ hazard, status: 'running' })
+    .insert({ hazard, status: 'running', demo })
     .select('id')
     .single();
   if (error) throw new Error(`prediction_runs insert: ${error.message}`);
@@ -169,14 +170,18 @@ async function withRun(
   }
 }
 
-export async function runPredictions(ctx: SourceContext): Promise<PredictionSummary[]> {
+export async function runPredictions(
+  ctx: SourceContext,
+  opts: { demo?: boolean } = {},
+): Promise<PredictionSummary[]> {
+  const demo = opts.demo ?? false;
   const { db, now, state } = ctx;
   const districts = await loadDistricts(db, state);
   const places = districts.map((d) => ({ name: d.name, lat: d.centroid.lat, lon: d.centroid.lon }));
   const results: PredictionSummary[] = [];
 
   results.push(
-    await withRun(ctx, 'haze', async (runId) => {
+    await withRun(ctx, demo, 'haze', async (runId) => {
       const config = fromSettings(DEFAULT_HAZE, await settingsRow(db, 'haze'));
       const from = new Date(now.getTime() - 3 * HOUR).toISOString();
       const to = new Date(now.getTime() + (config.trajectoryHours + 3) * HOUR).toISOString();
@@ -205,7 +210,7 @@ export async function runPredictions(ctx: SourceContext): Promise<PredictionSumm
   );
 
   results.push(
-    await withRun(ctx, 'flood', async (runId) => {
+    await withRun(ctx, demo, 'flood', async (runId) => {
       const config = fromSettings(DEFAULT_FLOOD, await settingsRow(db, 'flood'));
       // Forecast grid limited to the state (plus a margin) for speed.
       const boxes = districts.filter((d) => d.geometry).map((d) => areaBbox(d.geometry!));
@@ -251,7 +256,7 @@ export async function runPredictions(ctx: SourceContext): Promise<PredictionSumm
   );
 
   results.push(
-    await withRun(ctx, 'disease', async (runId) => {
+    await withRun(ctx, demo, 'disease', async (runId) => {
       const config = fromSettings(DEFAULT_DISEASE, await settingsRow(db, 'disease'));
       const [summaryRes, typesRes, hazardZones] = await Promise.all([
         db

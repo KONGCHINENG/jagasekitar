@@ -1,0 +1,53 @@
+{
+  "id": "riau_haze",
+  "name": "Riau fires → Perak haze",
+  "description": "About 300 fire hotspots in northern Riau (Rokan Hilir, Bengkalis) and Jambi. North-easterly winds first keep the smoke over Sumatra; about 6 hours in they turn south-south-westerly and carry it across the Strait of Malacca, reaching Manjung, Perak Tengah and Kinta over the next 24–48 hours. Synthetic data.",
+  "fires": {
+    "seed": 2026,
+    "clusters": [
+      {
+        "name": "Rokan Hilir, Riau",
+        "lat": 1.95,
+        "lon": 100.85,
+        "spreadDeg": 0.25,
+        "count": 140,
+        "frpMean": 20
+      },
+      {
+        "name": "Bengkalis, Riau",
+        "lat": 1.45,
+        "lon": 101.55,
+        "spreadDeg": 0.25,
+        "count": 100,
+        "frpMean": 17
+      },
+      {
+        "name": "Muaro Jambi, Jambi",
+        "lat": -1.55,
+        "lon": 103.75,
+        "spreadDeg": 0.3,
+        "count": 60,
+        "frpMean": 14
+      }
+    ]
+  },
+  "wind": {
+    "before": {
+      "fromDeg": 55,
+      "speed850Kmh": 14,
+      "speed10mKmh": 8
+    },
+    "shiftHours": 6,
+    "fromDeg": 192,
+    "speed850Kmh": 20,
+    "speed10mKmh": 11,
+    "wobbleDeg": 8
+  },
+  "pm25": {
+    "baseline": 18,
+    "peak": 95,
+    "centre": [100.9, 4.3],
+    "radiusDeg": 1.4,
+    "rampHours": 24
+  }
+}

@@ -106,10 +106,18 @@ export function DemoControls({ state }: { state: DemoState }) {
           </>
         )}
       </div>
-      <p className="text-xs text-neutral-500">
-        While demo mode is on, the worker pauses live adapters. Scenario replay and its 30-second
-        prediction loop arrive in Phase 9.
-      </p>
+      <div className="text-xs text-neutral-500">
+        <p>
+          While demo mode is on, the worker (<code>npm run worker:dev</code>) pauses live data and
+          replays the scenario every 30 seconds: it advances the scenario, re-runs the predictions
+          and sends alerts. Phones show a “Demo scenario running” notice.
+        </p>
+        <p className="mt-1">
+          To move a phone into the action: in the app, Settings → tap the version 5 times → Simulate
+          my location at… (Kerian or Kuala Kangsar for the flood, Manjung or Kinta for haze and
+          illness). Stopping the demo removes every demo row and refreshes live data.
+        </p>
+      </div>
     </div>
   );
 }

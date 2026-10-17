@@ -12,6 +12,7 @@ import { HazardChip, RiskBadge } from '@/components/risk';
 import { ZoneSheet } from '@/components/zone-sheet';
 import { BottomTabInset } from '@/constants/theme';
 import { useApp } from '@/providers/app-provider';
+import { useDemoMode } from '@/hooks/use-demo-mode';
 import { useZones } from '@/hooks/use-zones';
 import { useLang } from '@/i18n';
 import type { AppZone } from '@/lib/data';
@@ -30,6 +31,7 @@ export default function HomeMap() {
   const { location, error: appError } = useApp();
   const { coords, status, simulated } = location;
   const zones = useZones();
+  const demo = useDemoMode();
   const [selected, setSelected] = useState<AppZone | null>(null);
 
   useEffect(() => {
@@ -82,6 +84,7 @@ export default function HomeMap() {
             <Text style={styles.sim}>{t('settings.simulating', { name: simulated.name })}</Text>
           )}
           {appError && <Text style={styles.sim}>{appError}</Text>}
+          {demo?.enabled && <Text style={styles.demo}>🎬 {t('common.demo')}</Text>}
           <StatusLine updatedAt={zones.updatedAt} fromCache={zones.fromCache} error={zones.error} />
         </Card>
 
@@ -123,6 +126,16 @@ const styles = StyleSheet.create({
   areaTitle: { fontSize: 20, fontWeight: '700', color: '#111' },
   chips: { flexDirection: 'row', gap: 8 },
   hint: { fontSize: 13, color: '#444' },
+  demo: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#92400e',
+    backgroundColor: '#fef3c7',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    overflow: 'hidden',
+  },
   sim: { fontSize: 13, color: '#9a3412', fontWeight: '600' },
   search: {
     backgroundColor: '#fff',
