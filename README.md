@@ -13,7 +13,7 @@ check risk at a destination and along the route.
 | ----- | ---------------------------------------------------------- | ------- |
 | 1     | Scaffold: monorepo, Expo app, Next.js app, shared + engine | ✅ Done |
 | 2     | Database: migrations, PostGIS, RLS, seed                   | ✅ Done |
-| 3     | Data adapters + worker (FIRMS, Open-Meteo, Infobanjir)     | ⏳      |
+| 3     | Data adapters + worker (FIRMS, Open-Meteo, Infobanjir)     | ✅ Done |
 | 4     | Prediction engines + tests                                 | ⏳      |
 | 5–6   | User app: maps, location, destination, notifications       | ⏳      |
 | 7–8   | Hospital portal, admin panel                               | ⏳      |
@@ -92,6 +92,49 @@ What's in it:
 `npm run test:db` applies the real migrations and seed to an in-process Postgres with PostGIS
 (PGlite), with a small stand-in for Supabase auth, and tests RLS, views and RPCs. No Docker or cloud
 project needed.
+
+## Data worker
+
+`npm run worker:once` runs every enabled source once. `npm run worker:dev` keeps running and
+refreshes each source on its own interval, which is set in `data_source_status` (editable from the
+admin panel later). Run a single source with `npm run worker:once -- --source=infobanjir_rain`.
+
+| Source (`data_source_status`) | What                                                                  | Every  |
+| ----------------------------- | --------------------------------------------------------------------- | ------ |
+| `firms`                       | NASA FIRMS hotspots, VIIRS S-NPP / NOAA-20 + MODIS, last 2 days       | 3 h    |
+| `open_meteo`                  | 1° wind grid (10 m + 850 hPa) over Sumatra–Borneo, now → +75 h        | 3 h    |
+| `open_meteo_aq`               | 0.5° PM2.5 / PM10 grid over Peninsular Malaysia                       | 3 h    |
+| `open_meteo_local`            | 0.25° rain-forecast grid over the default state (flood engine)        | 1 h    |
+| `infobanjir_rain`             | JPS rainfall per station: 1/3/6/24/72 h, since midnight, 6 daily      | 15 min |
+| `infobanjir_water_level`      | JPS river levels with official Normal/Alert/Warning/Danger thresholds | 15 min |
+| `infobanjir_alerts`           | JPS current alerts (all states), with exact station coordinates       | 15 min |
+
+Every adapter (`worker/sources/<name>/`) has a **timeout + retry with back-off**, a **file cache**
+(`worker/.cache`, which also serves stale data if the network fails), and a **mock fallback**
+(`mock.json`, with times shifted to "now" so the demo never looks stale). A failing source never
+stops the others. Its outcome (live/mock, record count, last error, a sample payload) goes to
+`data_source_status` for the admin overview. Set `USE_MOCKS=true` to run entirely offline.
+While demo mode is on, the worker pauses live adapters.
+
+**Infobanjir notes** (endpoints found by inspecting the site; saved responses live in
+`worker/sources/infobanjir/fixtures/` for the parser tests):
+
+- Rainfall: `/wp-content/themes/shapely/agency/searchresultrainfalldt1.php?state=PRK&district=ALL&station=ALL&loginStatus=0&language=1`
+- Water level: `/index.php/aras-air/data-paras-air/aras-air-data/?state=PRK&district=ALL&station=ALL&lang=en`.
+  Don't add `type=NEGERI`, or the endpoint returns "No Data".
+- Alerts: `/wp-content/themes/enlighten/data/currentalert.json`
+- The HTML is malformed, and the rainfall header has one more column than its rows. The parsers
+  identify cells by their `data-th` labels and check the header labels they depend on, so a
+  layout change fails loudly and the worker falls back to cache, then mock.
+- Station coordinates are not published. They are resolved in this order: admin-set, then
+  coordinates from the alert feed (exact), then a Nominatim geocode, then the JPS station-number
+  grid cell (e.g. `5207406` → 5.2°N 100.7°E, about 5 km), then the district centroid.
+  `coords_source` records which one was used. Geocoding needs a real contact in
+  `NOMINATIM_USER_AGENT`.
+
+FIRMS without `FIRMS_MAP_KEY` uses `firms/mock.json`: synthetic hotspots in Riau, Jambi, South
+Sumatra and Kalimantan, tagged `source = 'mock'`. The FIRMS parser fixtures are hand-written in
+the documented FIRMS CSV format, because no key was available when they were written.
 
 ## Run
 

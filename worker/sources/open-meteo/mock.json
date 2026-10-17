@@ -1,0 +1,12 @@
+{
+  "_comment": "Synthetic weather for the mock fallback: south-west monsoon flow carrying Sumatran smoke towards Perak, light afternoon showers over Perak. Not real data.",
+  "wind": {
+    "dir850": 225,
+    "speed850": 20,
+    "dir10m": 215,
+    "speed10m": 9,
+    "dirVariationDeg": 20
+  },
+  "precip": { "baseMm": 0.2, "peakMm": 6, "peakHourUtc": 8, "prob": 60 },
+  "airQuality": { "pm25Base": 22, "pm25Peak": 70, "plumeCentre": [100.9, 4.4], "plumeRadiusDeg": 1.5 }
+}

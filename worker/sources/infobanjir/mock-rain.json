@@ -1,0 +1,1788 @@
+[
+ {
+  "stationId": "28179",
+  "name": "S. K. Matang (F2)",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 16.5,
+  "rain72h": 98.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 24.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 3.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 70.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 4
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 61.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 5
+   }
+  ]
+ },
+ {
+  "stationId": "28232",
+  "name": "S. K. Pangkalan TLDM di Lumut (F2)",
+  "district": "Manjung",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 0,
+  "rain72h": 0.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 10
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 43.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 27.5
+   }
+  ]
+ },
+ {
+  "stationId": "5208001",
+  "name": "Loji Air Sg. Bayor",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0,
+  "rain3h": 0.5,
+  "rain6h": 0.5,
+  "rain24h": 3.5,
+  "rain72h": 49,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 3.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 20.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 25
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 13
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 9.5
+   }
+  ]
+ },
+ {
+  "stationId": "5207004",
+  "name": "Kg. Sg. Rambutan",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T05:55:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 8,
+  "rain72h": 67.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 9
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 40
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 18.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 2.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 5.5
+   }
+  ]
+ },
+ {
+  "stationId": "5207002",
+  "name": "Ladang Selding",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:20:00.000Z",
+  "rainSinceMidnight": 22,
+  "rain1h": 22,
+  "rain3h": 22,
+  "rain6h": 22,
+  "rain24h": 27.5,
+  "rain72h": 83,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 5.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 14
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 20.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 6
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 43.5
+   }
+  ]
+ },
+ {
+  "stationId": "5207403",
+  "name": "Kg. Gua Petai",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 1,
+  "rain1h": 1,
+  "rain3h": 1,
+  "rain6h": 1,
+  "rain24h": 1,
+  "rain72h": 7.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 3
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 2
+   }
+  ]
+ },
+ {
+  "stationId": "5108005",
+  "name": "Bekalan Ijok",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 2.5,
+  "rain72h": 6,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 2.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 1.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 2
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 7
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 2
+   }
+  ]
+ },
+ {
+  "stationId": "5107007",
+  "name": "Felda Ijok",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:20:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 1,
+  "rain72h": 7,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 2.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 3.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 5.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 17.5
+   }
+  ]
+ },
+ {
+  "stationId": "25789",
+  "name": "Titi Ijok Perak (RHN)",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 79,
+  "rain72h": 149.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 40
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 30.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 9.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 2.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 16
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 8
+   }
+  ]
+ },
+ {
+  "stationId": "5008001",
+  "name": "Kg. Pantai Besar",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 2,
+  "rain1h": 1,
+  "rain3h": 2,
+  "rain6h": 2,
+  "rain24h": 5.5,
+  "rain72h": 32,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 2.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 8
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 5.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 5.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 5.5
+   }
+  ]
+ },
+ {
+  "stationId": "4907020",
+  "name": "Bt. 14 Batu Kurau",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 8,
+  "rain1h": 8,
+  "rain3h": 8,
+  "rain6h": 8,
+  "rain24h": 10.5,
+  "rain72h": 33,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 6
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 15.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 74
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 3
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 17.5
+   }
+  ]
+ },
+ {
+  "stationId": "5007020",
+  "name": "Pondok Tanjung",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 4.5,
+  "rain1h": 3,
+  "rain3h": 3,
+  "rain6h": 3,
+  "rain24h": 17,
+  "rain72h": 60,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 15
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 25.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 16
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 48
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 11.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 5.5
+   }
+  ]
+ },
+ {
+  "stationId": "4908013",
+  "name": "Kg. Sempenih",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0.5,
+  "rain3h": 0.5,
+  "rain6h": 0.5,
+  "rain24h": 7,
+  "rain72h": 22,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 11.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 32.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 36
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 2.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 6
+   }
+  ]
+ },
+ {
+  "stationId": "4807016",
+  "name": "Bukit Larut",
+  "district": "Larut Matang dan Selama",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 6,
+  "rain1h": 1.5,
+  "rain3h": 1.5,
+  "rain6h": 1.5,
+  "rain24h": 39,
+  "rain72h": 63.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 43
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 11
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 8
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 28
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 16
+   }
+  ]
+ },
+ {
+  "stationId": "TGPIANDANG",
+  "name": "Tanjung Piandang",
+  "district": "Kerian",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 1,
+  "rain1h": 0.5,
+  "rain3h": 0.5,
+  "rain6h": 1,
+  "rain24h": 5,
+  "rain72h": 13.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 8.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 3.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 66.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 0.5
+   }
+  ]
+ },
+ {
+  "stationId": "27180",
+  "name": "Stn. Petak Ujian di Tg. Piandang Perak (RHN)",
+  "district": "Kerian",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0.5,
+  "rain3h": 0.5,
+  "rain6h": 0.5,
+  "rain24h": 4.5,
+  "rain72h": 13,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 9
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 3.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 66.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 1
+   }
+  ]
+ },
+ {
+  "stationId": "5006021",
+  "name": "Bukit Merah",
+  "district": "Kerian",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 37,
+  "rain1h": 37,
+  "rain3h": 37,
+  "rain6h": 37,
+  "rain24h": 104,
+  "rain72h": 172,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 68.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 61
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 43.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 23.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 9
+   }
+  ]
+ },
+ {
+  "stationId": "5005005",
+  "name": "Samagagah",
+  "district": "Kerian",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 21.5,
+  "rain1h": 20.5,
+  "rain3h": 21,
+  "rain6h": 21,
+  "rain24h": 42,
+  "rain72h": 46,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 22
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 2
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 8
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 19
+   }
+  ]
+ },
+ {
+  "stationId": "25791",
+  "name": "Pejabat JPS Setiawan Perak (RHN)",
+  "district": "Manjung",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 0.5,
+  "rain72h": 0.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 8.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 2.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 6
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 8.5
+   }
+  ]
+ },
+ {
+  "stationId": "4205102",
+  "name": "Pulau Pangkor",
+  "district": "Manjung",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 0,
+  "rain72h": 0,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 19
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 35.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 25
+   }
+  ]
+ },
+ {
+  "stationId": "5610063",
+  "name": "Kg. Lalang",
+  "district": "Hulu Perak",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 4.5,
+  "rain72h": 21,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 4.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 8
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 8.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 10
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 9
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 7
+   }
+  ]
+ },
+ {
+  "stationId": "5513001",
+  "name": "Tasik Temengor di Banding",
+  "district": "Hulu Perak",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 5.5,
+  "rain72h": 30.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 5.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 24.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 12
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 5.5
+   }
+  ]
+ },
+ {
+  "stationId": "5411066",
+  "name": "Kuala Kenderong",
+  "district": "Hulu Perak",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 5,
+  "rain72h": 7,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 2
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 6
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 8.5
+   }
+  ]
+ },
+ {
+  "stationId": "5210069",
+  "name": "Lawin",
+  "district": "Hulu Perak",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 26,
+  "rain72h": 26,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 26
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 7.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 11.5
+   }
+  ]
+ },
+ {
+  "stationId": "4911077",
+  "name": "Kg. Lintang",
+  "district": "Kuala Kangsar",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 0.5,
+  "rain72h": 12,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 3
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 8
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 6.5
+   }
+  ]
+ },
+ {
+  "stationId": "25786",
+  "name": "Pekan Manong (RHN)",
+  "district": "Kuala Kangsar",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 0,
+  "rain72h": 0,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 0
+   }
+  ]
+ },
+ {
+  "stationId": "26323",
+  "name": "KM. 43 Simpang Pulai / Cameron (RHN)",
+  "district": "Kinta",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 0,
+  "rain72h": 0,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 0
+   }
+  ]
+ },
+ {
+  "stationId": "25968",
+  "name": "Kg. Cik Zainal (RHN)",
+  "district": "Kinta",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0.5,
+  "rain24h": 3,
+  "rain72h": 59.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 21
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 36
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 8
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 1
+   }
+  ]
+ },
+ {
+  "stationId": "27181",
+  "name": "Emp. Ulu Kinta (RHN)",
+  "district": "Kinta",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 4,
+  "rain72h": 11,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 6
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 3.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 1
+   }
+  ]
+ },
+ {
+  "stationId": "4611002",
+  "name": "Tanjung Rambutan",
+  "district": "Kinta",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 22,
+  "rain72h": 31,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 15
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 4.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 7
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 2
+   }
+  ]
+ },
+ {
+  "stationId": "25136",
+  "name": "Puncak Jelapang di Ipoh (RHN)",
+  "district": "Kinta",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 26,
+  "rain72h": 72,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 29
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 40.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 22
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 9.5
+   }
+  ]
+ },
+ {
+  "stationId": "4610118",
+  "name": "Kuala Pari",
+  "district": "Kinta",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0.5,
+  "rain24h": 2.5,
+  "rain72h": 25.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 2.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 21
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 22.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 2.5
+   }
+  ]
+ },
+ {
+  "stationId": "SGRAIA",
+  "name": "Keramat Pulai",
+  "district": "Kinta",
+  "observedAt": "2026-10-17T05:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 2,
+  "rain72h": 8,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 2
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 6
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 15
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 1
+   }
+  ]
+ },
+ {
+  "stationId": "4310001",
+  "name": "Tanjung Tualang",
+  "district": "Kinta",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 45.5,
+  "rain72h": 67,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 41
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 3
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 7
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 32
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 0
+   }
+  ]
+ },
+ {
+  "stationId": "25969",
+  "name": "Kg. Baru Kuala Dipang (RHN)",
+  "district": "Kampar",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 44,
+  "rain72h": 47.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 44
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 2
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 39.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 1
+   }
+  ]
+ },
+ {
+  "stationId": "4411120",
+  "name": "Gua Tempurung",
+  "district": "Kampar",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0.5,
+  "rain3h": 0.5,
+  "rain6h": 0.5,
+  "rain24h": 9,
+  "rain72h": 24,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 8.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 14
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 1.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 17
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 2
+   }
+  ]
+ },
+ {
+  "stationId": "4312001",
+  "name": "Kg. Sahom",
+  "district": "Kampar",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 67,
+  "rain72h": 71.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 36
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 2
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 5.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 10
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 28
+   }
+  ]
+ },
+ {
+  "stationId": "4409092",
+  "name": "Parit",
+  "district": "Perak Tengah",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 37.5,
+  "rain72h": 64,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 38.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 15
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 8.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 4.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 1.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 17.5
+   }
+  ]
+ },
+ {
+  "stationId": "26010",
+  "name": "Seri Iskandar (RHN)",
+  "district": "Perak Tengah",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 4,
+  "rain72h": 24,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 8
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 16
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 4
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 20.5
+   }
+  ]
+ },
+ {
+  "stationId": "4209093",
+  "name": "Teluk Sena",
+  "district": "Perak Tengah",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 23.5,
+  "rain72h": 50.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 26.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 20.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 3
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 6.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 5.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 4.5
+   }
+  ]
+ },
+ {
+  "stationId": "4109094",
+  "name": "Kg. Gajah",
+  "district": "Perak Tengah",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 3,
+  "rain72h": 27.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 9.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 16.5
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 10
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 13.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 20
+   }
+  ]
+ },
+ {
+  "stationId": "4011144",
+  "name": "Rumah JPS Chui Chak",
+  "district": "Hilir Perak",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0.5,
+  "rain24h": 59.5,
+  "rain72h": 76,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 60
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 2
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 13.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 10.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 21
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 0.5
+   }
+  ]
+ },
+ {
+  "stationId": "SGMENGKUANG",
+  "name": "Sg. Mengkuang",
+  "district": "Hilir Perak",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 26,
+  "rain72h": 38.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 27
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 11.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 28.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 6.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 0.5
+   }
+  ]
+ },
+ {
+  "stationId": "3901001",
+  "name": "Changkat Jong",
+  "district": "Hilir Perak",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 13,
+  "rain72h": 16,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 14
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 24
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 3
+   }
+  ]
+ },
+ {
+  "stationId": "3814160",
+  "name": "Ulu Slim",
+  "district": "Muallim",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 3.5,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 15,
+  "rain72h": 24,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 13.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 6
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 11.5
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 20
+   }
+  ]
+ },
+ {
+  "stationId": "3814159",
+  "name": "Slim River",
+  "district": "Muallim",
+  "observedAt": "2026-10-17T06:30:00.000Z",
+  "rainSinceMidnight": 0.5,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 3,
+  "rain72h": 39.5,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 3.5
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 35
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 4
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 2.5
+   }
+  ]
+ },
+ {
+  "stationId": "3907104",
+  "name": "Pasang Api",
+  "district": "Bagan Datuk",
+  "observedAt": "2026-10-17T06:15:00.000Z",
+  "rainSinceMidnight": 0,
+  "rain1h": 0,
+  "rain3h": 0,
+  "rain6h": 0,
+  "rain24h": 22.5,
+  "rain72h": 35,
+  "daily": [
+   {
+    "date": "2026-10-16",
+    "mm": 35
+   },
+   {
+    "date": "2026-10-15",
+    "mm": 0
+   },
+   {
+    "date": "2026-10-14",
+    "mm": 1.5
+   },
+   {
+    "date": "2026-10-13",
+    "mm": 15.5
+   },
+   {
+    "date": "2026-10-12",
+    "mm": 40
+   },
+   {
+    "date": "2026-10-11",
+    "mm": 11
+   }
+  ]
+ }
+]

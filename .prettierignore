@@ -6,3 +6,5 @@ package-lock.json
 supabase/seed/**/*.csv
 AGENTS.md
 supabase/config.toml
+worker/sources/**/fixtures
+worker/sources/**/mock*.json
