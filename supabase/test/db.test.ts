@@ -502,3 +502,52 @@ describe('devices, places and notification candidates', () => {
     ).rejects.toThrow(/permission denied/);
   });
 });
+
+describe('hospital portal: edit requests and profile', () => {
+  it('staff can request edits only for their own facility reports', async () => {
+    const own = await db.query<{ id: string }>(
+      `select id from case_reports where facility_id = $1 limit 1`,
+      [bainunId],
+    );
+    const other = await db.query<{ id: string }>(
+      `select id from case_reports where facility_id = $1 limit 1`,
+      [taipingId],
+    );
+    await asRole(db, 'authenticated', staffId, () =>
+      db.query(
+        `insert into case_report_edits (report_id, requested_by, new_cases, suspected_cases, reason) values ($1, $2, 3, 0, 'typo in count')`,
+        [own.rows[0]!.id, staffId],
+      ),
+    );
+    await expect(
+      asRole(db, 'authenticated', staffId, () =>
+        db.query(
+          `insert into case_report_edits (report_id, requested_by, new_cases, suspected_cases, reason) values ($1, $2, 3, 0, 'not mine')`,
+          [other.rows[0]!.id, staffId],
+        ),
+      ),
+    ).rejects.toThrow(/row-level security/);
+    const seenByOtherUser = await asRole(db, 'authenticated', userB, () =>
+      db.query('select * from case_report_edits'),
+    );
+    expect(seenByOtherUser.rows).toHaveLength(0);
+  });
+
+  it('my_portal_profile returns role and facility for the caller only', async () => {
+    const res = await asRole(db, 'authenticated', staffId, () =>
+      db.query<{ role: string; facility_name: string; facility_verified: boolean }>(
+        'select role, facility_name, facility_verified from my_portal_profile()',
+      ),
+    );
+    expect(res.rows).toEqual([
+      {
+        role: 'hospital_staff',
+        facility_name: 'Hospital Raja Permaisuri Bainun',
+        facility_verified: true,
+      },
+    ]);
+    await expect(
+      asRole(db, 'anon', null, () => db.query('select * from my_portal_profile()')),
+    ).rejects.toThrow(/permission denied/);
+  });
+});

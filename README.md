@@ -17,7 +17,8 @@ check risk at a destination and along the route.
 | 4     | Prediction engines + tests                                 | ✅ Done |
 | 5     | User app: main map, haze/flood/illness maps, zone sheet    | ✅ Done |
 | 6     | User app: location, destination, notifications             | ✅ Done |
-| 7–8   | Hospital portal, admin panel                               | ⏳      |
+| 7     | Hospital portal                                            | ✅ Done |
+| 8     | Admin panel                                                | ⏳      |
 | 9–10  | Demo mode polish, hardening, docs                          | ⏳      |
 
 ## Repo layout
@@ -245,6 +246,51 @@ last known location, never a history.
 `scripts/e2e-notify.ts` checks the whole pipeline against the real database. It attaches a
 temporary device with a fake push token to the demo admin user inside a live zone, runs the job
 twice (alert, then dedupe), checks that the dead token is cleared, and deletes the test rows.
+
+## Hospital portal (`/hospital`)
+
+Next.js 16 (App Router, Cache Components) with Supabase Auth via `@supabase/ssr`. Run it with
+`npm run dev:web` and open http://localhost:3000/hospital.
+
+- **Sign in / sign up** at `/login` (email + password). New staff accounts start with no facility.
+- **Join request**: choose a verified facility, or propose a new one. An admin approves it
+  (Phase 8). Until then the dashboard shows "pending".
+- **Dashboard**: your facility, whether today's report is in, reports flagged for review, and a
+  14-day bar chart (hover tooltips, screen-reader table, palette checked with the dataviz
+  validator for light and dark).
+- **Report cases**: grid with one row per disease ("Add another disease"). Validation: whole
+  numbers ≥ 0, no future dates or dates more than 60 days back, no duplicate disease+date. Notes
+  with IC or phone numbers are refused, both in the app and by a database CHECK. **Spike
+  warning**: if a count is more than 5× the facility's usual daily count (28-day average; the
+  multiplier is the admin setting `disease.spike_warning_multiplier`), the form lists the spikes
+  and asks you to confirm. Confirmed spikes are flagged for an admin to verify.
+- **CSV upload**: download the template (`/hospital/template.csv`), upload, preview with per-row
+  errors, submit through the same validation and spike check.
+- **History**: last 60 days with status (submitted / verified / rejected, flagged, change
+  requested). **Edit** within 48 h of submitting. After that, **Request change** with a reason
+  goes to `case_report_edits` for admin approval.
+- **District map**: view-only MapLibre map (OpenStreetMap tiles) of illness risk by district,
+  with a disease filter and per-district details.
+- A permanent notice on every page: _Enter aggregated counts only. Do not enter patient names, IC
+  numbers, or any personal data._
+
+Security: `proxy.ts` refreshes the session and sends signed-out visitors to `/login`. That is an
+optimistic check only. Every page and Server Action re-checks the user and role through the data
+access layer (`src/lib/auth.ts`) and re-validates input. RLS then limits staff to their own
+verified facility, and the database rate-limits submissions. Pages read the session inside
+`<Suspense>`, so each route is a static shell with the signed-in content streamed in.
+
+Tests: `npm run test -w @jagasekitar/web` (validation, CSV, spike and edit-window rules).
+E2E smoke test of the form (Playwright, signs in with `DEMO_STAFF_*` from `.env` and submits a
+zero-count row tagged "e2e smoke test"):
+
+```bash
+npx playwright install chromium
+```
+
+```bash
+npm run e2e -w @jagasekitar/web
+```
 
 ## Run
 
