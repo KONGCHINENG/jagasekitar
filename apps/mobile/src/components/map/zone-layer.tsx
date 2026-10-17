@@ -1,13 +1,11 @@
-// Draws HazardZones as react-native-maps Polygons (one per polygon part, holes included).
+// Turns HazardZones into WebMap polygons (one per polygon part, holes included).
 import type { RiskLevel } from '@jagasekitar/shared';
 import { riskRank } from '@jagasekitar/shared';
 import type { MultiPolygon, Polygon as GeoPolygon, Position } from 'geojson';
-import { Fragment } from 'react';
-import { Polygon } from 'react-native-maps';
 import type { AppZone } from '@/lib/data';
 import { zoneFill, zoneStroke } from '../risk';
+import type { LatLng, MapPolygon } from './web-map';
 
-type LatLng = { latitude: number; longitude: number };
 const toLatLng = (ring: Position[]): LatLng[] =>
   ring.map(([lon, lat]) => ({ latitude: lat!, longitude: lon! }));
 
@@ -20,42 +18,41 @@ export function polygonParts(
     .map((rings) => ({ outer: toLatLng(rings[0]!), holes: rings.slice(1).map(toLatLng) }));
 }
 
-export interface ZoneLayerProps {
-  zones: AppZone[];
+export interface ZonePolygonOptions {
   /** 'hazard' uses each hazard's palette; 'neutral' draws subtle outlines (main map). */
   mode?: 'hazard' | 'neutral';
-  onPress?: (zone: AppZone) => void;
   fillOverride?: (zone: AppZone) => string | undefined;
 }
 
-export function ZoneLayer({ zones, mode = 'hazard', onPress, fillOverride }: ZoneLayerProps) {
-  // Low levels first so higher-risk polygons draw on top and win taps.
-  const ordered = [...zones].sort((a, b) => riskRank(a.level) - riskRank(b.level));
-  return (
-    <>
-      {ordered.map((zone) => (
-        <Fragment key={`${zone.dbId}`}>
-          {polygonParts(zone.geometry).map((part, i) => (
-            <Polygon
-              key={i}
-              coordinates={part.outer}
-              holes={part.holes.length ? part.holes : undefined}
-              fillColor={
-                fillOverride?.(zone) ??
-                (mode === 'neutral'
-                  ? zoneFill(zone.hazard, zone.level, '22')
-                  : zoneFill(zone.hazard, zone.level))
-              }
-              strokeColor={zoneStroke(zone.hazard, zone.level)}
-              strokeWidth={mode === 'neutral' ? 1.5 : levelStroke(zone.level)}
-              tappable={!!onPress}
-              onPress={() => onPress?.(zone)}
-            />
-          ))}
-        </Fragment>
-      ))}
-    </>
-  );
+const ZONE_PREFIX = 'zone:';
+
+/** Polygons for the zones, low levels first so higher-risk ones draw on top and win taps. */
+export function zonePolygons(
+  zones: AppZone[],
+  { mode = 'hazard', fillOverride }: ZonePolygonOptions = {},
+): MapPolygon[] {
+  return [...zones]
+    .sort((a, b) => riskRank(a.level) - riskRank(b.level))
+    .flatMap((zone) =>
+      polygonParts(zone.geometry).map((part) => ({
+        id: `${ZONE_PREFIX}${zone.dbId}`,
+        rings: [part.outer, ...part.holes],
+        fill:
+          fillOverride?.(zone) ??
+          (mode === 'neutral'
+            ? zoneFill(zone.hazard, zone.level, '22')
+            : zoneFill(zone.hazard, zone.level)),
+        stroke: zoneStroke(zone.hazard, zone.level),
+        width: mode === 'neutral' ? 1.5 : levelStroke(zone.level),
+      })),
+    );
+}
+
+/** The zone a tapped polygon id belongs to, if it was a zone. */
+export function zoneForId(zones: AppZone[] | null | undefined, id: string): AppZone | undefined {
+  if (!id.startsWith(ZONE_PREFIX)) return undefined;
+  const dbId = id.slice(ZONE_PREFIX.length);
+  return zones?.find((z) => `${z.dbId}` === dbId);
 }
 
 const levelStroke = (level: RiskLevel) => (riskRank(level) >= riskRank('high') ? 2.5 : 1.5);

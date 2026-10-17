@@ -2,16 +2,16 @@
 import * as WebBrowser from 'expo-web-browser';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Marker } from 'react-native-maps';
-import { BaseMap } from '@/components/map/base-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, LegendRow, RiskLegend, StatusLine, Toggle } from '@/components/map/overlays';
-import { ZoneLayer } from '@/components/map/zone-layer';
+import { WebMap, escapeHtml, type MapMarker } from '@/components/map/web-map';
+import { zoneForId, zonePolygons } from '@/components/map/zone-layer';
 import { Sheet } from '@/components/sheet';
 import { ZoneSheet, sheetStyles } from '@/components/zone-sheet';
 import { useFocusRegion } from '@/hooks/use-focus-region';
 import { useRemote } from '@/hooks/use-remote';
 import { useZones } from '@/hooks/use-zones';
+import { useApp } from '@/providers/app-provider';
 import { useLang } from '@/i18n';
 import {
   fetchRainStations,
@@ -51,6 +51,7 @@ export default function FloodMap() {
   const [zone, setZone] = useState<AppZone | null>(null);
   const [station, setStation] = useState<Selected>(null);
 
+  const { coords, status, simulated: sim } = useApp().location;
   const zones = useZones('flood');
   const region = useFocusRegion({
     latitude: 4.6,
@@ -68,58 +69,53 @@ export default function FloodMap() {
   const bandOf = (r: RainStation) =>
     period === '1h' ? rainBand(r.rain_1h) : rain24Band(r.rain_24h);
 
+  const polygons = useMemo(() => zonePolygons(zones.data ?? []), [zones.data]);
+  const markers: MapMarker[] = [
+    ...rainPins.map((r) => {
+      const band = bandOf(r);
+      const dark = band === 'light' || band === 'moderate';
+      const value = band === 'none' ? '' : String(Math.round(rainValue(r) ?? 0));
+      return {
+        id: `rain:${r.station_id}`,
+        latitude: r.lat,
+        longitude: r.lon,
+        size: 30,
+        pressable: true,
+        html: `<div style="min-width:22px;height:22px;border-radius:11px;border:1.5px solid #fff;box-sizing:border-box;padding:0 3px;display:flex;align-items:center;justify-content:center;background:${RAIN_COLORS[band]};font:800 11px system-ui,sans-serif;color:${dark ? '#0C4A6E' : '#fff'}">${value}</div>`,
+      };
+    }),
+    ...waterPins.map((w) => ({
+      id: `water:${w.station_id}`,
+      latitude: w.lat,
+      longitude: w.lon,
+      size: 32,
+      pressable: true,
+      html: `<div style="background:#fff;border:2.5px solid ${WATER_COLORS[w.status]};border-radius:6px;padding:1px 3px;font:800 12px system-ui,sans-serif;color:${WATER_COLORS[w.status]};white-space:nowrap">🌊${w.trend ? escapeHtml(TREND_ARROW[w.trend]) : ''}</div>`,
+    })),
+  ];
+  const onMapPress = (id: string) => {
+    const hit = zoneForId(zones.data, id);
+    if (hit) return setZone(hit);
+    const [kind, sid] = id.split(':');
+    if (kind === 'rain') {
+      const r = rainPins.find((p) => `${p.station_id}` === sid);
+      if (r) setStation({ kind: 'rain', station: r });
+    } else if (kind === 'water') {
+      const w = waterPins.find((p) => `${p.station_id}` === sid);
+      if (w) setStation({ kind: 'water', station: w });
+    }
+  };
+
   return (
     <View style={styles.root}>
-      <BaseMap
+      <WebMap
         style={StyleSheet.absoluteFill}
         initialRegion={region}
-        showsUserLocation
-        toolbarEnabled={false}
-      >
-        <ZoneLayer zones={zones.data ?? []} onPress={setZone} />
-        {rainPins.map((r) => {
-          const band = bandOf(r);
-          return (
-            <Marker
-              key={`r${r.station_id}`}
-              coordinate={{ latitude: r.lat, longitude: r.lon }}
-              anchor={{ x: 0.5, y: 0.5 }}
-              tracksViewChanges={false}
-              onPress={() => setStation({ kind: 'rain', station: r })}
-              accessibilityLabel={`${t('flood.rainStation')} ${r.name}: ${t(`flood.intensity.${band}`)}`}
-            >
-              <View style={[styles.rainDot, { backgroundColor: RAIN_COLORS[band] }]}>
-                {band !== 'none' && (
-                  <Text
-                    style={[
-                      styles.rainValue,
-                      (band === 'light' || band === 'moderate') && styles.rainValueDark,
-                    ]}
-                  >
-                    {Math.round(rainValue(r) ?? 0)}
-                  </Text>
-                )}
-              </View>
-            </Marker>
-          );
-        })}
-        {waterPins.map((w) => (
-          <Marker
-            key={`w${w.station_id}`}
-            coordinate={{ latitude: w.lat, longitude: w.lon }}
-            anchor={{ x: 0.5, y: 0.5 }}
-            tracksViewChanges={false}
-            onPress={() => setStation({ kind: 'water', station: w })}
-            accessibilityLabel={`${t('flood.river')} ${w.name}: ${t(`flood.water.${w.status}`)}`}
-          >
-            <View style={[styles.gauge, { borderColor: WATER_COLORS[w.status] }]}>
-              <Text style={[styles.gaugeText, { color: WATER_COLORS[w.status] }]}>
-                🌊{w.trend ? TREND_ARROW[w.trend] : ''}
-              </Text>
-            </View>
-          </Marker>
-        ))}
-      </BaseMap>
+        user={status === 'granted' && !sim ? coords : null}
+        polygons={polygons}
+        markers={markers}
+        onPress={onMapPress}
+      />
 
       <WaterTint />
 
@@ -256,24 +252,4 @@ const styles = StyleSheet.create({
   linkText: { fontSize: 15, fontWeight: '700', color: ACCENT },
   bottom: { position: 'absolute', left: 12, right: 12, bottom: 0, gap: 8 },
   empty: { fontSize: 15, color: '#0c4a6e' },
-  rainDot: {
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    borderColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 3,
-  },
-  rainValue: { fontSize: 11, fontWeight: '800', color: '#fff' },
-  rainValueDark: { color: '#0C4A6E' },
-  gauge: {
-    backgroundColor: '#fff',
-    borderWidth: 2.5,
-    borderRadius: 6,
-    paddingHorizontal: 3,
-    paddingVertical: 1,
-  },
-  gaugeText: { fontSize: 12, fontWeight: '800' },
 });

@@ -1,11 +1,10 @@
 // Illness map: district choropleth by risk, disease filter, facility pins, per-district trends.
 import { HAZARD_PALETTES, maxRisk, riskRank, type RiskLevel } from '@jagasekitar/shared';
-import { Fragment, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Marker, Polygon } from 'react-native-maps';
-import { BaseMap } from '@/components/map/base-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, RiskLegend, StatusLine } from '@/components/map/overlays';
+import { WebMap, type MapMarker, type MapPolygon } from '@/components/map/web-map';
 import { polygonParts } from '@/components/map/zone-layer';
 import { RiskBadge, zoneFill } from '@/components/risk';
 import { Sheet } from '@/components/sheet';
@@ -51,6 +50,38 @@ export default function IllnessMap() {
   const levelOf = (name: string): RiskLevel =>
     maxRisk(...visibleZones.filter((z) => z.district === name).map((z) => z.level));
 
+  const polygons: MapPolygon[] = (districts.data ?? []).flatMap((d) => {
+    if (!d.geometry) return [];
+    const level = levelOf(d.name);
+    return polygonParts(d.geometry).map((part) => ({
+      id: `district:${d.name}`,
+      rings: [part.outer, ...part.holes],
+      fill: level === 'none' ? '#ffffff22' : zoneFill('disease', level, '99'),
+      stroke: '#9D174D',
+      width: 1,
+    }));
+  });
+  const markers: MapMarker[] = (facilities.data ?? []).map((f) => ({
+    id: `facility:${f.facility_id}`,
+    latitude: f.lat,
+    longitude: f.lon,
+    size: 34,
+    popup: `${f.name}
+${t('illness.reports', { count: f.reports_7d })}`,
+    html:
+      `<div style="display:flex;flex-direction:column;align-items:center">` +
+      `<div style="font-size:20px;line-height:1">${f.type === 'hospital' ? '🏥' : '🩺'}</div>` +
+      (f.reports_7d > 0
+        ? `<div style="margin-top:-4px;font:800 11px system-ui,sans-serif;color:#fff;background:${ACCENT};border-radius:8px;padding:0 5px">${f.reports_7d}</div>`
+        : '') +
+      '</div>',
+  }));
+  const onMapPress = (id: string) => {
+    const name = id.startsWith('district:') ? id.slice('district:'.length) : null;
+    const hit = name ? districts.data?.find((d) => d.name === name) : undefined;
+    if (hit) setDistrict(hit);
+  };
+
   const districtZones = district
     ? visibleZones
         .filter((z) => z.district === district.name)
@@ -64,43 +95,13 @@ export default function IllnessMap() {
 
   return (
     <View style={styles.root}>
-      <BaseMap style={StyleSheet.absoluteFill} initialRegion={region} toolbarEnabled={false}>
-        {(districts.data ?? []).map((d) =>
-          d.geometry ? (
-            <Fragment key={d.name}>
-              {polygonParts(d.geometry).map((part, i) => {
-                const level = levelOf(d.name);
-                return (
-                  <Polygon
-                    key={i}
-                    coordinates={part.outer}
-                    holes={part.holes.length ? part.holes : undefined}
-                    fillColor={level === 'none' ? '#ffffff22' : zoneFill('disease', level, '99')}
-                    strokeColor="#9D174D"
-                    strokeWidth={1}
-                    tappable
-                    onPress={() => setDistrict(d)}
-                  />
-                );
-              })}
-            </Fragment>
-          ) : null,
-        )}
-        {(facilities.data ?? []).map((f) => (
-          <Marker
-            key={f.facility_id}
-            coordinate={{ latitude: f.lat, longitude: f.lon }}
-            tracksViewChanges={false}
-            title={f.name}
-            description={t('illness.reports', { count: f.reports_7d })}
-          >
-            <View style={styles.pin}>
-              <Text style={styles.pinIcon}>{f.type === 'hospital' ? '🏥' : '🩺'}</Text>
-              {f.reports_7d > 0 && <Text style={styles.pinCount}>{f.reports_7d}</Text>}
-            </View>
-          </Marker>
-        ))}
-      </BaseMap>
+      <WebMap
+        style={StyleSheet.absoluteFill}
+        initialRegion={region}
+        polygons={polygons}
+        markers={markers}
+        onPress={onMapPress}
+      />
 
       <View style={styles.top} pointerEvents="box-none">
         <ScrollView
@@ -204,18 +205,6 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 14, fontWeight: '600', color: '#831843' },
   bottom: { position: 'absolute', left: 12, right: 12, bottom: 0 },
   note: { fontSize: 12, color: '#555' },
-  pin: { alignItems: 'center' },
-  pinIcon: { fontSize: 20 },
-  pinCount: {
-    marginTop: -4,
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#fff',
-    backgroundColor: ACCENT,
-    borderRadius: 8,
-    paddingHorizontal: 5,
-    overflow: 'hidden',
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

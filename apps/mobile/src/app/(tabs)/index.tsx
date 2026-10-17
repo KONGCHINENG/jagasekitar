@@ -12,11 +12,10 @@ import {
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type MapView from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BaseMap, MapCredit } from '@/components/map/base-map';
+import { MapCredit, WebMap, type WebMapHandle } from '@/components/map/web-map';
 import { Card, RiskLegend, StatusLine } from '@/components/map/overlays';
-import { ZoneLayer } from '@/components/map/zone-layer';
+import { zoneForId, zonePolygons } from '@/components/map/zone-layer';
 import { HazardIcon, RiskBadge } from '@/components/risk';
 import { ZoneSheet } from '@/components/zone-sheet';
 import { BottomTabInset } from '@/constants/theme';
@@ -37,7 +36,7 @@ export default function HomeMap() {
   const { t } = useLang();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const map = useRef<MapView>(null);
+  const map = useRef<WebMapHandle>(null);
   const { location, error: appError } = useApp();
   const { coords, status, simulated } = location;
   const zones = useZones();
@@ -47,11 +46,11 @@ export default function HomeMap() {
   const [cardHeight, setCardHeight] = useState(200);
 
   const recenter = () =>
-    map.current?.animateToRegion({ ...coords, latitudeDelta: 0.4, longitudeDelta: 0.4 }, 600);
+    map.current?.animateToRegion({ ...coords, latitudeDelta: 0.4, longitudeDelta: 0.4 });
 
   useEffect(() => {
     if (status === 'granted') {
-      map.current?.animateToRegion({ ...coords, latitudeDelta: 0.6, longitudeDelta: 0.6 }, 600);
+      map.current?.animateToRegion({ ...coords, latitudeDelta: 0.6, longitudeDelta: 0.6 });
     }
   }, [coords, status]);
 
@@ -59,10 +58,15 @@ export default function HomeMap() {
     () => assessPoint(coords.latitude, coords.longitude, zones.data ?? []),
     [coords, zones.data],
   );
-  const shown = useMemo(
-    () => (zones.data ?? []).filter((z) => !layer || z.hazard === layer),
+  const polygons = useMemo(
+    () =>
+      zonePolygons(
+        (zones.data ?? []).filter((z) => !layer || z.hazard === layer),
+        { mode: layer ? 'hazard' : 'neutral' },
+      ),
     [zones.data, layer],
   );
+  const user = status === 'granted' && !simulated ? coords : null;
 
   const bottomOffset = BottomTabInset + insets.bottom + 8;
   const notice =
@@ -73,20 +77,20 @@ export default function HomeMap() {
 
   return (
     <View style={styles.root}>
-      <BaseMap
+      <WebMap
         ref={map}
         style={StyleSheet.absoluteFill}
         initialRegion={{ ...coords, latitudeDelta: 0.8, longitudeDelta: 0.8 }}
-        showsUserLocation={status === 'granted' && !simulated}
-        mapPadding={{
+        user={user}
+        polygons={polygons}
+        onPress={(id) => setSelected(zoneForId(zones.data, id) ?? null)}
+        padding={{
           top: insets.top + TOP_BAR,
           bottom: bottomOffset + cardHeight,
           left: 0,
           right: 0,
         }}
-      >
-        <ZoneLayer zones={shown} mode={layer ? 'hazard' : 'neutral'} onPress={setSelected} />
-      </BaseMap>
+      />
 
       {/* Top: search, then the status pills that matter right now. */}
       <View style={[styles.top, { paddingTop: insets.top + 8 }]} pointerEvents="box-none">

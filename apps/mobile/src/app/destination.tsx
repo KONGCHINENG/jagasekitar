@@ -12,8 +12,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Marker, Polyline } from 'react-native-maps';
-import { BaseMap, MapCredit } from '@/components/map/base-map';
+import { MapCredit, WebMap } from '@/components/map/web-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toggle } from '@/components/map/overlays';
 import { RiskBadge } from '@/components/risk';
@@ -167,21 +166,27 @@ export default function Destination() {
 
   return (
     <View style={styles.root}>
-      <BaseMap style={styles.map} region={region} toolbarEnabled={false}>
-        {along?.segments.map((s, i) => (
-          <Polyline
-            key={i}
-            coordinates={s.coords.map(([lon, lat]) => ({ latitude: lat, longitude: lon }))}
-            strokeColor={levelColor(s.level)}
-            strokeWidth={s.level === 'none' ? 4 : 7}
-          />
-        ))}
-        <Marker
-          coordinate={{ latitude: from.latitude, longitude: from.longitude }}
-          pinColor="#2563EB"
-        />
-        <Marker coordinate={{ latitude: dest.lat, longitude: dest.lon }} title={dest.name} />
-      </BaseMap>
+      <WebMap
+        style={styles.map}
+        region={region}
+        lines={(along?.segments ?? []).map((seg, i) => ({
+          id: `seg:${i}`,
+          coords: seg.coords.map(([lon, lat]) => ({ latitude: lat!, longitude: lon! })),
+          color: levelColor(seg.level),
+          width: seg.level === 'none' ? 4 : 7,
+        }))}
+        user={from}
+        markers={[
+          {
+            id: 'dest',
+            latitude: dest.lat,
+            longitude: dest.lon,
+            size: 28,
+            popup: dest.name,
+            html: '<div style="width:18px;height:18px;border-radius:9px 9px 9px 0;transform:rotate(-45deg);background:#DC2626;border:3px solid #fff;box-shadow:0 1px 3px #0006"></div>',
+          },
+        ]}
+      />
 
       <ScrollView contentContainerStyle={[styles.panel, { paddingBottom: insets.bottom + 24 }]}>
         <Pressable onPress={() => setDest(null)} accessibilityRole="button">

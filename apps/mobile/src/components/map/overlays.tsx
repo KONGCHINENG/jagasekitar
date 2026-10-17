@@ -6,7 +6,7 @@ import { useLang } from '@/i18n';
 import { useNow } from '@/hooks/use-now';
 import { timeAgo } from '@/lib/format';
 import { zoneFill } from '../risk';
-import { MapCredit } from './base-map';
+import { MapCredit } from './web-map';
 
 const LEVELS = RISK_LEVELS.filter((l): l is Exclude<RiskLevel, 'none'> => l !== 'none');
 

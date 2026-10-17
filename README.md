@@ -186,9 +186,12 @@ connect, run `npx expo start --tunnel` from `apps/mobile` instead. The app reads
   worked out on the device with the engine's `assessPoint`. The tiles are also the layer
   switcher: tap one to show only that hazard's zones in its own colours, with its legend and a
   button to the full hazard map and forecast; tap it again to show every zone.
-- **Basemap**: on Android every map draws Humanitarian OpenStreetMap tiles (OSM France, no key)
-  through `components/map/base-map.tsx`, because Expo Go's Google tiles can fail and leave the map
-  black. iOS uses Apple Maps. For a public launch, move to a paid or self-hosted tile service.
+- **Maps**: every map is Leaflet in a WebView (`components/map/web-map.tsx`) with Humanitarian
+  OpenStreetMap tiles (OSM France, no key). react-native-maps was dropped: in Expo Go on Android
+  it uses Google Maps with Expo Go's key, and on some phones that map drew nothing at all. Screens
+  pass zones, lines and markers as plain data; taps come back as ids. Leaflet loads from unpkg,
+  so the map needs a connection (the risk cards still work offline from cache). For a public
+  launch, move to a paid or self-hosted tile service.
 - **Haze map**: grey, amber and purple palette under a haze tint. Fire-hotspot icons (🔥, 0.1°
   cells from the last 48 h), wind arrows, and animated drift particles that follow the wind near
   the centre of the map and stay still when the phone's reduce-motion setting is on. Time slider

@@ -11,12 +11,11 @@ import { riskRank } from '@jagasekitar/shared';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Marker } from 'react-native-maps';
-import { BaseMap } from '@/components/map/base-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, LegendRow, RiskLegend, StatusLine, TimeSlider } from '@/components/map/overlays';
+import { WebMap, type MapMarker } from '@/components/map/web-map';
 import { WindParticles } from '@/components/map/wind-particles';
-import { ZoneLayer } from '@/components/map/zone-layer';
+import { zoneForId, zonePolygons } from '@/components/map/zone-layer';
 import { RiskBadge } from '@/components/risk';
 import { ZoneSheet } from '@/components/zone-sheet';
 import { useFocusRegion } from '@/hooks/use-focus-region';
@@ -40,7 +39,7 @@ const BAND_COLORS = {
 export default function HazeMap() {
   const { t, lang, pick } = useLang();
   const insets = useSafeAreaInsets();
-  const { coords } = useApp().location;
+  const { coords, status, simulated: sim } = useApp().location;
   const region = useFocusRegion({
     latitude: 2.6,
     longitude: 101.0,
@@ -77,6 +76,29 @@ export default function HazeMap() {
     return vectorToBearing({ u: sum.u / near.length, v: sum.v / near.length });
   }, [wind.data, center]);
 
+  const polygons = useMemo(() => zonePolygons(zones.data ?? []), [zones.data]);
+  const markers = useMemo<MapMarker[]>(() => {
+    const fireMarkers = (fires.data ?? []).slice(0, 200).map((f) => {
+      const size = Math.round(Math.min(26, 12 + Math.sqrt(f.frp_sum)));
+      return {
+        id: `fire:${f.lat},${f.lon}`,
+        latitude: f.lat,
+        longitude: f.lon,
+        size: size + 4,
+        html: `<div style="font-size:${size}px;line-height:1">🔥</div>`,
+      };
+    });
+    // ➤ points east; rotate to the direction the air travels.
+    const windMarkers = (wind.data ?? []).map((w) => ({
+      id: `wind:${w.lat},${w.lon}`,
+      latitude: w.lat,
+      longitude: w.lon,
+      size: 22,
+      html: `<div style="font-size:18px;line-height:1;color:#4B4453;opacity:${Math.min(1, 0.35 + w.speed / 40).toFixed(2)};transform:rotate(${Math.round(windToBearing(w.dir_from) - 90)}deg)">➤</div>`,
+    }));
+    return [...fireMarkers, ...windMarkers];
+  }, [fires.data, wind.data]);
+
   const now = useNow();
   const at = new Date(now + slice * 3600_000);
   const here = assessPoint(coords.latitude, coords.longitude, zones.data ?? [], { time: at });
@@ -89,48 +111,15 @@ export default function HazeMap() {
 
   return (
     <View style={styles.root}>
-      <BaseMap
+      <WebMap
         style={StyleSheet.absoluteFill}
         initialRegion={region}
-        onRegionChangeComplete={(r) => setCenter({ latitude: r.latitude, longitude: r.longitude })}
-        showsUserLocation
-        toolbarEnabled={false}
-      >
-        <ZoneLayer zones={zones.data ?? []} onPress={setSelected} />
-        {(fires.data ?? []).slice(0, 200).map((f) => (
-          <Marker
-            key={`f${f.lat},${f.lon}`}
-            coordinate={{ latitude: f.lat, longitude: f.lon }}
-            tracksViewChanges={false}
-            anchor={{ x: 0.5, y: 0.5 }}
-            accessibilityLabel={`${t('haze.fires')}: ${f.hotspots}`}
-          >
-            <Text style={{ fontSize: Math.min(26, 12 + Math.sqrt(f.frp_sum)) }}>🔥</Text>
-          </Marker>
-        ))}
-        {(wind.data ?? []).map((w) => (
-          <Marker
-            key={`w${w.lat},${w.lon}`}
-            coordinate={{ latitude: w.lat, longitude: w.lon }}
-            tracksViewChanges={false}
-            anchor={{ x: 0.5, y: 0.5 }}
-            flat
-          >
-            {/* ➤ points east; rotate to the direction the air travels. */}
-            <Text
-              style={[
-                styles.arrow,
-                {
-                  transform: [{ rotate: `${windToBearing(w.dir_from) - 90}deg` }],
-                  opacity: Math.min(1, 0.35 + w.speed / 40),
-                },
-              ]}
-            >
-              ➤
-            </Text>
-          </Marker>
-        ))}
-      </BaseMap>
+        onRegionChangeComplete={setCenter}
+        user={status === 'granted' && !sim ? coords : null}
+        polygons={polygons}
+        markers={markers}
+        onPress={(id) => setSelected(zoneForId(zones.data, id) ?? null)}
+      />
 
       <LinearGradient
         pointerEvents="none"
@@ -202,6 +191,5 @@ const styles = StyleSheet.create({
   whyTitle: { fontSize: 15, fontWeight: '700', color: '#111' },
   whyText: { fontSize: 15, lineHeight: 21, color: '#222' },
   pm: { fontSize: 14, fontWeight: '700', color: '#444' },
-  arrow: { fontSize: 18, color: '#4B4453' },
   footnote: { fontSize: 12, color: '#fff', textShadowColor: '#000', textShadowRadius: 3 },
 });
