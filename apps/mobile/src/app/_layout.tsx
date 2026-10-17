@@ -1,8 +1,14 @@
 import { HAZARD_PALETTES } from '@jagasekitar/shared';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import {
+  DarkTheme,
+  DefaultTheme,
+  Stack,
+  ThemeProvider,
+  type ErrorBoundaryProps,
+} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { Pressable, Text, View, useColorScheme } from 'react-native';
 import { restoreLanguage, useLang } from '@/i18n';
 // Registers the background-location task at module load (required by TaskManager).
 import '@/lib/background-location';
@@ -66,5 +72,45 @@ export default function RootLayout() {
         <RootStack />
       </AppProvider>
     </ThemeProvider>
+  );
+}
+
+/** Shown instead of a white screen if any screen crashes; "Try again" re-renders the route. */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const { t } = useLang();
+  useEffect(() => {
+    void SplashScreen.hideAsync();
+    console.error(error);
+  }, [error]);
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        padding: 28,
+        gap: 16,
+        backgroundColor: '#F0F9FF',
+      }}
+    >
+      <Text style={{ fontSize: 24, fontWeight: '800', color: '#0C4A6E' }}>
+        {t('common.errorTitle')}
+      </Text>
+      <Text style={{ fontSize: 16, lineHeight: 23, color: '#1f2937' }}>
+        {t('common.errorBody')}
+      </Text>
+      <Pressable
+        onPress={() => void retry()}
+        accessibilityRole="button"
+        style={{
+          alignSelf: 'flex-start',
+          backgroundColor: '#0E7490',
+          borderRadius: 12,
+          paddingVertical: 12,
+          paddingHorizontal: 20,
+        }}
+      >
+        <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{t('common.retry')}</Text>
+      </Pressable>
+    </View>
   );
 }

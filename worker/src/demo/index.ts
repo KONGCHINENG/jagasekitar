@@ -40,13 +40,11 @@ async function getRuntime(ctx: SourceContext): Promise<Runtime | null> {
 
 async function setRuntime(ctx: SourceContext, value: Runtime | null): Promise<void> {
   if (value) {
-    await ctx.db
-      .from('settings')
-      .upsert({
-        key: RUNTIME_KEY,
-        value,
-        description: 'Worker bookkeeping for the running demo scenario',
-      });
+    await ctx.db.from('settings').upsert({
+      key: RUNTIME_KEY,
+      value,
+      description: 'Worker bookkeeping for the running demo scenario',
+    });
   } else {
     await ctx.db.from('settings').delete().eq('key', RUNTIME_KEY);
   }

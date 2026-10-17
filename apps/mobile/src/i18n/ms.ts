@@ -8,6 +8,9 @@ const ms: Strings = {
   common: {
     loading: 'Memuatkan…',
     retry: 'Cuba lagi',
+    errorTitle: 'Ada masalah',
+    errorBody:
+      'Skrin ini tidak dapat dimuatkan. Tempat tersimpan dan tetapan anda selamat. Cuba lagi, atau mulakan semula aplikasi.',
     close: 'Tutup',
     offline: 'Luar talian: memaparkan data tersimpan',
     updated: 'Dikemas kini {{ago}}',

@@ -6,6 +6,9 @@ const en = {
   common: {
     loading: 'Loading…',
     retry: 'Retry',
+    errorTitle: 'Something went wrong',
+    errorBody:
+      'This screen could not load. Your saved places and settings are safe. Try again, or restart the app.',
     close: 'Close',
     offline: 'Offline: showing saved data',
     updated: 'Updated {{ago}}',
