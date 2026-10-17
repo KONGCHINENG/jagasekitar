@@ -6,6 +6,7 @@ import { useLang } from '@/i18n';
 import { useNow } from '@/hooks/use-now';
 import { timeAgo } from '@/lib/format';
 import { zoneFill } from '../risk';
+import { MapCredit } from './base-map';
 
 const LEVELS = RISK_LEVELS.filter((l): l is Exclude<RiskLevel, 'none'> => l !== 'none');
 
@@ -18,14 +19,21 @@ export function RiskLegend({
   hazard,
   title,
   extra,
+  bare,
+  credit = true,
 }: {
   hazard: Hazard;
   title?: string;
   extra?: ReactNode;
+  /** Without the card background, for use inside another card. */
+  bare?: boolean;
+  /** Show the basemap credit (Android); off where the screen shows it elsewhere. */
+  credit?: boolean;
 }) {
   const { t } = useLang();
+  const Wrapper = bare ? View : Card;
   return (
-    <Card style={styles.legend}>
+    <Wrapper style={styles.legend}>
       {title && <Text style={styles.legendTitle}>{title}</Text>}
       <View style={styles.legendRow}>
         {LEVELS.map((level) => (
@@ -38,7 +46,8 @@ export function RiskLegend({
         ))}
       </View>
       {extra}
-    </Card>
+      {credit && <MapCredit />}
+    </Wrapper>
   );
 }
 

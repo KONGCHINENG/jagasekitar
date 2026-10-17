@@ -32,6 +32,9 @@ const ms: Strings = {
     locating: 'Mencari lokasi anda…',
     defaultArea: 'Memaparkan Ipoh. Benarkan lokasi untuk melihat kawasan anda.',
     legend: 'Zon aktif',
+    showOnly: 'Ketik satu bahaya untuk memaparkan zonnya sahaja di peta.',
+    details: 'Peta dan ramalan {{hazard}}',
+    locate: 'Tunjuk lokasi saya',
   },
   zone: {
     level: 'Tahap risiko',

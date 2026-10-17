@@ -2,7 +2,8 @@
 import { HAZARD_PALETTES, maxRisk, riskRank, type RiskLevel } from '@jagasekitar/shared';
 import { Fragment, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import MapView, { Marker, Polygon } from 'react-native-maps';
+import { Marker, Polygon } from 'react-native-maps';
+import { BaseMap } from '@/components/map/base-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, RiskLegend, StatusLine } from '@/components/map/overlays';
 import { polygonParts } from '@/components/map/zone-layer';
@@ -63,7 +64,7 @@ export default function IllnessMap() {
 
   return (
     <View style={styles.root}>
-      <MapView style={StyleSheet.absoluteFill} initialRegion={region} toolbarEnabled={false}>
+      <BaseMap style={StyleSheet.absoluteFill} initialRegion={region} toolbarEnabled={false}>
         {(districts.data ?? []).map((d) =>
           d.geometry ? (
             <Fragment key={d.name}>
@@ -99,7 +100,7 @@ export default function IllnessMap() {
             </View>
           </Marker>
         ))}
-      </MapView>
+      </BaseMap>
 
       <View style={styles.top} pointerEvents="box-none">
         <ScrollView

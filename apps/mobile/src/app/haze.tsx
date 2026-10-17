@@ -11,7 +11,8 @@ import { riskRank } from '@jagasekitar/shared';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { Marker } from 'react-native-maps';
+import { BaseMap } from '@/components/map/base-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, LegendRow, RiskLegend, StatusLine, TimeSlider } from '@/components/map/overlays';
 import { WindParticles } from '@/components/map/wind-particles';
@@ -88,7 +89,7 @@ export default function HazeMap() {
 
   return (
     <View style={styles.root}>
-      <MapView
+      <BaseMap
         style={StyleSheet.absoluteFill}
         initialRegion={region}
         onRegionChangeComplete={(r) => setCenter({ latitude: r.latitude, longitude: r.longitude })}
@@ -129,7 +130,7 @@ export default function HazeMap() {
             </Text>
           </Marker>
         ))}
-      </MapView>
+      </BaseMap>
 
       <LinearGradient
         pointerEvents="none"

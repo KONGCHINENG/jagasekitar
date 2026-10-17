@@ -12,7 +12,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import { Marker, Polyline } from 'react-native-maps';
+import { BaseMap, MapCredit } from '@/components/map/base-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toggle } from '@/components/map/overlays';
 import { RiskBadge } from '@/components/risk';
@@ -166,7 +167,7 @@ export default function Destination() {
 
   return (
     <View style={styles.root}>
-      <MapView style={styles.map} region={region} toolbarEnabled={false}>
+      <BaseMap style={styles.map} region={region} toolbarEnabled={false}>
         {along?.segments.map((s, i) => (
           <Polyline
             key={i}
@@ -180,7 +181,7 @@ export default function Destination() {
           pinColor="#2563EB"
         />
         <Marker coordinate={{ latitude: dest.lat, longitude: dest.lon }} title={dest.name} />
-      </MapView>
+      </BaseMap>
 
       <ScrollView contentContainerStyle={[styles.panel, { paddingBottom: insets.bottom + 24 }]}>
         <Pressable onPress={() => setDest(null)} accessibilityRole="button">
@@ -285,6 +286,7 @@ export default function Destination() {
         <Text style={styles.attribution}>
           {t('destination.attribution')} · {t('common.disclaimer')}
         </Text>
+        <MapCredit style={{ marginHorizontal: 12 }} />
       </ScrollView>
     </View>
   );

@@ -24,7 +24,8 @@ check risk at a destination and along the route.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the data-flow diagram and design decisions, and
 [PITCH_NOTES.md](PITCH_NOTES.md) for the pitch, the 3-minute demo script, limitations and the
-built / mocked checklist.
+built / mocked checklist. [DATA_ACCURACY.md](DATA_ACCURACY.md) lists the data to add next to make flood and
+haze predictions more accurate.
 
 ## Repo layout
 
@@ -179,10 +180,15 @@ Scan the QR code with Expo Go. The phone must be on the same Wi-Fi as the PC; if
 connect, run `npx expo start --tunnel` from `apps/mobile` instead. The app reads
 `EXPO_PUBLIC_SUPABASE_*` from the root `.env` (via `app.config.ts`).
 
-- **Main map** (Map tab): full-screen map at your location (Ipoh if location is denied). The
-  "Your area" card shows the overall risk badge plus Haze / Flood / Illness chips, worked out on
-  the device with the engine's `assessPoint`. Tapping a chip opens that hazard's map. All active
-  zones are drawn with neutral outlines, with a legend, the search bar and the disclaimer.
+- **Main map** (Map tab): the map is the interface. It fills the screen at your location (Ipoh if
+  location is denied), with the search bar floating on top and a locate button. A compact "Your
+  area" card at the bottom shows the overall risk badge and a Haze / Flood / Illness tile each,
+  worked out on the device with the engine's `assessPoint`. The tiles are also the layer
+  switcher: tap one to show only that hazard's zones in its own colours, with its legend and a
+  button to the full hazard map and forecast; tap it again to show every zone.
+- **Basemap**: on Android every map draws Humanitarian OpenStreetMap tiles (OSM France, no key)
+  through `components/map/base-map.tsx`, because Expo Go's Google tiles can fail and leave the map
+  black. iOS uses Apple Maps. For a public launch, move to a paid or self-hosted tile service.
 - **Haze map**: grey, amber and purple palette under a haze tint. Fire-hotspot icons (🔥, 0.1°
   cells from the last 48 h), wind arrows, and animated drift particles that follow the wind near
   the centre of the map and stay still when the phone's reduce-motion setting is on. Time slider

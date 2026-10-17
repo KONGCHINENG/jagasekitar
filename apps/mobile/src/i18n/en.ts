@@ -30,6 +30,9 @@ const en = {
     locating: 'Finding your location…',
     defaultArea: 'Showing Ipoh. Allow location to see your own area.',
     legend: 'Active zones',
+    showOnly: 'Tap a hazard to show only its zones on the map.',
+    details: '{{hazard}} map and forecast',
+    locate: 'Show my location',
   },
   zone: {
     level: 'Risk level',

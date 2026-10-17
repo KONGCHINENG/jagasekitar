@@ -7,6 +7,8 @@ import {
   type Hazard,
   type RiskLevel,
 } from '@jagasekitar/shared';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useLang } from '@/i18n';
 
@@ -63,6 +65,33 @@ export function HazardChip({
         {RISK_ICONS[level]} {t(`risk.${level}`)}
       </Text>
     </Pressable>
+  );
+}
+
+const HAZARD_GLYPHS: Record<Hazard, ComponentProps<typeof MaterialCommunityIcons>['name']> = {
+  haze: 'weather-fog',
+  flood: 'waves',
+  disease: 'virus-outline',
+};
+
+/** Vector icon for a hazard (decorative: always shown next to its name). */
+export function HazardIcon({
+  hazard,
+  size = 20,
+  color,
+}: {
+  hazard: Hazard;
+  size?: number;
+  color?: string;
+}) {
+  return (
+    <MaterialCommunityIcons
+      name={HAZARD_GLYPHS[hazard]}
+      size={size}
+      color={color ?? HAZARD_PALETTES[hazard].base}
+      accessibilityElementsHidden
+      importantForAccessibility="no"
+    />
   );
 }
 

@@ -2,7 +2,8 @@
 import * as WebBrowser from 'expo-web-browser';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { Marker } from 'react-native-maps';
+import { BaseMap } from '@/components/map/base-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, LegendRow, RiskLegend, StatusLine, Toggle } from '@/components/map/overlays';
 import { ZoneLayer } from '@/components/map/zone-layer';
@@ -69,7 +70,7 @@ export default function FloodMap() {
 
   return (
     <View style={styles.root}>
-      <MapView
+      <BaseMap
         style={StyleSheet.absoluteFill}
         initialRegion={region}
         showsUserLocation
@@ -118,7 +119,7 @@ export default function FloodMap() {
             </View>
           </Marker>
         ))}
-      </MapView>
+      </BaseMap>
 
       <WaterTint />
 
