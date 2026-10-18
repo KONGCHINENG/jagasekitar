@@ -64,15 +64,16 @@ async function loadDistricts(db: SupabaseClient, state: string): Promise<Distric
   }));
 }
 
-async function loadHotspots(db: SupabaseClient, since: Date): Promise<Hotspot[]> {
+/** In demo mode only the scenario's own fires count, so live FIRMS data can't change the script. */
+async function loadHotspots(db: SupabaseClient, since: Date, demo: boolean): Promise<Hotspot[]> {
   const out: Hotspot[] = [];
   for (let from = 0; ; from += PAGE) {
-    const { data, error } = await db
+    let query = db
       .from('fire_hotspots')
       .select('lat, lon, frp, confidence, acquired_at')
-      .gte('acquired_at', since.toISOString())
-      .order('id')
-      .range(from, from + PAGE - 1);
+      .gte('acquired_at', since.toISOString());
+    if (demo) query = query.eq('source', 'demo');
+    const { data, error } = await query.order('id').range(from, from + PAGE - 1);
     if (error) throw new Error(`fire_hotspots: ${error.message}`);
     for (const h of data ?? []) {
       out.push({
@@ -188,7 +189,7 @@ export async function runPredictions(
       const from = new Date(now.getTime() - 3 * HOUR).toISOString();
       const to = new Date(now.getTime() + (config.trajectoryHours + 3) * HOUR).toISOString();
       const [hotspots, wind, pm25, measuredRes] = await Promise.all([
-        loadHotspots(db, new Date(now.getTime() - 48 * HOUR)),
+        loadHotspots(db, new Date(now.getTime() - 48 * HOUR), demo),
         rpc<WindSample[]>(db, 'engine_weather', {
           p_kind: 'wind',
           p_from: from,
@@ -212,17 +213,20 @@ export async function runPredictions(
       ]);
       if (measuredRes.error) throw new Error(`v_air_quality_latest: ${measuredRes.error.message}`);
       const result = runHazeEngine({ now, hotspots, wind, pm25, places, config });
-      const measured = measuredHazeZones(
-        (measuredRes.data ?? []).map((o) => ({
-          name: o.name,
-          lat: o.lat,
-          lon: o.lon,
-          pm25: o.pm25,
-          observedAt: o.observed_at,
-        })),
-        now,
-        { bands: config.pm25Bands },
-      );
+      // Demo scenarios stay reproducible: no live measurements mixed in.
+      const measured = demo
+        ? []
+        : measuredHazeZones(
+            (measuredRes.data ?? []).map((o) => ({
+              name: o.name,
+              lat: o.lat,
+              lon: o.lon,
+              pm25: o.pm25,
+              observedAt: o.observed_at,
+            })),
+            now,
+            { bands: config.pm25Bands },
+          );
       const zones = await writeZones(db, 'haze', runId, [...result.zones, ...measured]);
       return {
         zones,
@@ -266,17 +270,20 @@ export async function runPredictions(
       ]);
       if (alertsRes.error) throw new Error(`official_alerts: ${alertsRes.error.message}`);
       if (flowRes.error) throw new Error(`river_flow_forecasts: ${flowRes.error.message}`);
-      const alerts: OfficialAlertInput[] = (alertsRes.data ?? []).map((a) => ({
-        source: a.source,
-        stationId: a.station_id,
-        title: a.title,
-        titleMs: (a.raw as { title_ms?: string } | null)?.title_ms,
-        level: a.level,
-        district: a.district,
-        lat: (a.raw as { lat?: number } | null)?.lat ?? null,
-        lon: (a.raw as { lon?: number } | null)?.lon ?? null,
-      }));
-      const riverFlow: RiverFlowInput[] = (flowRes.data ?? []).map((r) => ({
+      const alerts: OfficialAlertInput[] = (alertsRes.data ?? [])
+        .filter((a) => !demo || a.source !== 'metmalaysia')
+        .map((a) => ({
+          source: a.source,
+          stationId: a.station_id,
+          title: a.title,
+          titleMs: (a.raw as { title_ms?: string } | null)?.title_ms,
+          level: a.level,
+          district: a.district,
+          lat: (a.raw as { lat?: number } | null)?.lat ?? null,
+          lon: (a.raw as { lon?: number } | null)?.lon ?? null,
+        }));
+      // Demo scenarios stay reproducible: no live GloFAS forecasts or MetMalaysia warnings.
+      const riverFlow: RiverFlowInput[] = (demo ? [] : (flowRes.data ?? [])).map((r) => ({
         stationId: r.station_id,
         peak: r.peak,
         peakDate: r.peak_date,

@@ -88,7 +88,9 @@ insert into public.settings (key, value, description) values
       "high_forecast_24h_mm": 100,
       "high_cumulative_3d_mm": 150,
       "buffer_km": {"low": 3, "moderate": 4, "high": 6, "severe": 8},
-      "official_alert_min_level": "high"
+      "official_alert_min_level": "high",
+      "river_flow_levels": {"rp2": "moderate", "rp5": "high", "rp20": "high"},
+      "river_flow_min_rp2": 2
     }', 'Flood engine rules'),
   ('disease', '{
       "outbreak_min_count": 5,

@@ -26,6 +26,8 @@ const LABELS: Record<string, string> = {
   high_cumulative_3d_mm: '… with 3-day total above (mm)',
   buffer_km: 'Zone radius per level (km)',
   official_alert_min_level: 'Minimum level for official JPS alerts',
+  river_flow_levels: 'GloFAS: level when forecast flow reaches the 2 / 5 / 20-year flood flow',
+  river_flow_min_rp2: 'GloFAS: ignore rivers whose 2-year flow is below (m³/s)',
   outbreak_min_count: 'Outbreak: minimum cases in 7 days',
   outbreak_ratio: 'Outbreak: ratio to baseline',
   flood_linked: 'Diseases raised by flooding (codes)',
