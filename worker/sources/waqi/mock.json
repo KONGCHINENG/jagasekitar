@@ -1,7 +1,57 @@
 [
-  { "uid": "mock:ipoh-tasek", "source": "mock", "name": "Jalan Tasek, Ipoh (sample)", "lat": 4.6297, "lon": 101.1131, "pm25": 18.4, "aqi": 64, "observedAt": "2026-10-18T04:00:00.000Z" },
-  { "uid": "mock:ipoh-pegoh", "source": "mock", "name": "SK Jalan Pegoh, Ipoh (sample)", "lat": 4.5539, "lon": 101.0806, "pm25": 21.0, "aqi": 69, "observedAt": "2026-10-18T04:00:00.000Z" },
-  { "uid": "mock:seri-manjung", "source": "mock", "name": "Seri Manjung (sample)", "lat": 4.2008, "lon": 100.6635, "pm25": 15.2, "aqi": 57, "observedAt": "2026-10-18T04:00:00.000Z" },
-  { "uid": "mock:taiping", "source": "mock", "name": "Kg. Air Putih, Taiping (sample)", "lat": 4.8999, "lon": 100.6794, "pm25": 12.6, "aqi": 52, "observedAt": "2026-10-18T04:00:00.000Z" },
-  { "uid": "mock:tanjung-malim", "source": "mock", "name": "Tanjung Malim (sample)", "lat": 3.6884, "lon": 101.5244, "pm25": 16.8, "aqi": 61, "observedAt": "2026-10-18T04:00:00.000Z" }
+  {
+    "uid": "mock:ipoh-tasek",
+    "source": "mock",
+    "name": "Jalan Tasek, Ipoh (sample)",
+    "lat": 4.6297,
+    "lon": 101.1131,
+    "pm25": 18.4,
+    "aqi": 64,
+    "observedAt": "2026-10-18T04:00:00.000Z",
+    "official": true
+  },
+  {
+    "uid": "mock:ipoh-pegoh",
+    "source": "mock",
+    "name": "SK Jalan Pegoh, Ipoh (sample)",
+    "lat": 4.5539,
+    "lon": 101.0806,
+    "pm25": 21,
+    "aqi": 69,
+    "observedAt": "2026-10-18T04:00:00.000Z",
+    "official": true
+  },
+  {
+    "uid": "mock:seri-manjung",
+    "source": "mock",
+    "name": "Seri Manjung (sample)",
+    "lat": 4.2008,
+    "lon": 100.6635,
+    "pm25": 15.2,
+    "aqi": 57,
+    "observedAt": "2026-10-18T04:00:00.000Z",
+    "official": true
+  },
+  {
+    "uid": "mock:taiping",
+    "source": "mock",
+    "name": "Kg. Air Putih, Taiping (sample)",
+    "lat": 4.8999,
+    "lon": 100.6794,
+    "pm25": 12.6,
+    "aqi": 52,
+    "observedAt": "2026-10-18T04:00:00.000Z",
+    "official": true
+  },
+  {
+    "uid": "mock:tanjung-malim",
+    "source": "mock",
+    "name": "Tanjung Malim (sample)",
+    "lat": 3.6884,
+    "lon": 101.5244,
+    "pm25": 16.8,
+    "aqi": 61,
+    "observedAt": "2026-10-18T04:00:00.000Z",
+    "official": true
+  }
 ]

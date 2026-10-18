@@ -52,6 +52,7 @@ const ms: Strings = {
     measured: 'PM2.5 diukur: {{value}} µg/m³',
     measuredAt: 'Diukur {{value}} µg/m³ · {{band}} di {{name}}',
     stations: 'Diukur (JAS)',
+    sensor: 'Penderia komuniti (bukan rasmi)',
     pm25Unknown: 'Ramalan PM2.5 tidak tersedia di sini',
     noHaze: 'Tiada jerebu dijangka pada masa ini.',
     fires: 'Titik panas kebakaran',

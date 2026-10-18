@@ -52,7 +52,8 @@ Rehearse without phones: `npm run demo:check -w @jagasekitar/worker`.
 - Predictions are **indicative**. The haze model is a simplified puff model (no terrain, vertical mixing or
   chemistry); flood zones are rule-based buffers, not hydraulic models; disease signals depend on how many
   facilities report.
-- **Measured air quality is sample data** until a free WAQI token is added. Fire data is live from NASA FIRMS.
+- Measured air quality is hourly; community sensors are shown but never used for zones. The "Unhealthy" label starts
+  at 35 µg/m³ (the US-EPA "unhealthy for sensitive groups" level), which is stricter than some readers expect.
 - GloFAS cells are ~5 km, so a forecast may describe a neighbouring river; it never raises risk above high on its own.
 - **JPS has no public API**: we parse its web pages, which can change (the parsers fail loudly and fall back to cache,
   then mock). Station coordinates are approximate for some stations until an admin pins them.
@@ -70,7 +71,7 @@ Rehearse without phones: `npm run demo:check -w @jagasekitar/worker`.
 | NASA FIRMS                    | ✅ Live (~12,000 hotspots over 2 days)                                                   |
 | MetMalaysia warnings          | ✅ Live (data.gov.my), district-wide flood zones                                         |
 | GloFAS river forecasts        | ✅ Live, against each river's 2/5/20-year return periods                                 |
-| Measured air quality (WAQI)   | ◐ Adapter built and tested; **sample data** until `WAQI_TOKEN` is set                    |
+| Measured air quality (WAQI)   | ✅ Live: DOE monitors around Perak; unhealthy readings add zones for "now"               |
 | Haze / flood / disease        | ✅ Engines, tests, live predictions every worker tick                                    |
 | User app                      | ✅ All screens, EN/BM, offline cache, error screen                                       |
 | Notifications                 | ✅ In-app over Realtime (Expo Go); ◐ remote push needs a dev build + EAS project ID      |

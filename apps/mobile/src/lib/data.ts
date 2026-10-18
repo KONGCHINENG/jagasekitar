@@ -180,13 +180,15 @@ export interface AirStation {
   aqi: number | null;
   observed_at: string;
   simulated: boolean;
+  /** false for community sensors (shown, labelled, but not used for zones). */
+  official: boolean;
 }
 
 export const fetchAirStations = () =>
   unwrap<AirStation[]>(
     requireSupabase()
       .from('v_air_quality_latest')
-      .select('uid, name, lat, lon, pm25, aqi, observed_at, simulated')
+      .select('uid, name, lat, lon, pm25, aqi, observed_at, simulated, official')
       .gt('observed_at', new Date(Date.now() - 6 * 3600_000).toISOString()),
   );
 

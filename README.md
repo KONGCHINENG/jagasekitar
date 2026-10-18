@@ -165,9 +165,13 @@ Selama)`. The parser finds the state at the top level of the text (so "Hulu Pera
   periods, every gauge was correctly below its 2-year flow.
 - **WAQI** (`WAQI_TOKEN`, free from aqicn.org). It republishes the Department of Environment's
   (DOE) stations. WAQI gives US-EPA AQI numbers; PM2.5 is converted back to µg/m³ with the EPA
-  2024 breakpoints (approximate). Without a token, five labelled sample stations are shown, and
-  they never create zones. The parser fixtures follow the documented format; replace them with
-  saved live responses once a token is set.
+  2024 breakpoints (approximate). The PM2.5 sub-index is used, not the overall AQI (Seri Manjung
+  read overall 95 but PM2.5 105 on 2026-10-18). On 2026-10-18 a run returned 19 stations around
+  Perak, Penang, Kedah and south Thailand. Stations with a negative WAQI id are community sensors:
+  they are shown on the map (round, dashed, labelled) but never create zones; only official
+  monitors do (`air_quality_obs.official`). Without a token, five labelled sample stations are
+  shown, and they never create zones either. Parser fixtures are real responses with the token
+  scrubbed.
 
 ## Prediction engines
 

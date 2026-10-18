@@ -5,13 +5,13 @@ without a key.
 
 ## Status (2026-10-18)
 
-| #      | Item                                          | Status                                                                                                    |
-| ------ | --------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| 1      | NASA FIRMS key                                | ✅ Live: ~12,000 hotspots per run                                                                         |
-| 2      | MetMalaysia warnings                          | ✅ `metmalaysia` source → district-wide flood zones                                                       |
-| 3      | GloFAS river discharge                        | ✅ `glofas` source, judged against 2/5/20-year return periods (not the recent median: see README)         |
-| 5      | Measured air quality                          | ◐ `waqi` source built; needs `WAQI_TOKEN` (free at aqicn.org/data-platform/token). Sample data until then |
-| 4, 6–8 | Soil moisture, mixing height, AOD, visibility | Not started                                                                                               |
+| #      | Item                                          | Status                                                                                            |
+| ------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| 1      | NASA FIRMS key                                | ✅ Live: ~12,000 hotspots per run                                                                 |
+| 2      | MetMalaysia warnings                          | ✅ `metmalaysia` source → district-wide flood zones                                               |
+| 3      | GloFAS river discharge                        | ✅ `glofas` source, judged against 2/5/20-year return periods (not the recent median: see README) |
+| 5      | Measured air quality                          | ✅ `waqi` source live: 19 stations; official monitors at Unhealthy or worse add "now" zones       |
+| 4, 6–8 | Soil moisture, mixing height, AOD, visibility | Not started                                                                                       |
 
 ## Quick wins (free, no new accounts or a free key, mostly a new worker adapter)
 

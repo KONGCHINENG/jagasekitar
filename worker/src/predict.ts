@@ -201,11 +201,12 @@ export async function runPredictions(
           p_to: to,
           p_step_hours: 3,
         }),
-        // Live station readings only: sample readings must never create zones.
+        // Live official monitors only: sample readings and community sensors never create zones.
         db
           .from('v_air_quality_latest')
           .select('name, lat, lon, pm25, observed_at')
           .eq('simulated', false)
+          .eq('official', true)
           .not('pm25', 'is', null)
           .gt('observed_at', new Date(now.getTime() - 3 * HOUR).toISOString()),
       ]);

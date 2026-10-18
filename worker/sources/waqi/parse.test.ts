@@ -1,5 +1,5 @@
-// WAQI parser tests. Fixtures follow the documented JSON API format (aqicn.org/json-api/doc);
-// replace them with saved live responses once a WAQI_TOKEN is configured.
+// WAQI parser tests: real responses saved on 2026-10-18 (token scrubbed), plus small hand-written
+// ones in the documented format (aqicn.org/json-api/doc) for edge cases.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { aqiToPm25, parseBounds, parseFeed } from './parse';
@@ -47,6 +47,31 @@ describe('parseFeed', () => {
       pm25: 18.2,
       aqi: 68,
       observedAt: '2026-10-18T04:00:00.000Z',
+      official: true,
+    });
+  });
+});
+
+describe('live responses', () => {
+  it('reads the stations around Perak, telling official monitors from community sensors', () => {
+    const stations = parseBounds(fixture('bounds-live-2026-10-18.json'));
+    expect(stations).toHaveLength(19);
+    expect(stations.filter((s) => s.uid < 0)).toHaveLength(4);
+    expect(stations.find((s) => s.uid === 2598)?.name).toBe('Tanjung Malim, Perak, Malaysia');
+  });
+
+  it('uses the PM2.5 sub-index, not the overall AQI', () => {
+    const station = parseBounds(fixture('bounds-live-2026-10-18.json')).find(
+      (s) => s.uid === 2597,
+    )!;
+    // Seri Manjung: overall AQI 95, PM2.5 sub-index 105 → 37.1 µg/m³.
+    expect(parseFeed(fixture('feed-live-2026-10-18.json'), station)).toMatchObject({
+      uid: 'waqi:2597',
+      name: 'Seri Manjung, Perak, Malaysia',
+      aqi: 95,
+      pm25: 37.1,
+      observedAt: '2026-10-18T04:00:00.000Z',
+      official: true,
     });
   });
 });

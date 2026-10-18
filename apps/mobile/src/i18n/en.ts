@@ -51,6 +51,7 @@ const en = {
     measured: 'Measured PM2.5: {{value}} µg/m³',
     measuredAt: 'Measured {{value}} µg/m³ · {{band}} at {{name}}',
     stations: 'Measured (DOE)',
+    sensor: 'Community sensor (not official)',
     noHaze: 'No haze expected at this time.',
     fires: 'Fire hotspots',
     wind: 'Wind',

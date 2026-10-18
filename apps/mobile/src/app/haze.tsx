@@ -117,14 +117,16 @@ export default function HazeMap() {
                 latitude: a.lat,
                 longitude: a.lon,
                 size: 34,
-                popup: `${a.name}
-${t('haze.measured', { value })}${
-                  a.simulated
-                    ? `
-${t('common.simulated')}`
-                    : ''
-                }`,
-                html: `<div style="min-width:26px;padding:2px 4px;border-radius:6px;border:2px solid #fff;box-shadow:0 1px 3px #0006;background:${BAND_COLORS[b]};color:#fff;font:800 12px system-ui,sans-serif;text-align:center${a.simulated ? ';opacity:.7' : ''}">${value}</div>`,
+                popup: [
+                  a.name,
+                  t('haze.measured', { value }),
+                  a.official ? '' : t('haze.sensor'),
+                  a.simulated ? t('common.simulated') : '',
+                ]
+                  .filter(Boolean)
+                  .join('\n'),
+                // Community sensors: round and dashed, so they don't read as official monitors.
+                html: `<div style="min-width:26px;padding:2px 4px;border-radius:${a.official ? 6 : 13}px;border:2px ${a.official ? 'solid' : 'dashed'} #fff;box-shadow:0 1px 3px #0006;background:${BAND_COLORS[b]};color:#fff;font:800 12px system-ui,sans-serif;text-align:center${a.simulated ? ';opacity:.7' : ''}">${value}</div>`,
               };
             })
         : [];
@@ -141,7 +143,7 @@ ${t('common.simulated')}`
   const band = pm25.data != null ? pm25Band(pm25.data) : null;
   // Nearest measured station within 30 km, shown next to the model's estimate.
   const nearest = (air.data ?? [])
-    .filter((a) => a.pm25 != null)
+    .filter((a) => a.pm25 != null && a.official)
     .map((a) => ({ a, km: haversineKm(coords.latitude, coords.longitude, a.lat, a.lon) }))
     .filter((x) => x.km <= 30)
     .sort((x, y) => x.km - y.km)[0]?.a;

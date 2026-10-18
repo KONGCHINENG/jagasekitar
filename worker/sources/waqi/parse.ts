@@ -12,6 +12,8 @@ export interface AirQualityObs {
   pm25: number | null;
   aqi: number | null;
   observedAt: string;
+  /** Official monitor (positive WAQI id) rather than a community sensor (negative id). */
+  official: boolean;
 }
 
 export interface BoundsStation {
@@ -42,16 +44,15 @@ const num = (v: unknown): number | null => {
 
 /** /v2/map/bounds → stations with a current reading. */
 export function parseBounds(json: string): BoundsStation[] {
-  const rows =
-    unwrap<
-      {
-        uid?: number;
-        lat?: number;
-        lon?: number;
-        aqi?: string | number;
-        station?: { name?: string };
-      }[]
-    >(json);
+  const rows = unwrap<
+    {
+      uid?: number;
+      lat?: number;
+      lon?: number;
+      aqi?: string | number;
+      station?: { name?: string };
+    }[]
+  >(json);
   return rows
     .filter((r) => r.uid != null && r.lat != null && r.lon != null)
     .map((r) => ({
@@ -84,6 +85,7 @@ export function parseFeed(json: string, fallback: BoundsStation): AirQualityObs 
     pm25: pm25Aqi == null ? null : aqiToPm25(pm25Aqi),
     aqi: num(d.aqi) ?? fallback.aqi,
     observedAt: new Date(observed).toISOString(),
+    official: fallback.uid > 0,
   };
 }
 

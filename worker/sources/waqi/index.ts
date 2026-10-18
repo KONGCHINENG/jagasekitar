@@ -60,6 +60,7 @@ export const waqiSource: SourceDef<AirQualityObs> = {
       pm25: r.pm25,
       aqi: r.aqi,
       observed_at: r.observedAt,
+      official: r.official,
       updated_at: ctx.now.toISOString(),
     }));
     return upsertChunks(ctx.db, 'air_quality_obs', rows, 'uid');
