@@ -19,6 +19,12 @@ export interface SourceInfo {
 const fmt = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }) : '–';
 
+/** The last error is older than the last success, so it no longer applies. */
+const resolved = (s: SourceInfo) =>
+  !!s.last_error_at &&
+  !!s.last_success_at &&
+  Date.parse(s.last_success_at) > Date.parse(s.last_error_at);
+
 export function SourceRow({ source: s }: { source: SourceInfo }) {
   const [minutes, setMinutes] = useState(String(s.refresh_minutes));
   return (
@@ -56,9 +62,14 @@ export function SourceRow({ source: s }: { source: SourceInfo }) {
           <dd>{s.last_record_count ?? '–'}</dd>
         </div>
       </dl>
-      {s.last_error && (
-        <p className="text-xs break-words text-red-700 dark:text-red-400">{s.last_error}</p>
-      )}
+      {s.last_error &&
+        (resolved(s) ? (
+          <p className="text-xs break-words text-neutral-500">
+            Resolved (a later run succeeded): {s.last_error}
+          </p>
+        ) : (
+          <p className="text-xs break-words text-red-700 dark:text-red-400">{s.last_error}</p>
+        ))}
       <div className="flex flex-wrap items-end gap-2">
         <label className="flex flex-col gap-1 text-sm">
           Refresh every (minutes)

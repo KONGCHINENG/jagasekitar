@@ -61,7 +61,7 @@ async function OverviewBody() {
     supabase
       .from('data_source_status')
       .select(
-        'source, enabled, last_success_at, last_error_at, last_error, last_record_count, used_mock',
+        'source, enabled, refresh_minutes, last_success_at, last_error_at, last_error, last_record_count, used_mock',
       )
       .order('source'),
     count(supabase.from('profiles').select('*', { count: 'exact', head: true })),
@@ -113,7 +113,26 @@ async function OverviewBody() {
   const byHazard = (h: Hazard, l: RiskLevel) =>
     (zones.data ?? []).filter((z) => z.hazard === h && z.level === l).length;
   const levels = RISK_LEVELS.filter((l) => l !== 'none');
-  const STALE_MS = 2 * 3600_000;
+  // A source is stale after missing three of its own refreshes (at least 30 min).
+  const staleMs = (refreshMinutes: number) => Math.max(30, 3 * refreshMinutes) * 60_000;
+  const health = (sources.data ?? []).map((s) => {
+    const sinceOk = s.last_success_at ? now.getTime() - Date.parse(s.last_success_at) : null;
+    const erroredLater =
+      !!s.last_error_at &&
+      (!s.last_success_at || Date.parse(s.last_error_at) > Date.parse(s.last_success_at));
+    const state = !s.enabled
+      ? 'off'
+      : erroredLater
+        ? 'down'
+        : sinceOk == null || sinceOk > staleMs(s.refresh_minutes)
+          ? 'stale'
+          : s.used_mock
+            ? 'mock'
+            : 'ok';
+    return { ...s, sinceOk, erroredLater, state } as const;
+  });
+  const allStale =
+    health.length > 0 && health.every((h) => h.state === 'stale' || h.state === 'off');
 
   return (
     <div className="flex flex-col gap-6">
@@ -186,28 +205,21 @@ async function OverviewBody() {
               <th className="pb-2 font-medium">Status</th>
               <th className="pb-2 font-medium">Last success</th>
               <th className="pb-2 text-right font-medium">Records</th>
-              <th className="pb-2 font-medium">Last error</th>
+              <th className="pb-2 pl-6 font-medium">Last error</th>
             </tr>
           </thead>
           <tbody>
-            {(sources.data ?? []).map((s) => {
-              const okRecent =
-                s.last_success_at && now.getTime() - Date.parse(s.last_success_at) < STALE_MS;
-              const erroredLater =
-                s.last_error_at && (!s.last_success_at || s.last_error_at > s.last_success_at);
-              const state = !s.enabled
-                ? 'off'
-                : okRecent && !erroredLater
-                  ? s.used_mock
-                    ? 'mock'
-                    : 'ok'
-                  : 'down';
+            {health.map((s) => {
               const badge = {
                 ok: { text: '● Live', cls: 'text-green-700 dark:text-green-400' },
-                mock: { text: '◐ Mock data', cls: 'text-amber-700 dark:text-amber-400' },
-                down: { text: '✕ Failing / stale', cls: 'text-red-700 dark:text-red-400' },
+                mock: { text: '◐ Sample data', cls: 'text-amber-700 dark:text-amber-400' },
+                stale: {
+                  text: `◷ Stale${s.sinceOk != null ? ` (${ago(s.sinceOk)})` : ''}`,
+                  cls: 'text-amber-700 dark:text-amber-400',
+                },
+                down: { text: '✕ Failing', cls: 'text-red-700 dark:text-red-400' },
                 off: { text: '○ Disabled', cls: 'text-neutral-500' },
-              }[state];
+              }[s.state];
               return (
                 <tr key={s.source} className="border-t border-neutral-100 dark:border-neutral-900">
                   <td className="py-2 font-mono text-xs">{s.source}</td>
@@ -220,17 +232,27 @@ async function OverviewBody() {
                       : '–'}
                   </td>
                   <td className="py-2 text-right tabular-nums">{s.last_record_count ?? '–'}</td>
+                  {/* Only errors newer than the last success: older ones are already resolved. */}
                   <td
-                    className="max-w-72 truncate py-2 text-xs text-neutral-500"
-                    title={s.last_error ?? ''}
+                    className="max-w-72 truncate py-2 pl-6 text-xs text-red-700 dark:text-red-400"
+                    title={s.erroredLater ? (s.last_error ?? '') : ''}
                   >
-                    {s.last_error ?? ''}
+                    {s.erroredLater ? s.last_error : ''}
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+        {allStale && (
+          <p className="mt-3 text-sm text-amber-800 dark:text-amber-300">
+            No source has updated recently. Is the worker running? Start it with{' '}
+            <code className="rounded bg-neutral-100 px-1 dark:bg-neutral-800">
+              npm run worker:dev
+            </code>
+            .
+          </p>
+        )}
       </Card>
 
       <Card title="Recent prediction runs">
@@ -270,4 +292,12 @@ function Stat({ label, value, sub }: { label: string; value: number; sub?: strin
       {sub && <p className="text-xs text-neutral-500">{sub}</p>}
     </div>
   );
+}
+
+/** "35 min ago" / "3 h ago" / "2 d ago". */
+function ago(ms: number): string {
+  const min = Math.round(ms / 60_000);
+  if (min < 90) return `${min} min ago`;
+  const h = Math.round(min / 60);
+  return h < 48 ? `${h} h ago` : `${Math.round(h / 24)} d ago`;
 }

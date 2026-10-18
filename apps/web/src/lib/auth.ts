@@ -1,6 +1,7 @@
 // Data Access Layer: the only place that turns the session into "who is this and what may they do".
 import 'server-only';
 import { redirect } from 'next/navigation';
+import { connection } from 'next/server';
 import { createClient } from './supabase/server';
 
 export interface PortalUser {
@@ -14,6 +15,9 @@ export interface PortalUser {
 
 /** The signed-in portal user, or null. Reads cookies: call inside Suspense or an action. */
 export async function getPortalUser(): Promise<PortalUser | null> {
+  // Request-time only: the Supabase auth client reads the clock (token expiry), which Next.js
+  // forbids while prerendering. Without this, every portal header logged "Date.now() while prerendering".
+  await connection();
   const supabase = await createClient();
   const {
     data: { user },
