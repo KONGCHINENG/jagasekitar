@@ -2,7 +2,7 @@
 // Generic MapLibre map for the admin panel: coloured polygons (optionally clickable) and markers
 // (optionally draggable). OpenStreetMap raster tiles.
 import type { Feature, MultiPolygon, Polygon } from 'geojson';
-import * as maplibregl from 'maplibre-gl';
+import { maplibregl } from '@/lib/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useRef } from 'react';
 

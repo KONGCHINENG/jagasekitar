@@ -9,7 +9,7 @@ import {
   type RiskLevel,
 } from '@jagasekitar/shared';
 import type { MultiPolygon, Polygon } from 'geojson';
-import * as maplibregl from 'maplibre-gl';
+import { maplibregl } from '@/lib/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
