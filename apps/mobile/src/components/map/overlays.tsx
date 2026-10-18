@@ -112,11 +112,14 @@ export function Toggle<T extends string>({
   value,
   onChange,
   accent,
+  fill = true,
 }: {
   options: { value: T; label: string }[];
   value: T;
   onChange: (v: T) => void;
   accent: string;
+  /** false inside a horizontal ScrollView: options size to their labels instead of sharing the width. */
+  fill?: boolean;
 }) {
   return (
     <View style={styles.segments}>
@@ -126,9 +129,16 @@ export function Toggle<T extends string>({
           onPress={() => onChange(o.value)}
           accessibilityRole="button"
           accessibilityState={{ selected: o.value === value }}
-          style={[styles.segment, o.value === value && { backgroundColor: accent }]}
+          style={[
+            styles.segment,
+            !fill && styles.segmentHug,
+            o.value === value && { backgroundColor: accent },
+          ]}
         >
-          <Text style={[styles.segmentText, o.value === value && styles.segmentTextActive]}>
+          <Text
+            style={[styles.segmentText, o.value === value && styles.segmentTextActive]}
+            numberOfLines={1}
+          >
             {o.label}
           </Text>
         </Pressable>
@@ -193,6 +203,7 @@ const styles = StyleSheet.create({
   slider: { gap: 6 },
   segments: { flexDirection: 'row', backgroundColor: '#eceef2', borderRadius: 10, padding: 3 },
   segment: { flex: 1, paddingVertical: 8, borderRadius: 8, alignItems: 'center' },
+  segmentHug: { flex: 0, paddingHorizontal: 14 },
   segmentText: { fontSize: 14, fontWeight: '600', color: '#333' },
   segmentTextActive: { color: '#fff' },
   status: { gap: 2 },

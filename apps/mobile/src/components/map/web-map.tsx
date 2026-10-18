@@ -37,6 +37,8 @@ export interface MapMarker {
   popup?: string;
   /** Send taps to onPress. */
   pressable?: boolean;
+  /** 'bottom' puts the coordinate at the bottom centre (pins); default is the centre. */
+  anchor?: 'center' | 'bottom';
 }
 
 export interface WebMapHandle {
@@ -262,7 +264,12 @@ const PAGE = `<!doctype html>
       });
       s.markers.forEach(function (m) {
         var mk = L.marker([m.latitude, m.longitude], {
-          icon: L.divIcon({ html: m.html, className: 'pin', iconSize: [m.size, m.size] }),
+          icon: L.divIcon({
+            html: m.html,
+            className: 'pin',
+            iconSize: [m.size, m.size],
+            iconAnchor: m.anchor === 'bottom' ? [m.size / 2, m.size] : undefined,
+          }),
           interactive: !!(m.pressable || m.popup), keyboard: false,
         });
         if (m.popup) { var box = document.createElement('div'); box.textContent = m.popup; mk.bindPopup(box); }

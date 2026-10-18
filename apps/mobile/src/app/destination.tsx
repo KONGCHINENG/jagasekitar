@@ -182,6 +182,8 @@ export default function Destination() {
             latitude: dest.lat,
             longitude: dest.lon,
             size: 28,
+            // Tip on the coordinate, so the pin never hides the end of the route.
+            anchor: 'bottom',
             popup: dest.name,
             html: '<div style="width:18px;height:18px;border-radius:9px 9px 9px 0;transform:rotate(-45deg);background:#DC2626;border:3px solid #fff;box-shadow:0 1px 3px #0006"></div>',
           },
@@ -208,6 +210,7 @@ export default function Destination() {
             value={String(arrivalH)}
             onChange={(v) => setArrivalH(Number(v))}
             accent={ACCENT}
+            fill={false}
           />
         </ScrollView>
 
