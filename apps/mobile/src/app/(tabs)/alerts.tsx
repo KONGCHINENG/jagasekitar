@@ -23,7 +23,9 @@ interface MyAlert {
 
 interface OfficialAlert {
   id: number;
+  source: string;
   title: string;
+  raw: { title_ms?: string } | null;
   level: RiskLevel;
   district: string | null;
   issued_at: string;
@@ -52,7 +54,7 @@ async function fetchMine(): Promise<MyAlert[]> {
 async function fetchOfficial(): Promise<OfficialAlert[]> {
   const { data, error } = await requireSupabase()
     .from('official_alerts')
-    .select('id, title, level, district, issued_at')
+    .select('id, source, title, raw, level, district, issued_at')
     .eq('state', 'PERAK')
     .gt('expires_at', new Date().toISOString())
     .order('issued_at', { ascending: false });
@@ -129,8 +131,13 @@ export default function AlertsScreen() {
       {official.data?.map((a) => (
         <View key={a.id} style={styles.card}>
           <RiskBadge level={a.level} size="sm" />
-          <Text style={styles.title}>🌊 {a.title}</Text>
+          <Text style={styles.title}>
+            {a.source === 'metmalaysia'
+              ? `⛈️ ${lang === 'ms' && a.raw?.title_ms ? a.raw.title_ms : a.title}`
+              : `🌊 ${a.title}`}
+          </Text>
           <Text style={styles.time}>
+            {a.source === 'metmalaysia' ? 'MetMalaysia · ' : 'JPS · '}
             {a.district ? `${a.district} · ` : ''}
             {formatTime(a.issued_at, lang)}
           </Text>

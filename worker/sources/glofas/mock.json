@@ -1,0 +1,26 @@
+[
+  {
+    "stationId": "5006401",
+    "cellLat": 5.025,
+    "cellLon": 100.575,
+    "baselineMedian": 48.2,
+    "peak": 53.9,
+    "peakDate": "2026-10-18",
+    "ratio": 1.12,
+    "series": [],
+    "returnPeriods": null,
+    "exceeded": 0
+  },
+  {
+    "stationId": "5005405",
+    "cellLat": 5.025,
+    "cellLon": 100.475,
+    "baselineMedian": 21.4,
+    "peak": 22.8,
+    "peakDate": "2026-10-18",
+    "ratio": 1.07,
+    "series": [],
+    "returnPeriods": null,
+    "exceeded": 0
+  }
+]

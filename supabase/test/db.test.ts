@@ -115,6 +115,26 @@ describe('RLS: public data', () => {
       ),
     ).resolves.toBe(0);
   });
+
+  it('anon can read measured air quality and river forecasts but not write them', async () => {
+    await db.query(
+      `insert into air_quality_obs (uid, source, name, geom, pm25, aqi, observed_at)
+       values ('waqi:1', 'waqi', 'Jalan Tasek, Ipoh', 'SRID=4326;POINT(101.11 4.63)', 18.2, 68, now())`,
+    );
+    const read = await asRole(db, 'anon', null, () =>
+      db.query<{ lat: number; simulated: boolean }>(
+        `select lat, simulated from v_air_quality_latest where uid = 'waqi:1'`,
+      ),
+    );
+    expect(read.rows[0]).toEqual({ lat: 4.63, simulated: false });
+    await asRole(db, 'anon', null, () => db.query('select * from river_flow_forecasts'));
+    await expect(
+      asRole(db, 'anon', null, () =>
+        db.query(`delete from air_quality_obs`).then((r) => r.affectedRows),
+      ),
+    ).resolves.toBe(0);
+    await db.query(`delete from air_quality_obs`);
+  });
 });
 
 describe('RLS: hospital staff', () => {

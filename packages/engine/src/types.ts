@@ -82,6 +82,29 @@ export interface OfficialAlertInput {
   lat: number | null;
   lon: number | null;
   district: string | null;
+  /** 'jps' (default): station alerts. 'metmalaysia': weather warnings that cover a whole district. */
+  source?: string;
+  titleMs?: string;
+}
+
+/** A measured PM2.5 reading from a monitoring station (air_quality_obs). */
+export interface AirQualityObsInput {
+  name: string;
+  lat: number;
+  lon: number;
+  pm25: number;
+  observedAt: string;
+}
+
+/** GloFAS forecast for one JPS river gauge (see river_flow_forecasts). */
+export interface RiverFlowInput {
+  stationId: string;
+  peak: number;
+  peakDate: string;
+  rp2: number | null;
+  rp5: number | null;
+  rp20: number | null;
+  exceeded: 0 | 2 | 5 | 20;
 }
 
 export interface DiseaseSummaryInput {

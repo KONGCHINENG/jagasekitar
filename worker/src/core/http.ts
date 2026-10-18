@@ -19,7 +19,9 @@ export class HttpError extends Error {
 
 /** Hide API keys in URLs before they reach logs or the admin panel. */
 export function redactUrl(url: string): string {
-  return url.replace(/(\/api\/area\/csv\/)[^/]+/, '$1***').replace(/(key=)[^&]+/gi, '$1***');
+  return url
+    .replace(/(\/api\/area\/csv\/)[^/]+/, '$1***')
+    .replace(/((?:key|token)=)[^&]+/gi, '$1***');
 }
 
 export interface FetchOptions {

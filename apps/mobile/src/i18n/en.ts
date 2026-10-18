@@ -48,6 +48,9 @@ const en = {
     plus: '+{{h}}h',
     pm25: 'PM2.5 here: {{value}} µg/m³ · {{band}}',
     pm25Unknown: 'PM2.5 forecast unavailable here',
+    measured: 'Measured PM2.5: {{value}} µg/m³',
+    measuredAt: 'Measured {{value}} µg/m³ · {{band}} at {{name}}',
+    stations: 'Measured (DOE)',
     noHaze: 'No haze expected at this time.',
     fires: 'Fire hotspots',
     wind: 'Wind',
@@ -172,7 +175,7 @@ const en = {
   alerts: {
     mine: 'Your alerts',
     none: 'No alerts yet. You will be notified when a hazard reaches your area.',
-    official: 'Official JPS alerts',
+    official: 'Official alerts (JPS, MetMalaysia)',
     noOfficial: 'No official alerts right now.',
     announcements: 'Announcements',
   },

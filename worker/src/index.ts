@@ -8,13 +8,16 @@
 import { config } from 'dotenv';
 import { fileURLToPath } from 'node:url';
 import { firmsSource } from '../sources/firms';
+import { glofasSource } from '../sources/glofas';
 import { alertsSource, rainSource, waterLevelSource } from '../sources/infobanjir';
 import { resolveStationCoords } from '../sources/infobanjir/stations';
+import { metMalaysiaSource } from '../sources/metmalaysia';
 import {
   openMeteoAirQualitySource,
   openMeteoLocalSource,
   openMeteoWindSource,
 } from '../sources/open-meteo';
+import { waqiSource } from '../sources/waqi';
 import { createServiceClient, getSetting } from './core/db';
 import { endDemoIfNeeded, runDemoTick } from './demo';
 import type { DemoState } from './demo/scenarios';
@@ -35,6 +38,10 @@ const SOURCES: SourceDef<any>[] = [
   rainSource,
   waterLevelSource,
   alertsSource,
+  metMalaysiaSource,
+  // After the water-level source: it reads the gauges that source keeps up to date.
+  glofasSource,
+  waqiSource,
 ];
 const INFOBANJIR = new Set([rainSource.name, waterLevelSource.name, alertsSource.name]);
 // 30 s: demo scenarios advance every tick; live sources still run only when due.

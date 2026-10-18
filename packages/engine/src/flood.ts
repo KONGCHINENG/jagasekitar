@@ -7,6 +7,9 @@
 //                moderate heavy rain (≥ 31 mm/h) observed or forecast
 //                low      moderate rain (≥ 11 mm/h) observed or forecast
 //   official JPS alert: at least `officialAlertMinLevel` (default high) at the alert's station
+//   MetMalaysia warning: its own level over the whole district it names, until it expires
+//   GloFAS forecast:  peak flow at a gauge reaching its 2/5/20-year return period →
+//                     `riverFlowLevels` (default moderate/high/high) at the gauge
 // Zones: a circle around each station (radius grows with level), clipped to its district, then
 // merged per (district, level) so each zone's "why" lists the stations behind it.
 import type { HazardZone, RiskLevel } from '@jagasekitar/shared';
@@ -19,6 +22,7 @@ import type {
   OfficialAlertInput,
   PrecipSample,
   RainStationInput,
+  RiverFlowInput,
   WaterStationInput,
 } from './types';
 
@@ -40,7 +44,7 @@ const WATER_STATUS_LABEL: Record<WaterStationInput['status'], { en: string; ms: 
 const TREND_MS = { rising: 'meningkat', falling: 'menurun', steady: 'stabil' } as const;
 
 export interface StationRisk {
-  kind: 'rain' | 'water' | 'alert';
+  kind: 'rain' | 'water' | 'alert' | 'warning' | 'river';
   id: string;
   name: string;
   district: string | null;
@@ -50,6 +54,8 @@ export interface StationRisk {
   confidence: number;
   reasonEn: string;
   reasonMs: string;
+  /** The zone's area when it isn't a circle around the point (a district-wide warning). */
+  area?: Area;
 }
 
 export interface FloodInput {
@@ -58,6 +64,7 @@ export interface FloodInput {
   water: WaterStationInput[];
   forecast?: PrecipSample[];
   alerts?: OfficialAlertInput[];
+  riverFlow?: RiverFlowInput[];
   districts?: District[];
   config?: Partial<FloodConfig>;
 }
@@ -221,6 +228,11 @@ export function runFloodEngine(input: FloodInput): FloodResult {
     );
   }
   for (const a of input.alerts ?? []) {
+    if (a.source === 'metmalaysia') {
+      const risk = assessWeatherWarning(a, input.districts ?? []);
+      if (risk) risks.push(risk);
+      continue;
+    }
     // Use the alert's own coordinates, or the matching station's.
     const station = [...water, ...rain].find((s) => s.stationId === a.stationId);
     const lat = a.lat ?? station?.lat;
@@ -240,6 +252,15 @@ export function runFloodEngine(input: FloodInput): FloodResult {
     });
   }
 
+  // GloFAS uses every known gauge (even one that stopped reporting): the forecast doesn't need it.
+  for (const f of input.riverFlow ?? []) {
+    const gauge = input.water.find((w) => w.stationId === f.stationId);
+    if (gauge) {
+      const risk = assessRiverFlow(f, gauge, cfg);
+      if (risk) risks.push(risk);
+    }
+  }
+
   const atRisk = risks.filter((r) => r.level !== 'none');
   const zones = buildZones(atRisk, input.districts ?? [], cfg, now);
   return {
@@ -253,6 +274,61 @@ export function runFloodEngine(input: FloodInput): FloodResult {
     },
   };
 }
+
+/** A MetMalaysia rain/thunderstorm warning drawn over the district it names. */
+export function assessWeatherWarning(
+  a: OfficialAlertInput,
+  districts: District[],
+): StationRisk | null {
+  const district = districts.find((d) => d.name === a.district);
+  if (!district || a.level === 'none') return null;
+  return {
+    kind: 'warning',
+    id: `met:${district.name}:${a.title}`,
+    name: a.title,
+    district: district.name,
+    lat: district.centroid.lat,
+    lon: district.centroid.lon,
+    level: a.level,
+    confidence: 0.8,
+    reasonEn: `MetMalaysia ${a.title} for ${district.name}`,
+    reasonMs: `${a.titleMs ?? a.title} MetMalaysia untuk ${district.name}`,
+    area: district.geometry ?? undefined,
+  };
+}
+
+/** GloFAS forecast flow at a gauge against the river's return periods. */
+export function assessRiverFlow(
+  f: RiverFlowInput,
+  gauge: WaterStationInput,
+  cfg: FloodConfig,
+): StationRisk | null {
+  if (!f.exceeded || f.rp2 == null || f.rp2 < cfg.riverFlowMinRp2) return null;
+  const level = cfg.riverFlowLevels[`rp${f.exceeded}`];
+  if (level === 'none') return null;
+  const river = gauge.river ?? gauge.name;
+  const flow = `${Math.round(f.peak)} m³/s`;
+  return {
+    kind: 'river',
+    id: `glofas:${f.stationId}`,
+    name: gauge.name,
+    district: gauge.district,
+    lat: gauge.lat,
+    lon: gauge.lon,
+    level,
+    confidence: 0.6,
+    reasonEn: `GloFAS forecasts ${river} near ${gauge.name} at ${flow} on ${f.peakDate}, above its ${f.exceeded}-year flood flow`,
+    reasonMs: `GloFAS meramalkan ${river} berhampiran ${gauge.name} mencapai ${flow} pada ${f.peakDate}, melebihi aliran banjir ${f.exceeded} tahun`,
+  };
+}
+
+const SOURCE_LABEL: Record<StationRisk['kind'], string> = {
+  water: 'JPS water level',
+  alert: 'JPS current alerts',
+  rain: 'JPS rainfall',
+  warning: 'MetMalaysia warning',
+  river: 'GloFAS river forecast (Copernicus)',
+};
 
 function buildZones(
   risks: StationRisk[],
@@ -271,6 +347,7 @@ function buildZones(
     const district = districts.find((d) => d.name === districtName);
     const radius = cfg.bufferKm[level as Exclude<RiskLevel, 'none'>];
     const areas: Area[] = group.map((r) => {
+      if (r.area) return r.area;
       const c = circleArea(r.lat, r.lon, radius);
       // Clip to the district so a buffer doesn't spill across a watershed/district line.
       return (district?.geometry && intersectAreas(c, district.geometry)) || c;
@@ -294,15 +371,7 @@ function buildZones(
       reason: `Flood risk ${level}${where}: ${reasons.join('. ')}.`,
       reasonMs: `Risiko banjir ${LEVEL_MS[level]}${where}: ${reasonsMs.join('. ')}.`,
       sourceRefs: [
-        ...new Set(
-          group.map((r) =>
-            r.kind === 'water'
-              ? 'JPS water level'
-              : r.kind === 'alert'
-                ? 'JPS current alerts'
-                : 'JPS rainfall',
-          ),
-        ),
+        ...new Set(group.map((r) => SOURCE_LABEL[r.kind])),
         ...(group.some((r) => r.kind === 'rain') ? ['Open-Meteo rain forecast'] : []),
       ],
     });

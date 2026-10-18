@@ -49,6 +49,9 @@ const ms: Strings = {
     now: 'Kini',
     plus: '+{{h}}j',
     pm25: 'PM2.5 di sini: {{value}} µg/m³ · {{band}}',
+    measured: 'PM2.5 diukur: {{value}} µg/m³',
+    measuredAt: 'Diukur {{value}} µg/m³ · {{band}} di {{name}}',
+    stations: 'Diukur (JAS)',
     pm25Unknown: 'Ramalan PM2.5 tidak tersedia di sini',
     noHaze: 'Tiada jerebu dijangka pada masa ini.',
     fires: 'Titik panas kebakaran',
@@ -181,7 +184,7 @@ const ms: Strings = {
   alerts: {
     mine: 'Amaran anda',
     none: 'Tiada amaran lagi. Anda akan dimaklumkan apabila bahaya sampai ke kawasan anda.',
-    official: 'Amaran rasmi JPS',
+    official: 'Amaran rasmi (JPS, MetMalaysia)',
     noOfficial: 'Tiada amaran rasmi buat masa ini.',
     announcements: 'Pengumuman',
   },

@@ -36,6 +36,10 @@ export interface FloodConfig {
   /** A rising river within this distance of a rain station counts for the severe rule. */
   nearbyRiverKm: number;
   validHours: number;
+  /** GloFAS forecast peak reaching a river's 2/5/20-year return period → this level at the gauge. */
+  riverFlowLevels: { rp2: RiskLevel; rp5: RiskLevel; rp20: RiskLevel };
+  /** Ignore GloFAS cells whose 2-year flow is below this (m³/s): likely not the gauge's river. */
+  riverFlowMinRp2: number;
 }
 
 export interface DiseaseConfig {
@@ -75,6 +79,10 @@ export const DEFAULT_FLOOD: FloodConfig = {
   maxWaterAgeHours: 6,
   nearbyRiverKm: 20,
   validHours: 6,
+  // GloFAS's own colours: 2-year medium, 5-year high, 20-year severe. Capped at high here because
+  // a ~5 km cell may not sit on the gauge's exact river.
+  riverFlowLevels: { rp2: 'moderate', rp5: 'high', rp20: 'high' },
+  riverFlowMinRp2: 2,
 };
 
 export const DEFAULT_DISEASE: DiseaseConfig = {

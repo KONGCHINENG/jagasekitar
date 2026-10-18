@@ -191,3 +191,133 @@ describe('runFloodEngine', () => {
     expect(circleArea(4.77, 100.94, 4).type).toBe('Polygon');
   });
 });
+
+describe('MetMalaysia warnings and GloFAS forecasts', () => {
+  const district: District = {
+    state: 'PRK',
+    name: 'Kerian',
+    population: 190000,
+    centroid: { lat: 5.01, lon: 100.54 },
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [100.4, 4.9],
+          [100.7, 4.9],
+          [100.7, 5.2],
+          [100.4, 5.2],
+          [100.4, 4.9],
+        ],
+      ],
+    },
+  };
+  const gauge = river({
+    stationId: 'W9',
+    name: 'Sg. Kurau di Pondok Tanjung',
+    river: 'Sungai Kurau',
+    district: 'Kerian',
+    lat: 5.0,
+    lon: 100.55,
+  });
+
+  it('draws a warning over the whole district at its own level (no JPS minimum)', () => {
+    const result = runFloodEngine({
+      now: NOW,
+      rain: [],
+      water: [],
+      districts: [district],
+      alerts: [
+        {
+          source: 'metmalaysia',
+          stationId: null,
+          title: 'Thunderstorms Warning',
+          titleMs: 'Amaran Ribut Petir',
+          level: 'low',
+          lat: null,
+          lon: null,
+          district: 'Kerian',
+        },
+      ],
+    });
+    expect(result.zones).toHaveLength(1);
+    const zone = result.zones[0]!;
+    expect(zone.level).toBe('low');
+    expect(zone.reason).toBe(
+      'Flood risk low (Kerian): MetMalaysia Thunderstorms Warning for Kerian.',
+    );
+    expect(zone.reasonMs).toContain('Amaran Ribut Petir MetMalaysia untuk Kerian');
+    expect(zone.sourceRefs).toEqual(['MetMalaysia warning']);
+    // The whole district, not a station buffer.
+    expect(pointInArea(5.15, 100.45, zone.geometry)).toBe(true);
+  });
+
+  it('skips a warning for a district it does not know', () => {
+    const result = runFloodEngine({
+      now: NOW,
+      rain: [],
+      water: [],
+      districts: [district],
+      alerts: [
+        {
+          source: 'metmalaysia',
+          stationId: null,
+          title: 'X',
+          level: 'high',
+          lat: null,
+          lon: null,
+          district: 'Kinta',
+        },
+      ],
+    });
+    expect(result.zones).toEqual([]);
+  });
+
+  it('grades GloFAS peaks by return period and caps them at high', () => {
+    const flow = (exceeded: 0 | 2 | 5 | 20, rp2 = 160) => ({
+      stationId: 'W9',
+      peak: 300,
+      peakDate: '2026-10-20',
+      rp2,
+      rp5: 200,
+      rp20: 290,
+      exceeded,
+    });
+    const level = (f: ReturnType<typeof flow>) =>
+      runFloodEngine({ now: NOW, rain: [], water: [gauge], riverFlow: [f] }).zones[0]?.level ??
+      'none';
+    expect(level(flow(0))).toBe('none');
+    expect(level(flow(2))).toBe('moderate');
+    expect(level(flow(5))).toBe('high');
+    expect(level(flow(20))).toBe('high');
+    // A tiny cell is probably not the gauge's river.
+    expect(level(flow(20, 1))).toBe('none');
+
+    const zone = runFloodEngine({ now: NOW, rain: [], water: [gauge], riverFlow: [flow(5)] })
+      .zones[0]!;
+    expect(zone.reason).toContain(
+      'GloFAS forecasts Sungai Kurau near Sg. Kurau di Pondok Tanjung at 300 m³/s on 2026-10-20, above its 5-year flood flow',
+    );
+    expect(zone.sourceRefs).toEqual(['GloFAS river forecast (Copernicus)']);
+  });
+
+  it('uses the forecast even when the gauge itself has stopped reporting', () => {
+    const stale = { ...gauge, observedAt: iso(48) };
+    const result = runFloodEngine({
+      now: NOW,
+      rain: [],
+      water: [stale],
+      riverFlow: [
+        {
+          stationId: 'W9',
+          peak: 250,
+          peakDate: '2026-10-20',
+          rp2: 160,
+          rp5: 200,
+          rp20: 290,
+          exceeded: 5,
+        },
+      ],
+    });
+    expect(result.zones[0]?.level).toBe('high');
+  });
+});

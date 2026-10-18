@@ -2,6 +2,7 @@
 import {
   PM25_BAND_LABELS,
   assessPoint,
+  haversineKm,
   pm25Band,
   vectorToBearing,
   windToBearing,
@@ -24,7 +25,13 @@ import { useApp } from '@/providers/app-provider';
 import { useZones } from '@/hooks/use-zones';
 import { useNow } from '@/hooks/use-now';
 import { useLang } from '@/i18n';
-import { fetchHotspotCells, fetchPm25, fetchWind, type AppZone } from '@/lib/data';
+import {
+  fetchAirStations,
+  fetchHotspotCells,
+  fetchPm25,
+  fetchWind,
+  type AppZone,
+} from '@/lib/data';
 
 const SLICES = [0, 12, 24, 48, 72];
 const ACCENT = '#6D28D9';
@@ -55,6 +62,7 @@ export default function HazeMap() {
   const wind = useRemote(`wind:+${slice}h`, () =>
     fetchWind(new Date(Date.now() + slice * 3600_000)),
   );
+  const air = useRemote('air-stations', fetchAirStations, { refreshMs: 30 * 60_000 });
   const pm25 = useRemote(
     `pm25:${coords.latitude.toFixed(2)},${coords.longitude.toFixed(2)}:+${slice}h`,
     () => fetchPm25(coords.latitude, coords.longitude, new Date(Date.now() + slice * 3600_000)),
@@ -96,8 +104,32 @@ export default function HazeMap() {
       size: 22,
       html: `<div style="font-size:18px;line-height:1;color:#4B4453;opacity:${Math.min(1, 0.35 + w.speed / 40).toFixed(2)};transform:rotate(${Math.round(windToBearing(w.dir_from) - 90)}deg)">➤</div>`,
     }));
-    return [...fireMarkers, ...windMarkers];
-  }, [fires.data, wind.data]);
+    // Measured readings are for "now" only.
+    const airMarkers =
+      slice === 0
+        ? (air.data ?? [])
+            .filter((a) => a.pm25 != null)
+            .map((a) => {
+              const b = pm25Band(a.pm25!);
+              const value = Math.round(a.pm25!);
+              return {
+                id: `air:${a.uid}`,
+                latitude: a.lat,
+                longitude: a.lon,
+                size: 34,
+                popup: `${a.name}
+${t('haze.measured', { value })}${
+                  a.simulated
+                    ? `
+${t('common.simulated')}`
+                    : ''
+                }`,
+                html: `<div style="min-width:26px;padding:2px 4px;border-radius:6px;border:2px solid #fff;box-shadow:0 1px 3px #0006;background:${BAND_COLORS[b]};color:#fff;font:800 12px system-ui,sans-serif;text-align:center${a.simulated ? ';opacity:.7' : ''}">${value}</div>`,
+              };
+            })
+        : [];
+    return [...fireMarkers, ...windMarkers, ...airMarkers];
+  }, [fires.data, wind.data, air.data, slice, t]);
 
   const now = useNow();
   const at = new Date(now + slice * 3600_000);
@@ -107,6 +139,13 @@ export default function HazeMap() {
     here.zones.find((z) => z.hazard === 'haze') ??
     [...(zones.data ?? [])].sort((a, b) => riskRank(b.level) - riskRank(a.level))[0];
   const band = pm25.data != null ? pm25Band(pm25.data) : null;
+  // Nearest measured station within 30 km, shown next to the model's estimate.
+  const nearest = (air.data ?? [])
+    .filter((a) => a.pm25 != null)
+    .map((a) => ({ a, km: haversineKm(coords.latitude, coords.longitude, a.lat, a.lon) }))
+    .filter((x) => x.km <= 30)
+    .sort((x, y) => x.km - y.km)[0]?.a;
+  const measuredBand = nearest ? pm25Band(nearest.pm25!) : null;
   const simulated = fires.data?.some((f) => f.simulated);
 
   return (
@@ -149,6 +188,19 @@ export default function HazeMap() {
                 })
               : t('haze.pm25Unknown')}
           </Text>
+          {slice === 0 && nearest && measuredBand && (
+            <Text style={[styles.pm, { color: BAND_COLORS[measuredBand] }]}>
+              {t('haze.measuredAt', {
+                value: Math.round(nearest.pm25!),
+                band:
+                  lang === 'ms'
+                    ? PM25_BAND_LABELS[measuredBand].ms
+                    : PM25_BAND_LABELS[measuredBand].en,
+                name: nearest.name,
+              })}
+              {nearest.simulated ? ` · ${t('common.simulated')}` : ''}
+            </Text>
+          )}
           <StatusLine
             updatedAt={zones.updatedAt}
             fromCache={zones.fromCache}
@@ -173,7 +225,7 @@ export default function HazeMap() {
           }
         />
         <Text style={styles.footnote}>
-          🔥 {t('haze.fires')} · ➤ {t('haze.wind')}
+          🔥 {t('haze.fires')} · ➤ {t('haze.wind')} · ▢ {t('haze.stations')}
         </Text>
       </View>
 

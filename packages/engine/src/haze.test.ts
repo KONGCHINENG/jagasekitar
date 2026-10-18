@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pointInArea } from './geom';
 import {
+  measuredHazeZones,
   WindField,
   addPuff,
   clusterHotspots,
@@ -202,5 +203,37 @@ describe('runHazeEngine', () => {
       );
     };
     expect(rank(300)).toBeGreaterThanOrEqual(rank(20));
+  });
+});
+
+describe('measuredHazeZones', () => {
+  const now = new Date('2026-10-18T04:00:00Z');
+  const obs = (pm25: number, hoursAgo = 0.5) => ({
+    name: 'Jalan Tasek, Ipoh',
+    lat: 4.63,
+    lon: 101.11,
+    pm25,
+    observedAt: new Date(now.getTime() - hoursAgo * 3600_000).toISOString(),
+  });
+
+  it('turns unhealthy measured air into a zone around the station', () => {
+    const [zone] = measuredHazeZones([obs(80)], now);
+    expect(zone).toMatchObject({
+      hazard: 'haze',
+      level: 'high',
+      confidence: 0.9,
+      reason: 'Measured PM2.5 80 µg/m³ (Very Unhealthy) at Jalan Tasek, Ipoh.',
+      reasonMs: 'PM2.5 diukur 80 µg/m³ (Sangat Tidak Sihat) di Jalan Tasek, Ipoh.',
+      sourceRefs: ['DOE air quality (via WAQI)'],
+    });
+    expect(pointInArea(4.63, 101.11, zone!.geometry)).toBe(true);
+    expect(pointInArea(4.9, 101.11, zone!.geometry)).toBe(false);
+  });
+
+  it('ignores good and moderate air, and old readings', () => {
+    expect(measuredHazeZones([obs(12), obs(30)], now)).toEqual([]);
+    expect(measuredHazeZones([obs(200, 5)], now)).toEqual([]);
+    expect(measuredHazeZones([obs(40)], now)[0]?.level).toBe('moderate');
+    expect(measuredHazeZones([obs(200)], now)[0]?.level).toBe('severe');
   });
 });

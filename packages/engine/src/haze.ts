@@ -21,9 +21,9 @@ import type { MultiPolygon } from 'geojson';
 import { RISK_LEVELS, type HazardZone, type RiskLevel } from '@jagasekitar/shared';
 import { DEFAULT_HAZE, type HazeConfig } from './config';
 import { destinationPoint, haversineKm, windToBearing } from './geo';
-import { areaBbox, pointInArea } from './geom';
+import { areaBbox, circleArea, pointInArea, toMulti } from './geom';
 import { compass, compassMs, regionName, regionNameMs } from './regions';
-import type { Hotspot, Place, Pm25Sample, WindSample } from './types';
+import type { AirQualityObsInput, Hotspot, Place, Pm25Sample, WindSample } from './types';
 
 const HOUR = 3600_000;
 const RELEASE_STEP_H = 6;
@@ -317,6 +317,55 @@ export const PM25_BAND_LABELS: Record<Pm25Band, { en: string; ms: string }> = {
   very_unhealthy: { en: 'Very Unhealthy', ms: 'Sangat Tidak Sihat' },
   hazardous: { en: 'Hazardous', ms: 'Berbahaya' },
 };
+
+/**
+ * Measured air beats modelled air: a monitoring station reading unhealthy PM2.5 now makes a zone
+ * around it for the next few hours, whatever the smoke model says. Moderate readings are common
+ * in towns and don't count on their own.
+ */
+export const MEASURED_LEVEL: Record<Pm25Band, RiskLevel> = {
+  good: 'none',
+  moderate: 'none',
+  unhealthy: 'moderate',
+  very_unhealthy: 'high',
+  hazardous: 'severe',
+};
+
+export function measuredHazeZones(
+  obs: AirQualityObsInput[],
+  now: Date,
+  opts: {
+    bands?: HazeConfig['pm25Bands'];
+    radiusKm?: number;
+    maxAgeHours?: number;
+    validHours?: number;
+  } = {},
+): HazardZone[] {
+  const { bands = DEFAULT_HAZE.pm25Bands, radiusKm = 15, maxAgeHours = 3, validHours = 3 } = opts;
+  const t = now.getTime();
+  return obs.flatMap((o) => {
+    if (t - Date.parse(o.observedAt) > maxAgeHours * HOUR) return [];
+    const band = pm25Band(o.pm25, bands);
+    const level = MEASURED_LEVEL[band];
+    if (level === 'none') return [];
+    const label = PM25_BAND_LABELS[band];
+    const value = `${Math.round(o.pm25)} µg/m³`;
+    return [
+      {
+        id: `haze:measured:${o.name}`,
+        hazard: 'haze' as const,
+        level,
+        geometry: toMulti(circleArea(o.lat, o.lon, radiusKm)),
+        validFrom: now.toISOString(),
+        validTo: new Date(t + validHours * HOUR).toISOString(),
+        confidence: 0.9,
+        reason: `Measured PM2.5 ${value} (${label.en}) at ${o.name}.`,
+        reasonMs: `PM2.5 diukur ${value} (${label.ms}) di ${o.name}.`,
+        sourceRefs: ['DOE air quality (via WAQI)'],
+      },
+    ];
+  });
+}
 
 // ---------------------------------------------------------------------------
 // 6. The engine

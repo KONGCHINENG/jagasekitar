@@ -170,6 +170,26 @@ export async function fetchPm25(lat: number, lon: number, at: Date): Promise<num
   return rows[0]?.pm2_5 ?? null;
 }
 
+/** Measured air quality at a monitoring station (DOE via WAQI; sample data without a token). */
+export interface AirStation {
+  uid: string;
+  name: string;
+  lat: number;
+  lon: number;
+  pm25: number | null;
+  aqi: number | null;
+  observed_at: string;
+  simulated: boolean;
+}
+
+export const fetchAirStations = () =>
+  unwrap<AirStation[]>(
+    requireSupabase()
+      .from('v_air_quality_latest')
+      .select('uid, name, lat, lon, pm25, aqi, observed_at, simulated')
+      .gt('observed_at', new Date(Date.now() - 6 * 3600_000).toISOString()),
+  );
+
 export interface DistrictShape {
   name: string;
   population: number | null;

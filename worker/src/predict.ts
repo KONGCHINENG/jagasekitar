@@ -8,11 +8,13 @@ import {
   fromSettings,
   runDiseaseEngine,
   runFloodEngine,
+  measuredHazeZones,
   runHazeEngine,
   type DiseaseSummaryInput,
   type District,
   type Hotspot,
   type OfficialAlertInput,
+  type RiverFlowInput,
   type Pm25Sample,
   type PrecipSample,
   type RainStationInput,
@@ -185,7 +187,7 @@ export async function runPredictions(
       const config = fromSettings(DEFAULT_HAZE, await settingsRow(db, 'haze'));
       const from = new Date(now.getTime() - 3 * HOUR).toISOString();
       const to = new Date(now.getTime() + (config.trajectoryHours + 3) * HOUR).toISOString();
-      const [hotspots, wind, pm25] = await Promise.all([
+      const [hotspots, wind, pm25, measuredRes] = await Promise.all([
         loadHotspots(db, new Date(now.getTime() - 48 * HOUR)),
         rpc<WindSample[]>(db, 'engine_weather', {
           p_kind: 'wind',
@@ -199,9 +201,28 @@ export async function runPredictions(
           p_to: to,
           p_step_hours: 3,
         }),
+        // Live station readings only: sample readings must never create zones.
+        db
+          .from('v_air_quality_latest')
+          .select('name, lat, lon, pm25, observed_at')
+          .eq('simulated', false)
+          .not('pm25', 'is', null)
+          .gt('observed_at', new Date(now.getTime() - 3 * HOUR).toISOString()),
       ]);
+      if (measuredRes.error) throw new Error(`v_air_quality_latest: ${measuredRes.error.message}`);
       const result = runHazeEngine({ now, hotspots, wind, pm25, places, config });
-      const zones = await writeZones(db, 'haze', runId, result.zones);
+      const measured = measuredHazeZones(
+        (measuredRes.data ?? []).map((o) => ({
+          name: o.name,
+          lat: o.lat,
+          lon: o.lon,
+          pm25: o.pm25,
+          observedAt: o.observed_at,
+        })),
+        now,
+        { bands: config.pm25Bands },
+      );
+      const zones = await writeZones(db, 'haze', runId, [...result.zones, ...measured]);
       return {
         zones,
         stats: { ...result.stats, windSamples: wind.length, pm25Samples: pm25.length },
@@ -222,7 +243,7 @@ export async function runPredictions(
             Math.max(...boxes.map((b) => b[3])) + 0.3,
           ]
         : null;
-      const [rain, water, forecast, alertsRes] = await Promise.all([
+      const [rain, water, forecast, alertsRes, flowRes] = await Promise.all([
         rpc<RainStationInput[]>(db, 'engine_rain_latest', { p_state: state }),
         rpc<WaterStationInput[]>(db, 'engine_water_latest', { p_state: state }),
         rpc<PrecipSample[]>(db, 'engine_weather', {
@@ -234,23 +255,54 @@ export async function runPredictions(
         }),
         db
           .from('official_alerts')
-          .select('station_id, title, level, district, raw')
+          .select('source, station_id, title, level, district, raw')
           .gt('expires_at', now.toISOString()),
+        // GloFAS forecasts fetched in the last 2 days (it updates daily).
+        db
+          .from('river_flow_forecasts')
+          .select('station_id, peak, peak_date, rp2, rp5, rp20, exceeded')
+          .gt('fetched_at', new Date(now.getTime() - 48 * HOUR).toISOString()),
       ]);
       if (alertsRes.error) throw new Error(`official_alerts: ${alertsRes.error.message}`);
+      if (flowRes.error) throw new Error(`river_flow_forecasts: ${flowRes.error.message}`);
       const alerts: OfficialAlertInput[] = (alertsRes.data ?? []).map((a) => ({
+        source: a.source,
         stationId: a.station_id,
         title: a.title,
+        titleMs: (a.raw as { title_ms?: string } | null)?.title_ms,
         level: a.level,
         district: a.district,
         lat: (a.raw as { lat?: number } | null)?.lat ?? null,
         lon: (a.raw as { lon?: number } | null)?.lon ?? null,
       }));
-      const result = runFloodEngine({ now, rain, water, forecast, alerts, districts, config });
+      const riverFlow: RiverFlowInput[] = (flowRes.data ?? []).map((r) => ({
+        stationId: r.station_id,
+        peak: r.peak,
+        peakDate: r.peak_date,
+        rp2: r.rp2,
+        rp5: r.rp5,
+        rp20: r.rp20,
+        exceeded: r.exceeded,
+      }));
+      const result = runFloodEngine({
+        now,
+        rain,
+        water,
+        forecast,
+        alerts,
+        riverFlow,
+        districts,
+        config,
+      });
       const zones = await writeZones(db, 'flood', runId, result.zones);
       return {
         zones,
-        stats: { ...result.stats, alerts: alerts.length, forecastSamples: forecast.length },
+        stats: {
+          ...result.stats,
+          alerts: alerts.length,
+          riverForecasts: riverFlow.length,
+          forecastSamples: forecast.length,
+        },
       };
     }),
   );

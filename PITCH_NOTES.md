@@ -26,7 +26,8 @@ they're going_, explains why, and tells them what to do, in English and Bahasa M
 - **Haze:** clusters live NASA FIRMS hotspots, runs wind trajectories (850 hPa + 10 m from Open-Meteo), spreads and
   decays smoke on a 5 km grid, forecasts now → +72 h; Open-Meteo PM2.5 adjusts confidence.
 - **Flood:** JPS rain (1/3/72 h) and river status (Normal/Alert/Warning/Danger) plus the rain forecast, scored by the
-  JPS bands; official JPS alerts are always at least _high_.
+  JPS bands; official JPS alerts are always at least _high_. MetMalaysia rain warnings cover their districts, and the
+  GloFAS river-flow forecast flags rivers heading above their 2/5/20-year flood flow days ahead.
 - **Disease:** 7-day count vs. the 28-day baseline and cases per 100k per district; flooding raises water/vector-borne
   diseases and haze raises respiratory ones, and the app says so.
 
@@ -51,7 +52,8 @@ Rehearse without phones: `npm run demo:check -w @jagasekitar/worker`.
 - Predictions are **indicative**. The haze model is a simplified puff model (no terrain, vertical mixing or
   chemistry); flood zones are rule-based buffers, not hydraulic models; disease signals depend on how many
   facilities report.
-- **Fire data is mock** until a NASA FIRMS MAP_KEY is added (free).
+- **Measured air quality is sample data** until a free WAQI token is added. Fire data is live from NASA FIRMS.
+- GloFAS cells are ~5 km, so a forecast may describe a neighbouring river; it never raises risk above high on its own.
 - **JPS has no public API**: we parse its web pages, which can change (the parsers fail loudly and fall back to cache,
   then mock). Station coordinates are approximate for some stations until an admin pins them.
 - **Remote push needs a development build** (EAS). In Expo Go, alerts arrive in-app over Realtime. Background
@@ -65,7 +67,10 @@ Rehearse without phones: `npm run demo:check -w @jagasekitar/worker`.
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
 | Open-Meteo wind, rain, PM2.5  | ✅ Live                                                                                  |
 | JPS rainfall, rivers, alerts  | ✅ Live (scraped), with saved-fixture parser tests                                       |
-| NASA FIRMS                    | ◐ Adapter built and tested; **mock data** until `FIRMS_MAP_KEY` is set                   |
+| NASA FIRMS                    | ✅ Live (~12,000 hotspots over 2 days)                                                   |
+| MetMalaysia warnings          | ✅ Live (data.gov.my), district-wide flood zones                                         |
+| GloFAS river forecasts        | ✅ Live, against each river's 2/5/20-year return periods                                 |
+| Measured air quality (WAQI)   | ◐ Adapter built and tested; **sample data** until `WAQI_TOKEN` is set                    |
 | Haze / flood / disease        | ✅ Engines, tests, live predictions every worker tick                                    |
 | User app                      | ✅ All screens, EN/BM, offline cache, error screen                                       |
 | Notifications                 | ✅ In-app over Realtime (Expo Go); ◐ remote push needs a dev build + EAS project ID      |

@@ -105,7 +105,8 @@ project needed.
 
 `npm run worker:once` runs every enabled source once. `npm run worker:dev` keeps running and
 refreshes each source on its own interval, which is set in `data_source_status` (editable from the
-admin panel later). Run a single source with `npm run worker:once -- --source=infobanjir_rain`.
+admin panel later). Run a single source with `npx tsx src/index.ts --once --source=glofas` from
+`worker/` (npm swallows the `--source` flag when it goes through `npm run`).
 
 | Source (`data_source_status`) | What                                                                  | Every  |
 | ----------------------------- | --------------------------------------------------------------------- | ------ |
@@ -116,6 +117,9 @@ admin panel later). Run a single source with `npm run worker:once -- --source=in
 | `infobanjir_rain`             | JPS rainfall per station: 1/3/6/24/72 h, since midnight, 6 daily      | 15 min |
 | `infobanjir_water_level`      | JPS river levels with official Normal/Alert/Warning/Danger thresholds | 15 min |
 | `infobanjir_alerts`           | JPS current alerts (all states), with exact station coordinates       | 15 min |
+| `metmalaysia`                 | MetMalaysia rain and thunderstorm warnings for the state's districts  | 30 min |
+| `glofas`                      | GloFAS river-flow forecast per JPS gauge + 2/5/20-year return periods | 6 h    |
+| `waqi`                        | Measured PM2.5 at DOE stations (WAQI); mock without `WAQI_TOKEN`      | 1 h    |
 
 Every adapter (`worker/sources/<name>/`) has a **timeout + retry with back-off**, a **file cache**
 (`worker/.cache`, which also serves stale data if the network fails), and a **mock fallback**
@@ -141,8 +145,29 @@ While demo mode is on, the worker pauses live adapters.
   `NOMINATIM_USER_AGENT`.
 
 FIRMS without `FIRMS_MAP_KEY` uses `firms/mock.json`: synthetic hotspots in Riau, Jambi, South
-Sumatra and Kalimantan, tagged `source = 'mock'`. The FIRMS parser fixtures are hand-written in
-the documented FIRMS CSV format, because no key was available when they were written.
+Sumatra and Kalimantan, tagged `source = 'mock'`. With the key, a run returns about 12,000 live
+hotspots over two days, and the haze engine handles them in about 6 s.
+
+**New sources** (all free):
+
+- **MetMalaysia** (`api.data.gov.my/weather/warning/`, no key; the trailing slash matters). The
+  feed lists what is active now. Land warnings name places like `Perak (Kerian, Larut, Matang &
+Selama)`. The parser finds the state at the top level of the text (so "Hulu Perak" inside another
+  state's brackets doesn't count) and matches our district names, with aliases. A bare state name
+  means every district. Thunderstorm → low, continuous rain Alert/Bad/Danger → moderate/high/severe.
+  Rows go to `official_alerts` with `source = 'metmalaysia'`. There is no mock: inventing an
+  official warning would be worse than showing none.
+- **GloFAS** (Open-Meteo Flood API, no key). For each JPS river gauge, the highest forecast day
+  in the next 3 days is compared with that river's 2, 5 and 20-year return periods. These are
+  quantiles of the annual maxima in the GloFAS reanalysis, 1995–2024, refetched monthly. An
+  earlier version compared with the median of the past 92 days. On 2026-10-18 that put almost
+  every gauge at 4–17× "normal", because those months were the dry season. Against return
+  periods, every gauge was correctly below its 2-year flow.
+- **WAQI** (`WAQI_TOKEN`, free from aqicn.org). It republishes the Department of Environment's
+  (DOE) stations. WAQI gives US-EPA AQI numbers; PM2.5 is converted back to µg/m³ with the EPA
+  2024 breakpoints (approximate). Without a token, five labelled sample stations are shown, and
+  they never create zones. The parser fixtures follow the documented format; replace them with
+  saved live responses once a token is set.
 
 ## Prediction engines
 
@@ -157,10 +182,15 @@ replaces that hazard's zones atomically (`replace_hazard_zones`) and is logged i
   are summed on a 5 km grid over the Peninsula. The grid is contoured into risk bands for the
   slices now, +12h, +24h, +48h and +72h, each valid until the next slice. The Open-Meteo PM2.5
   forecast only adjusts confidence. Every simplifying assumption is listed at the top of the file.
+  **Measured air beats the model**: a live DOE station reading Unhealthy or worse in the last 3 h
+  adds a 15 km zone for "now" (Unhealthy → moderate, Very Unhealthy → high, Hazardous → severe).
 - **Flood** (`flood.ts`): JPS water-level status, observed 1/3/72 h rain, the next-24 h forecast
   and official JPS alerts (always at least `high`) are scored per station by the rules in the
   spec. Stale gauges are ignored. Stations are buffered by level, clipped to their district, and
-  merged per district and level.
+  merged per district and level. A **MetMalaysia warning** covers the whole district it names, at
+  its own level, until it expires. A **GloFAS forecast** reaching a river's 2/5/20-year flow gives
+  moderate/high/high at the gauge (`river_flow_levels`; capped at high because a ~5 km cell may not
+  sit on the gauge's exact river). Cells whose 2-year flow is under 2 m³/s are ignored.
 - **Disease** (`disease.ts`): the 7-day count vs. the 28-day baseline, and cases per 100k. An
   outbreak needs count ≥ min and ratio ≥ 2×. Active flood or haze zones raise linked diseases one
   level, and the "why" text says so.
