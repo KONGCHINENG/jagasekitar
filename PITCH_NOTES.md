@@ -41,7 +41,7 @@ they're going_, explains why, and tells them what to do, in English and Bahasa M
 4. **(1:40) Switch to "Post-flood leptospirosis + dengue".** Illness map: Kerian severe, "Flooding in Kerian → higher
    leptospirosis risk". Show the hospital portal: aggregate counts, spike warning.
 5. **(2:15) Switch to "Riau fires → Perak haze".** Haze map: fires over Sumatra, wind turning; slide the time slider
-   Now → +24 h → +48 h and watch the smoke cross the Strait to Manjung and Kinta. PM2.5 band: Unhealthy.
+   Now → +24 h → +48 h and watch the smoke cross the Strait to Manjung and Kinta. PM2.5 band: unhealthy for sensitive groups or worse.
 6. **(2:45) Admin → Broadcast:** pick Kerian, send "Evacuation centre open at SK Bagan Serai". Phone receives it.
    **Stop demo** → live data returns.
 
@@ -52,8 +52,8 @@ Rehearse without phones: `npm run demo:check -w @jagasekitar/worker`.
 - Predictions are **indicative**. The haze model is a simplified puff model (no terrain, vertical mixing or
   chemistry); flood zones are rule-based buffers, not hydraulic models; disease signals depend on how many
   facilities report.
-- Measured air quality is hourly; community sensors are shown but never used for zones. The "Unhealthy" label starts
-  at 35 µg/m³ (the US-EPA "unhealthy for sensitive groups" level), which is stricter than some readers expect.
+- Measured air quality is hourly; community sensors are shown but never used for zones. 35–55 µg/m³ is labelled
+  "unhealthy for sensitive groups" (US-EPA wording); it still raises a moderate zone.
 - GloFAS cells are ~5 km, so a forecast may describe a neighbouring river; it never raises risk above high on its own.
 - **JPS has no public API**: we parse its web pages, which can change (the parsers fail loudly and fall back to cache,
   then mock). Station coordinates are approximate for some stations until an admin pins them.

@@ -186,8 +186,8 @@ replaces that hazard's zones atomically (`replace_hazard_zones`) and is logged i
   are summed on a 5 km grid over the Peninsula. The grid is contoured into risk bands for the
   slices now, +12h, +24h, +48h and +72h, each valid until the next slice. The Open-Meteo PM2.5
   forecast only adjusts confidence. Every simplifying assumption is listed at the top of the file.
-  **Measured air beats the model**: a live DOE station reading Unhealthy or worse in the last 3 h
-  adds a 15 km zone for "now" (Unhealthy → moderate, Very Unhealthy → high, Hazardous → severe).
+  **Measured air beats the model**: a live DOE station reading "unhealthy for sensitive groups" (over 35 µg/m³) or worse in the last 3 h
+  adds a 15 km zone for "now" (unhealthy for sensitive groups → moderate, Very Unhealthy → high, Hazardous → severe).
 - **Flood** (`flood.ts`): JPS water-level status, observed 1/3/72 h rain, the next-24 h forecast
   and official JPS alerts (always at least `high`) are scored per station by the rules in the
   spec. Stale gauges are ignored. Stations are buffered by level, clipped to their district, and

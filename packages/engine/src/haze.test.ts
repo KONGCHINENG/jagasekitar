@@ -6,6 +6,7 @@ import {
   addPuff,
   clusterHotspots,
   makeRaster,
+  PM25_BAND_LABELS,
   pm25Band,
   rasterBands,
   runHazeEngine,
@@ -235,5 +236,24 @@ describe('measuredHazeZones', () => {
     expect(measuredHazeZones([obs(200, 5)], now)).toEqual([]);
     expect(measuredHazeZones([obs(40)], now)[0]?.level).toBe('moderate');
     expect(measuredHazeZones([obs(200)], now)[0]?.level).toBe('severe');
+  });
+});
+
+describe('PM2.5 band labels', () => {
+  it('names the 35–55 µg/m³ band for sensitive groups and keeps its zone level', () => {
+    expect(pm25Band(40)).toBe('unhealthy');
+    expect(PM25_BAND_LABELS.unhealthy).toEqual({
+      en: 'Unhealthy for sensitive groups',
+      ms: 'Tidak sihat untuk golongan sensitif',
+    });
+    const [zone] = measuredHazeZones(
+      [{ name: 'Ipoh', lat: 4.61, lon: 101.11, pm25: 42, observedAt: '2026-10-18T04:00:00Z' }],
+      new Date('2026-10-18T04:30:00Z'),
+    );
+    expect(zone?.level).toBe('moderate');
+    expect(zone?.reason).toBe('Measured PM2.5 42 µg/m³ (Unhealthy for sensitive groups) at Ipoh.');
+    expect(zone?.reasonMs).toBe(
+      'PM2.5 diukur 42 µg/m³ (Tidak sihat untuk golongan sensitif) di Ipoh.',
+    );
   });
 });

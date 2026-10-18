@@ -60,7 +60,7 @@ const ms: Strings = {
     bands: {
       good: 'Baik',
       moderate: 'Sederhana',
-      unhealthy: 'Tidak Sihat',
+      unhealthy: 'Tidak sihat untuk golongan sensitif',
       very_unhealthy: 'Sangat Tidak Sihat',
       hazardous: 'Berbahaya',
     },

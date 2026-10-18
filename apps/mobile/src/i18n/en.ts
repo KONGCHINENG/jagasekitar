@@ -58,7 +58,7 @@ const en = {
     bands: {
       good: 'Good',
       moderate: 'Moderate',
-      unhealthy: 'Unhealthy',
+      unhealthy: 'Unhealthy for sensitive groups',
       very_unhealthy: 'Very Unhealthy',
       hazardous: 'Hazardous',
     },

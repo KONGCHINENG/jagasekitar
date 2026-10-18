@@ -313,7 +313,11 @@ export function pm25Band(pm25: number, bands = DEFAULT_HAZE.pm25Bands): Pm25Band
 export const PM25_BAND_LABELS: Record<Pm25Band, { en: string; ms: string }> = {
   good: { en: 'Good', ms: 'Baik' },
   moderate: { en: 'Moderate', ms: 'Sederhana' },
-  unhealthy: { en: 'Unhealthy', ms: 'Tidak Sihat' },
+  // 35–55 µg/m³: the US-EPA "unhealthy for sensitive groups" range.
+  unhealthy: {
+    en: 'Unhealthy for sensitive groups',
+    ms: 'Tidak sihat untuk golongan sensitif',
+  },
   very_unhealthy: { en: 'Very Unhealthy', ms: 'Sangat Tidak Sihat' },
   hazardous: { en: 'Hazardous', ms: 'Berbahaya' },
 };
