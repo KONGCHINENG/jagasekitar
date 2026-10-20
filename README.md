@@ -340,6 +340,31 @@ npx playwright install chromium
 npm run e2e -w @jagasekitar/web
 ```
 
+## Calibration from past floods (`/admin/calibration`)
+
+Thresholds are tuned against what really happened, not guessed:
+
+1. **Past events** (`flood_events`): district, dates and a source link. 20 draft Perak events
+   (2014–2026, from news reports) ship **unverified**; an admin checks each source and clicks
+   Verify, or adds events. Only verified events are used.
+2. **Replay** (`npm run calibrate`, or `cd worker && npx tsx scripts/calibrate.ts --include-drafts`):
+   ERA5 daily rain at each district centre and GloFAS daily flow at each gauge, 2014 → last week,
+   both cached. Every day is run through the flood forecast rain rule (forecast 24 h > X and past
+   3 days > Y) for a grid of X and Y.
+3. **Score** (`packages/engine/src/calibrate.ts`): an event is caught if an alert fires from 2
+   days before it starts until it ends; an alert episode with no event is a false alarm. CSI =
+   hits / (hits + misses + false alarms). GloFAS flow above the 5-year level is a second check.
+4. **Apply**: the page shows current vs suggested thresholds with their scores; **Apply** writes
+   them to Thresholds → flood (audited) and re-runs predictions.
+
+First run (draft events): the defaults (100 / 150 mm) never fired in 12 years of gridded rain (0
+of 19 events); the best pair (70 / 50 mm) caught 5 of 19 with 33 false alarms. Daily district
+rain alone is a weak flood signal, which is why the gauge, JPS-alert and GloFAS rules carry
+most of the weight. Caveats (shown on the page): ERA5 smooths storms, the next day's actual rain
+stands in for the forecast, JPS gauge rules can't be replayed (no public history), and one
+point per district can miss local storms. Haze calibration needs historical PM2.5 (e.g. the free
+Copernicus CAMS archive) and is not built yet.
+
 ## Demo mode (`/admin/demo`)
 
 Live hazards may not be happening on pitch day, so the admin panel can replay one of three
