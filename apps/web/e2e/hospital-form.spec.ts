@@ -43,5 +43,8 @@ test('personal data in notes is refused before it reaches the server', async ({ 
   await page.getByLabel('New confirmed cases, row 1').fill('0');
   await page.getByLabel('Notes, row 1').fill('patient 850101-08-1234');
   await page.getByRole('button', { name: /^Submit 1 row/ }).click();
-  await expect(page.getByRole('alert')).toContainText('must not contain IC numbers');
+  // Next.js also renders a role="alert" route announcer, so pick the form's alert by its text.
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'must not contain IC numbers' }),
+  ).toBeVisible();
 });
