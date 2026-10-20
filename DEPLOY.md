@@ -141,8 +141,16 @@ Add each one (name exactly as shown, value from your `.env`):
 
 1. **Actions** tab → **Data worker** (left list) → **Run workflow** → **Run workflow**.
 2. Wait ~3 minutes, open the run → **run** → expand "Run due sources…".
-3. **Pass:** lines ending in `ok` and a table with `haze / flood / disease` `success`.
-   Then the portal's Overview shows recent "Last success" times.
+3. **Pass:** a green ✓, and in the log either
+   - lines ending in `ok` and a table with `haze / flood / disease` `success`, or
+   - `nothing due: every source refreshed within its interval` — normal when your laptop worker
+     (`npm run worker:dev`) refreshed everything recently. To see a full run, stop the laptop
+     worker, wait ~20 minutes, and run the workflow again.
+
+   A red ✗ that mentions `SUPABASE_URL` or a missing key means a secret is missing or misnamed (D1).
+
+4. The **"Node.js 20 is deprecated"** warning is gone once you've pushed the latest code (the
+   workflows use the Node 24 versions of GitHub's actions).
 
 ### D3. How often it runs
 

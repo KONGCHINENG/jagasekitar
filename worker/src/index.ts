@@ -234,6 +234,13 @@ function printSummary({ sources: results, predictions }: TickResult): void {
 if (once) {
   const result = await tick(!args.includes('--due'));
   printSummary(result);
+  if (!result.sources.length && !result.predictions.length) {
+    // --due with everything refreshed recently (e.g. a laptop worker is also running): not an error.
+    log.info(
+      'worker',
+      'nothing due: every source refreshed within its interval, predictions up to date',
+    );
+  }
   // Exit non-zero only if data could not be written or an engine failed; mock fallbacks are expected.
   process.exitCode =
     result.sources.some((r) => r.written === 0 && r.records > 0) ||
