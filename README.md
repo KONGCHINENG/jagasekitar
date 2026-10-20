@@ -24,7 +24,7 @@ check risk at a destination and along the route.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the data-flow diagram and design decisions, and
 [PITCH_NOTES.md](PITCH_NOTES.md) for the pitch, the 3-minute demo script, limitations and the
-built / mocked checklist. [TESTING.md](TESTING.md) is the step-by-step test workflow. [DATA_ACCURACY.md](DATA_ACCURACY.md) lists the data to add next to make flood and
+built / mocked checklist. [TESTING.md](TESTING.md) is the step-by-step test workflow, and [DEPLOY.md](DEPLOY.md) explains how to publish (GitHub, CI, Vercel, scheduled worker, Android APK). [DATA_ACCURACY.md](DATA_ACCURACY.md) lists the data to add next to make flood and
 haze predictions more accurate.
 
 ## Repo layout
