@@ -179,6 +179,7 @@ const en = {
     official: 'Official alerts (JPS, MetMalaysia)',
     noOfficial: 'No official alerts right now.',
     announcements: 'Announcements',
+    area: 'Area',
   },
 };
 

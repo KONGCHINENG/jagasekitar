@@ -39,6 +39,7 @@ interface Broadcast {
   body_ms: string | null;
   level: RiskLevel;
   sent_at: string;
+  target_districts: string[] | null;
 }
 
 async function fetchMine(): Promise<MyAlert[]> {
@@ -65,7 +66,7 @@ async function fetchOfficial(): Promise<OfficialAlert[]> {
 async function fetchBroadcasts(): Promise<Broadcast[]> {
   const { data, error } = await requireSupabase()
     .from('admin_broadcasts')
-    .select('id, title_en, title_ms, body_en, body_ms, level, sent_at')
+    .select('id, title_en, title_ms, body_en, body_ms, level, sent_at, target_districts')
     .not('sent_at', 'is', null)
     .order('sent_at', { ascending: false })
     .limit(10);
@@ -99,6 +100,11 @@ export default function AlertsScreen() {
         <View key={b.id} style={styles.card}>
           <RiskBadge level={b.level} size="sm" />
           <Text style={styles.title}>{pick(b.title_en, b.title_ms)}</Text>
+          {b.target_districts?.length ? (
+            <Text style={styles.area}>
+              📍 {t('alerts.area')}: {b.target_districts.join(', ')}
+            </Text>
+          ) : null}
           <Text style={styles.body}>{pick(b.body_en, b.body_ms)}</Text>
           <Text style={styles.time}>{formatTime(b.sent_at, lang)}</Text>
         </View>
@@ -160,4 +166,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontWeight: '700', color: '#111' },
   body: { fontSize: 15, lineHeight: 21, color: '#333' },
   time: { fontSize: 12, color: '#6b7280' },
+  area: { fontSize: 14, fontWeight: '600', color: '#0E7490' },
 });

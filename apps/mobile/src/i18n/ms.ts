@@ -188,6 +188,7 @@ const ms: Strings = {
     official: 'Amaran rasmi (JPS, MetMalaysia)',
     noOfficial: 'Tiada amaran rasmi buat masa ini.',
     announcements: 'Pengumuman',
+    area: 'Kawasan',
   },
 };
 

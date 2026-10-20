@@ -321,11 +321,17 @@ export async function sendBroadcast(input: unknown): Promise<ActionResult> {
     language: 'en' | 'ms';
   }[];
 
-  const message = (d: (typeof devices)[number]) => ({
-    title: `📢 ${d.language === 'ms' && b.titleMs ? b.titleMs : b.titleEn}`,
-    body: d.language === 'ms' && b.bodyMs ? b.bodyMs : b.bodyEn,
-  });
-  const data = { screen: '/alerts', broadcastId: id };
+  // Say where the broadcast applies, so people can tell it is about their area.
+  const area = b.districts.join(', ');
+  const message = (d: (typeof devices)[number]) => {
+    const ms = d.language === 'ms';
+    return {
+      title: `📢 ${ms && b.titleMs ? b.titleMs : b.titleEn}`,
+      body: `📍 ${ms ? 'Kawasan' : 'Area'}: ${area}
+${ms && b.bodyMs ? b.bodyMs : b.bodyEn}`,
+    };
+  };
+  const data = { screen: '/alerts', broadcastId: id, districts: b.districts };
   const results = await sendPush(
     devices
       .filter((d) => d.expo_push_token)

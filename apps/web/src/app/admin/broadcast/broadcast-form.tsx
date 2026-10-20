@@ -146,6 +146,9 @@ export function BroadcastForm({
           <div className="rounded-lg bg-neutral-100 p-3 text-sm dark:bg-neutral-900">
             <p className="text-xs font-medium text-neutral-500">Phone preview</p>
             <p className="mt-1 font-semibold">📢 {titleEn || 'Title'}</p>
+            <p className="text-cyan-800 dark:text-cyan-300">
+              📍 Area: {selected.length ? selected.join(', ') : 'choose districts'}
+            </p>
             <p>{bodyEn || 'Message'}</p>
           </div>
 
