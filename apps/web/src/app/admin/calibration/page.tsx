@@ -143,14 +143,14 @@ async function CalibrationBody() {
                     <span className="flex gap-2">
                       <ActionButton
                         className={small}
-                        action={() => setFloodEventVerified(e.id, !e.verified)}
+                        action={setFloodEventVerified.bind(null, e.id, !e.verified)}
                       >
                         {e.verified ? 'Unverify' : 'Verify'}
                       </ActionButton>
                       <ActionButton
                         className={small}
                         confirm="Delete this event?"
-                        action={() => deleteFloodEvent(e.id)}
+                        action={deleteFloodEvent.bind(null, e.id)}
                       >
                         Delete
                       </ActionButton>
@@ -255,7 +255,7 @@ function RunSummary({ run }: { run: Run }) {
           <ActionButton
             className={primary}
             confirm={`Set flood thresholds to forecast > ${run.suggested.params.highForecast24hMm} mm and past 3 days > ${run.suggested.params.highCumulative3dMm} mm?`}
-            action={() => applyCalibration(run.id)}
+            action={applyCalibration.bind(null, run.id)}
           >
             Apply suggested thresholds
           </ActionButton>
