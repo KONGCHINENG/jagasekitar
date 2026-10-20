@@ -7,6 +7,7 @@ const NAV = [
   { href: '/admin', label: 'Overview' },
   { href: '/admin/sources', label: 'Data sources' },
   { href: '/admin/thresholds', label: 'Thresholds' },
+  { href: '/admin/calibration', label: 'Calibration' },
   { href: '/admin/stations', label: 'Stations' },
   { href: '/admin/facilities', label: 'Facilities & staff' },
   { href: '/admin/reports', label: 'Case reports' },

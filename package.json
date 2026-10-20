@@ -24,7 +24,8 @@
     "seed:districts": "npm run seed:districts -w @jagasekitar/worker",
     "db:push": "supabase db push --workdir . --include-seed",
     "predict": "npm run predict -w @jagasekitar/worker",
-    "notify": "npm run notify -w @jagasekitar/worker"
+    "notify": "npm run notify -w @jagasekitar/worker",
+    "calibrate": "npm run calibrate -w @jagasekitar/worker"
   },
   "devDependencies": {
     "prettier": "^3.9.10",

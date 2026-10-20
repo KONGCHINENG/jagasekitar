@@ -572,6 +572,39 @@ describe('hospital portal: edit requests and profile', () => {
   });
 });
 
+describe('calibration', () => {
+  it('ships draft flood events unverified', async () => {
+    const res = await db.query<{ n: number; verified: number }>(
+      'select count(*)::int as n, count(*) filter (where verified)::int as verified from flood_events',
+    );
+    expect(res.rows[0]!.n).toBeGreaterThan(10);
+    expect(res.rows[0]!.verified).toBe(0);
+  });
+
+  it('only admins can read or change events and runs', async () => {
+    for (const [role, id] of [
+      ['anon', null],
+      ['authenticated', staffId],
+    ] as const) {
+      const read = await asRole(db, role, id, () => db.query('select * from flood_events'));
+      expect(read.rows).toHaveLength(0);
+      const upd = await asRole(db, role, id, () =>
+        db.query('update flood_events set verified = true').then((r) => r.affectedRows),
+      );
+      expect(upd).toBe(0);
+    }
+    const asAdmin = await asRole(db, 'authenticated', adminId, () =>
+      db.query<{ id: string }>(
+        `insert into calibration_runs (period_from, period_to, events_used, district_days, current, suggested)
+         values ('2014-01-01', '2024-12-31', 1, 10, '{}', '{}') returning id`,
+      ),
+    );
+    expect(asAdmin.rows).toHaveLength(1);
+    const audit = await db.query(`select 1 from audit_log where entity = 'calibration_runs'`);
+    expect(audit.rows.length).toBeGreaterThan(0);
+  });
+});
+
 describe('admin RPCs', () => {
   it('admins verify or reject flagged reports; staff cannot change a status', async () => {
     const rep = await db.query<{ id: string }>(

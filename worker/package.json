@@ -12,7 +12,8 @@
     "seed:districts": "tsx scripts/load-districts.ts",
     "predict": "tsx src/index.ts --once --predict",
     "notify": "tsx src/index.ts --once --notify",
-    "demo:check": "tsx scripts/demo-check.ts"
+    "demo:check": "tsx scripts/demo-check.ts",
+    "calibrate": "tsx scripts/calibrate.ts"
   },
   "dependencies": {
     "@jagasekitar/engine": "*",

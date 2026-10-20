@@ -366,3 +366,84 @@ ${ms && b.bodyMs ? b.bodyMs : b.bodyEn}`,
     `Sent to ${devices.length} device${devices.length === 1 ? '' : 's'} (${delivered.size} by push, the rest in-app)`,
   );
 }
+
+// ---------------------------------------------------------------------------
+// Calibration: past flood events and suggested thresholds
+// ---------------------------------------------------------------------------
+const floodEventSchema = z
+  .object({
+    district: z.string().trim().min(2, 'Choose a district'),
+    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date is required'),
+    endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'End date is required'),
+    description: z.string().trim().max(300).optional(),
+    sourceUrl: z
+      .string()
+      .trim()
+      .url('Source must be a link (news report, NADMA, JPS…)')
+      .max(500)
+      .optional()
+      .or(z.literal('')),
+  })
+  .refine((e) => e.endDate >= e.startDate, 'End date must be on or after the start date');
+
+export async function addFloodEvent(input: unknown): Promise<ActionResult> {
+  const parsed = floodEventSchema.safeParse(input);
+  if (!parsed.success) return fail(parsed.error.issues[0]!.message);
+  const e = parsed.data;
+  const supabase = await admin();
+  const user = await requireAdmin();
+  const { error } = await supabase.from('flood_events').insert({
+    district: e.district,
+    start_date: e.startDate,
+    end_date: e.endDate,
+    description: e.description || null,
+    source_url: e.sourceUrl || null,
+    // Entered by an admin from a source they checked.
+    verified: true,
+    created_by: user.id,
+  });
+  return error ? fail(error.message) : ok('Event added');
+}
+
+export async function setFloodEventVerified(id: string, verified: boolean): Promise<ActionResult> {
+  const supabase = await admin();
+  const { error } = await supabase.from('flood_events').update({ verified }).eq('id', id);
+  return error ? fail(error.message) : ok(verified ? 'Verified' : 'Marked unverified');
+}
+
+export async function deleteFloodEvent(id: string): Promise<ActionResult> {
+  const supabase = await admin();
+  const { error } = await supabase.from('flood_events').delete().eq('id', id);
+  return error ? fail(error.message) : ok('Deleted');
+}
+
+/** Copy a calibration run's suggested rain thresholds into the flood settings. */
+export async function applyCalibration(runId: string): Promise<ActionResult> {
+  const supabase = await admin();
+  const user = await requireAdmin();
+  const [{ data: run }, { data: setting }] = await Promise.all([
+    supabase.from('calibration_runs').select('suggested').eq('id', runId).single(),
+    supabase.from('settings').select('value').eq('key', 'flood').single(),
+  ]);
+  const params = (
+    run?.suggested as { params?: { highForecast24hMm?: number; highCumulative3dMm?: number } }
+  )?.params;
+  if (!params?.highForecast24hMm || params.highCumulative3dMm == null || !setting)
+    return fail('This run has no suggestion to apply');
+  const value = {
+    ...(setting.value as Record<string, unknown>),
+    high_forecast_24h_mm: params.highForecast24hMm,
+    high_cumulative_3d_mm: params.highCumulative3dMm,
+  };
+  const { error } = await supabase.from('settings').update({ value }).eq('key', 'flood');
+  if (error) return fail(error.message);
+  await supabase
+    .from('calibration_runs')
+    .update({ applied_at: new Date().toISOString(), applied_by: user.id })
+    .eq('id', runId);
+  await supabase
+    .from('settings')
+    .update({ value: { predict_at: new Date().toISOString() } })
+    .eq('key', 'worker_requests');
+  return ok('Applied to flood thresholds; predictions re-run on the next worker tick');
+}
