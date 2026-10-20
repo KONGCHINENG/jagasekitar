@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RefreshFab, useRefreshAll } from '@/components/map/refresh-button';
 import { MapCredit, WebMap, type WebMapHandle } from '@/components/map/web-map';
 import { Card, RiskLegend, StatusLine } from '@/components/map/overlays';
 import { zoneForId, zonePolygons } from '@/components/map/zone-layer';
@@ -44,6 +45,8 @@ export default function HomeMap() {
   const [selected, setSelected] = useState<AppZone | null>(null);
   const [layer, setLayer] = useState<Hazard | null>(null);
   const [cardHeight, setCardHeight] = useState(200);
+
+  const { refresh, loading: refreshing } = useRefreshAll([zones]);
 
   const recenter = () =>
     map.current?.animateToRegion({ ...coords, latitudeDelta: 0.4, longitudeDelta: 0.4 });
@@ -116,6 +119,7 @@ export default function HomeMap() {
         style={[styles.fabs, { bottom: bottomOffset + cardHeight + 12 }]}
         pointerEvents="box-none"
       >
+        <RefreshFab onPress={refresh} loading={refreshing} />
         <Pressable
           onPress={recenter}
           accessibilityRole="button"

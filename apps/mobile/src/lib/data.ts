@@ -252,13 +252,15 @@ export interface FacilityPin {
   lat: number;
   lon: number;
   reports_7d: number;
+  /** Confirmed cases in the last 7 days (sum over reports, rejected ones excluded). */
+  cases_7d: number;
 }
 
 export const fetchFacilities = () =>
   unwrap<FacilityPin[]>(
     requireSupabase()
       .from('v_facility_report_counts')
-      .select('facility_id, name, type, district, lat, lon, reports_7d')
+      .select('facility_id, name, type, district, lat, lon, reports_7d, cases_7d')
       .eq('state', DEFAULT_STATE),
   );
 

@@ -9,11 +9,13 @@ import {
   windVector,
 } from '@jagasekitar/engine';
 import { riskRank } from '@jagasekitar/shared';
+import { Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, LegendRow, RiskLegend, StatusLine, TimeSlider } from '@/components/map/overlays';
+import { RefreshHeaderButton, useRefreshAll } from '@/components/map/refresh-button';
 import { WebMap, type MapMarker } from '@/components/map/web-map';
 import { WindParticles } from '@/components/map/wind-particles';
 import { zoneForId, zonePolygons } from '@/components/map/zone-layer';
@@ -84,6 +86,7 @@ export default function HazeMap() {
     return vectorToBearing({ u: sum.u / near.length, v: sum.v / near.length });
   }, [wind.data, center]);
 
+  const { refresh, loading: refreshing } = useRefreshAll([zones, fires, wind, air, pm25]);
   const polygons = useMemo(() => zonePolygons(zones.data ?? []), [zones.data]);
   const markers = useMemo<MapMarker[]>(() => {
     const fireMarkers = (fires.data ?? []).slice(0, 200).map((f) => {
@@ -152,6 +155,11 @@ export default function HazeMap() {
 
   return (
     <View style={styles.root}>
+      <Stack.Screen
+        options={{
+          headerRight: () => <RefreshHeaderButton onPress={refresh} loading={refreshing} />,
+        }}
+      />
       <WebMap
         style={StyleSheet.absoluteFill}
         initialRegion={region}

@@ -6,6 +6,7 @@ const en = {
   common: {
     loading: 'Loading…',
     retry: 'Retry',
+    refresh: 'Refresh map data',
     errorTitle: 'Something went wrong',
     errorBody:
       'This screen could not load. Your saved places and settings are safe. Try again, or restart the app.',
@@ -87,6 +88,7 @@ const en = {
     all: 'All',
     facilities: 'Reporting facilities',
     reports: '{{count}} reports this week',
+    casesWeek: '{{cases}} confirmed cases this week ({{reports}} reports)',
     district: 'District',
     cases7d: '{{count}} cases in 7 days',
     trend: 'Last 14 days',

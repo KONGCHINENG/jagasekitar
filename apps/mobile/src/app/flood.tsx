@@ -1,9 +1,11 @@
 // Flood map: water palette, rain stations by intensity, river gauges by status, flood zones.
+import { Stack } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, LegendRow, RiskLegend, StatusLine, Toggle } from '@/components/map/overlays';
+import { RefreshHeaderButton, useRefreshAll } from '@/components/map/refresh-button';
 import { WebMap, escapeHtml, type MapMarker } from '@/components/map/web-map';
 import { zoneForId, zonePolygons } from '@/components/map/zone-layer';
 import { Sheet } from '@/components/sheet';
@@ -69,6 +71,7 @@ export default function FloodMap() {
   const bandOf = (r: RainStation) =>
     period === '1h' ? rainBand(r.rain_1h) : rain24Band(r.rain_24h);
 
+  const { refresh, loading: refreshing } = useRefreshAll([zones, rain, water]);
   const polygons = useMemo(() => zonePolygons(zones.data ?? []), [zones.data]);
   const markers: MapMarker[] = [
     ...rainPins.map((r) => {
@@ -108,6 +111,11 @@ export default function FloodMap() {
 
   return (
     <View style={styles.root}>
+      <Stack.Screen
+        options={{
+          headerRight: () => <RefreshHeaderButton onPress={refresh} loading={refreshing} />,
+        }}
+      />
       <WebMap
         style={StyleSheet.absoluteFill}
         initialRegion={region}

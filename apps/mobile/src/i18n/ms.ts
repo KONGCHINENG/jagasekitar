@@ -8,6 +8,7 @@ const ms: Strings = {
   common: {
     loading: 'Memuatkan…',
     retry: 'Cuba lagi',
+    refresh: 'Muat semula data peta',
     errorTitle: 'Ada masalah',
     errorBody:
       'Skrin ini tidak dapat dimuatkan. Tempat tersimpan dan tetapan anda selamat. Cuba lagi, atau mulakan semula aplikasi.',
@@ -89,6 +90,7 @@ const ms: Strings = {
     all: 'Semua',
     facilities: 'Fasiliti yang melapor',
     reports: '{{count}} laporan minggu ini',
+    casesWeek: '{{cases}} kes disahkan minggu ini ({{reports}} laporan)',
     district: 'Daerah',
     cases7d: '{{count}} kes dalam 7 hari',
     trend: '14 hari lalu',

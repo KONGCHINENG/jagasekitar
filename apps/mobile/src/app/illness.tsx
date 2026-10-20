@@ -1,9 +1,11 @@
 // Illness map: district choropleth by risk, disease filter, facility pins, per-district trends.
 import { HAZARD_PALETTES, maxRisk, riskRank, type RiskLevel } from '@jagasekitar/shared';
+import { Stack } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, RiskLegend, StatusLine } from '@/components/map/overlays';
+import { RefreshHeaderButton, useRefreshAll } from '@/components/map/refresh-button';
 import { WebMap, type MapMarker, type MapPolygon } from '@/components/map/web-map';
 import { polygonParts } from '@/components/map/zone-layer';
 import { RiskBadge, zoneFill } from '@/components/risk';
@@ -23,7 +25,7 @@ import {
 } from '@/lib/data';
 
 const ACCENT = HAZARD_PALETTES.disease.base;
-const HOUR = 3600_000;
+const FIVE_MIN = 5 * 60_000;
 
 export default function IllnessMap() {
   const { t, lang, pick } = useLang();
@@ -40,8 +42,10 @@ export default function IllnessMap() {
   });
   const districts = useRemote('districts', fetchDistricts);
   const types = useRemote('disease-types', fetchDiseaseTypes);
-  const summary = useRemote('disease-summary', fetchDiseaseSummary, { refreshMs: HOUR });
-  const facilities = useRemote('facilities', fetchFacilities, { refreshMs: HOUR });
+  const summary = useRemote('disease-summary', fetchDiseaseSummary, { refreshMs: FIVE_MIN });
+  const facilities = useRemote('facilities', fetchFacilities, { refreshMs: FIVE_MIN });
+
+  const { refresh, loading: refreshing } = useRefreshAll([zones, districts, summary, facilities]);
 
   const visibleZones = useMemo(
     () => (zones.data ?? []).filter((z) => !disease || z.diseaseCode === disease),
@@ -67,12 +71,13 @@ export default function IllnessMap() {
     longitude: f.lon,
     size: 34,
     popup: `${f.name}
-${t('illness.reports', { count: f.reports_7d })}`,
+${t('illness.casesWeek', { cases: f.cases_7d, reports: f.reports_7d })}`,
     html:
       `<div style="display:flex;flex-direction:column;align-items:center">` +
       `<div style="font-size:20px;line-height:1">${f.type === 'hospital' ? '🏥' : '🩺'}</div>` +
-      (f.reports_7d > 0
-        ? `<div style="margin-top:-4px;font:800 11px system-ui,sans-serif;color:#fff;background:${ACCENT};border-radius:8px;padding:0 5px">${f.reports_7d}</div>`
+      // Confirmed cases this week (a report corrected to 0 no longer shows a number).
+      (f.cases_7d > 0
+        ? `<div style="margin-top:-4px;font:800 11px system-ui,sans-serif;color:#fff;background:${ACCENT};border-radius:8px;padding:0 5px">${f.cases_7d}</div>`
         : '') +
       '</div>',
   }));
@@ -95,6 +100,11 @@ ${t('illness.reports', { count: f.reports_7d })}`,
 
   return (
     <View style={styles.root}>
+      <Stack.Screen
+        options={{
+          headerRight: () => <RefreshHeaderButton onPress={refresh} loading={refreshing} />,
+        }}
+      />
       <WebMap
         style={StyleSheet.absoluteFill}
         initialRegion={region}

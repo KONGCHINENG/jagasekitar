@@ -1,7 +1,7 @@
 // Destination check: search a place → risk there at arrival time → risk along the route.
 import { assessPoint, riskAlongRoute } from '@jagasekitar/engine';
 import { HAZARD_PALETTES, RISK_COLORS, type RiskLevel } from '@jagasekitar/shared';
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -12,6 +12,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { RefreshHeaderButton, useRefreshAll } from '@/components/map/refresh-button';
 import { MapCredit, WebMap } from '@/components/map/web-map';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toggle } from '@/components/map/overlays';
@@ -85,6 +86,8 @@ export default function Destination() {
       : null,
     () => fetchRoute(from, dest!),
   );
+
+  const { refresh, loading: refreshing } = useRefreshAll([zonesNow, zonesAtArrival, route]);
 
   const atDest = dest
     ? assessPoint(dest.lat, dest.lon, zonesAtArrival.data ?? [], { time: arrival })
@@ -166,6 +169,13 @@ export default function Destination() {
 
   return (
     <View style={styles.root}>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <RefreshHeaderButton onPress={refresh} loading={refreshing} color="#0E7490" />
+          ),
+        }}
+      />
       <WebMap
         style={styles.map}
         region={region}
