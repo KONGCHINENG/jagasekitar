@@ -37,6 +37,9 @@ const LABELS: Record<string, string> = {
   dedupe_hours: "Don't repeat an alert within (hours)",
   batch_size: 'Push batch size',
   quiet_hours_bypass_level: 'Level that ignores quiet hours',
+  daily_briefing: 'AI: write a briefing every morning',
+  briefing_hour_myt: 'AI: morning briefing hour (Malaysia time, 0–23)',
+  daily_limit: 'AI: briefings allowed per day',
 };
 
 export function SettingForm({ settingKey, value }: { settingKey: string; value: Json }) {

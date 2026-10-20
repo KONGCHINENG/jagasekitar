@@ -49,7 +49,7 @@ describe('migrations and seed', () => {
       facilities: 12,
       rain_stations: 18,
       water_level_stations: 8,
-      settings: 9,
+      settings: 10,
     });
   });
 

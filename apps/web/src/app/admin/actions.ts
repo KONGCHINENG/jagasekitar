@@ -58,6 +58,7 @@ const EDITABLE_SETTINGS = [
   'refresh_minutes',
   'retention_hours',
   'stale_data_minutes',
+  'ai',
 ];
 
 export async function saveSetting(key: string, value: unknown): Promise<ActionResult> {
@@ -446,4 +447,23 @@ export async function applyCalibration(runId: string): Promise<ActionResult> {
     .update({ value: { predict_at: new Date().toISOString() } })
     .eq('key', 'worker_requests');
   return ok('Applied to flood thresholds; predictions re-run on the next worker tick');
+}
+
+// ---------------------------------------------------------------------------
+// AI briefing (the worker generates it; this only queues the request)
+// ---------------------------------------------------------------------------
+export async function requestBriefing(): Promise<ActionResult> {
+  const supabase = await admin();
+  const user = await requireAdmin();
+  const { count } = await supabase
+    .from('ai_briefings')
+    .select('id', { count: 'exact', head: true })
+    .in('status', ['queued', 'running']);
+  if (count) return ok('A briefing is already being prepared');
+  const { error } = await supabase
+    .from('ai_briefings')
+    .insert({ requested_by: user.id, trigger: 'manual' });
+  return error
+    ? fail(error.message)
+    : ok('Queued. The worker writes it in about 1–3 minutes (needs the worker running).');
 }

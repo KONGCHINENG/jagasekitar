@@ -8,7 +8,15 @@ import { ZonePreview } from './zone-preview';
 
 export const metadata = { title: 'Thresholds · Admin' };
 
-const ORDER = ['haze', 'flood', 'disease', 'notifications', 'refresh_minutes', 'retention_hours'];
+const ORDER = [
+  'haze',
+  'flood',
+  'disease',
+  'notifications',
+  'ai',
+  'refresh_minutes',
+  'retention_hours',
+];
 
 export default function ThresholdsPage() {
   return (

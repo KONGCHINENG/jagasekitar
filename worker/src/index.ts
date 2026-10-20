@@ -23,6 +23,7 @@ import { waqiSource } from '../sources/waqi';
 import { createServiceClient, getSetting } from './core/db';
 import { endDemoIfNeeded, runDemoTick } from './demo';
 import type { DemoState } from './demo/scenarios';
+import { runBriefings } from './ai';
 import { runNotifications } from './notify';
 import { runPredictions, type PredictionSummary } from './predict';
 import { log } from './core/log';
@@ -193,6 +194,8 @@ async function tick(force: boolean): Promise<TickResult> {
       ? await runPredictions(ctx)
       : [];
   if (predictions.length) await notifySafely(ctx);
+  // AI briefings queued from the admin page, and the morning briefing (no-op without a key).
+  await runBriefings(ctx);
   return { sources: results, predictions };
 }
 

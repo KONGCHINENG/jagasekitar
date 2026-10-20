@@ -16,18 +16,30 @@ import { previewBroadcast, sendBroadcast } from '../actions';
 const input =
   'w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900';
 
+export interface BroadcastDraft {
+  districts: string[];
+  level: RiskLevel;
+  titleEn: string;
+  titleMs: string;
+  bodyEn: string;
+  bodyMs: string;
+}
+
 export function BroadcastForm({
   districts,
+  initial,
 }: {
   districts: { name: string; geometry: Polygon | MultiPolygon | null }[];
+  /** Pre-filled from an AI briefing suggestion; the admin still reviews and sends. */
+  initial?: BroadcastDraft;
 }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [level, setLevel] = useState<RiskLevel>('high');
-  const [titleEn, setTitleEn] = useState('');
-  const [titleMs, setTitleMs] = useState('');
-  const [bodyEn, setBodyEn] = useState('');
-  const [bodyMs, setBodyMs] = useState('');
+  const [selected, setSelected] = useState<string[]>(initial?.districts ?? []);
+  const [level, setLevel] = useState<RiskLevel>(initial?.level ?? 'high');
+  const [titleEn, setTitleEn] = useState(initial?.titleEn ?? '');
+  const [titleMs, setTitleMs] = useState(initial?.titleMs ?? '');
+  const [bodyEn, setBodyEn] = useState(initial?.bodyEn ?? '');
+  const [bodyMs, setBodyMs] = useState(initial?.bodyMs ?? '');
   const [preview, setPreview] = useState<{ devices: number; withPush: number } | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message?: string } | null>(null);

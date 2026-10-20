@@ -27,6 +27,8 @@ jobs:
       WAQI_TOKEN: ${{ secrets.WAQI_TOKEN }}
       NOMINATIM_USER_AGENT: ${{ secrets.NOMINATIM_USER_AGENT }}
       EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+      # AI briefing agent (optional: without it, queued briefings fail with a clear message)
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
       DEFAULT_STATE: PRK
     steps:
       - uses: actions/checkout@v7

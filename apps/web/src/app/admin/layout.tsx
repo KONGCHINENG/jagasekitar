@@ -8,6 +8,7 @@ const NAV = [
   { href: '/admin/sources', label: 'Data sources' },
   { href: '/admin/thresholds', label: 'Thresholds' },
   { href: '/admin/calibration', label: 'Calibration' },
+  { href: '/admin/briefing', label: 'AI briefing' },
   { href: '/admin/stations', label: 'Stations' },
   { href: '/admin/facilities', label: 'Facilities & staff' },
   { href: '/admin/reports', label: 'Case reports' },
