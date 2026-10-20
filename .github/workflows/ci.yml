@@ -1,0 +1,30 @@
+# Checks every push and pull request: types, lint and all test suites (no secrets needed;
+# the database tests run on an in-memory Postgres).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint (portal)
+        run: npm run lint
+      - name: Lint (app)
+        run: npm run lint -w @jagasekitar/mobile
+      - name: Unit tests
+        run: npm test
+      - name: Database tests
+        run: npm run test:db

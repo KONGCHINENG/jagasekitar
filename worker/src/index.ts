@@ -1,6 +1,8 @@
 // JagaSekitar data worker.
 //   npm run worker:once                       run every enabled source once, then exit
 //   npm run worker:once -- --source=firms     run one source
+//   tsx src/index.ts --once --due             run once, but only sources whose interval has passed
+//                                             (scheduled runs, e.g. the GitHub Actions workflow)
 //   npm run worker:dev                        keep running; each source refreshes on its own interval
 //   npm run predict                           run the prediction engines only
 // After any source writes data, the haze/flood/disease engines re-run.
@@ -230,7 +232,7 @@ function printSummary({ sources: results, predictions }: TickResult): void {
 }
 
 if (once) {
-  const result = await tick(true);
+  const result = await tick(!args.includes('--due'));
   printSummary(result);
   // Exit non-zero only if data could not be written or an engine failed; mock fallbacks are expected.
   process.exitCode =

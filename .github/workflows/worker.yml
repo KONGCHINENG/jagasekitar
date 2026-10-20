@@ -1,0 +1,46 @@
+# Runs the data worker on a schedule so data, predictions and alerts stay fresh when no laptop is
+# running `npm run worker:dev`. Each run fetches only the sources that are due (their interval in
+# Admin → Data sources has passed), re-runs predictions and sends notifications.
+#
+# Minutes: a run takes ~2 min. Private repos get 2,000 free minutes a month, so the default is
+# hourly (~1,500 min). On a public repo, minutes are free: switch to every 15 minutes.
+# Demo mode needs a tick every 30 s, so run demos with the laptop worker (`npm run worker:dev`).
+name: Data worker
+
+on:
+  schedule:
+    - cron: '7 * * * *' # hourly at :07 (UTC). Public repo: '*/15 * * * *'
+  workflow_dispatch: # "Run workflow" button in the Actions tab
+
+concurrency:
+  group: data-worker
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+      WAQI_TOKEN: ${{ secrets.WAQI_TOKEN }}
+      NOMINATIM_USER_AGENT: ${{ secrets.NOMINATIM_USER_AGENT }}
+      EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+      DEFAULT_STATE: PRK
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # The worker's response cache (e.g. GloFAS 30-year history, refetched monthly) between runs.
+      - uses: actions/cache@v4
+        with:
+          path: worker/.cache
+          key: worker-cache-${{ github.run_id }}
+          restore-keys: worker-cache-
+      - name: Run due sources, predictions and notifications
+        working-directory: worker
+        run: npx tsx src/index.ts --once --due
