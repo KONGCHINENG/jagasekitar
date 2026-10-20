@@ -115,6 +115,13 @@ const en = {
     deliveryInApp:
       'Alerts appear while the app is open or in the background (push needs the installed app).',
     deliveryDenied: 'Notifications are off. Turn them on to get alerts.',
+    testNotification: 'Send test notification',
+    testTitle: '✅ JagaSekitar test',
+    testBody: 'Notifications work on this phone.',
+    testSentPush:
+      'Sent by push. It should appear within a few seconds, even with the app closed next time.',
+    testSentLocal: 'Shown on this phone (in-app mode: push needs the installed app).',
+    testFailed: 'Test failed: {{error}}',
     enableNotifications: 'Turn on notifications',
     privacy: 'Privacy',
     privacyText:

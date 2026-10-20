@@ -62,6 +62,8 @@ interface AppContextValue {
   prefs: AlertPrefs;
   setPrefs: (p: AlertPrefs) => void;
   pushStatus: PushStatus;
+  /** Expo push token of this install, when push is available. */
+  pushToken: string | null;
   refreshPush: () => Promise<void>;
   error: string | null;
   resetAll: () => Promise<void>;
@@ -240,6 +242,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         void savePrefs(p);
       },
       pushStatus: push.status,
+      pushToken: push.token,
       refreshPush,
       error,
       resetAll: async () => {
@@ -265,6 +268,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       real.status,
       prefs,
       push.status,
+      push.token,
       refreshPush,
       error,
     ],

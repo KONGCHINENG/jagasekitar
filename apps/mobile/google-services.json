@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "879192796260",
+    "project_id": "jagasekitar-c848e",
+    "storage_bucket": "jagasekitar-c848e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879192796260:android:fcad7ce998792d1d170371",
+        "android_client_info": {
+          "package_name": "com.jagasekitar.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmOW3Ac-m9d6qAtPzY7PO7QcQ3KgzAtOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

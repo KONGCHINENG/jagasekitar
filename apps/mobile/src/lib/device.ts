@@ -86,6 +86,40 @@ export async function setupNotificationChannel(): Promise<void> {
 export type PushStatus = 'push' | 'in_app' | 'denied';
 
 /**
+ * Settings → "Send test notification". With a push token it goes the real way (Expo push service
+ * → Firebase → this phone), so it proves push works; otherwise it shows a local notification.
+ */
+export async function sendTestNotification(
+  token: string | null,
+  text: { title: string; body: string },
+): Promise<'push' | 'local'> {
+  await setupNotificationChannel();
+  if (!token) {
+    await Notifications.scheduleNotificationAsync({ content: text, trigger: null });
+    return 'local';
+  }
+  const res = await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      to: token,
+      ...text,
+      sound: 'default',
+      priority: 'high',
+      channelId: 'alerts',
+    }),
+  });
+  const json = (await res.json().catch(() => null)) as {
+    data?: { status?: string; message?: string };
+    errors?: { message?: string }[];
+  } | null;
+  if (!res.ok || json?.data?.status !== 'ok') {
+    throw new Error(json?.data?.message ?? json?.errors?.[0]?.message ?? `HTTP ${res.status}`);
+  }
+  return 'push';
+}
+
+/**
  * Expo push token when possible. Expo Go on Android can't receive remote push (SDK 53+), and a
  * token needs an EAS projectId; otherwise alerts arrive in-app over Realtime instead.
  */

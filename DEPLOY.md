@@ -227,11 +227,31 @@ npx eas-cli@latest build --platform android --profile preview
 
 Notes:
 
-- Alerts arrive **in-app** (while the app is open) until push is set up: real push on Android also
-  needs Firebase (FCM) credentials uploaded with `npx eas-cli@latest credentials`. Ask Claude when
-  you want it.
 - **Background location** works in this build: Settings → "Background location".
 - New version: run E3 again. (Small JS-only changes can later use `eas update` instead of a full build.)
+- When asked "Install and run the Android build on an emulator?", answer **N** (that needs Android
+  Studio; install on the phone instead).
+
+### E5. Real push notifications (alerts when the app is closed)
+
+Android delivers push through Firebase Cloud Messaging (free). Already set up for this project:
+
+1. Firebase project `jagasekitar-c848e` with an Android app `com.jagasekitar.app`; its
+   `apps/mobile/google-services.json` is committed (it's in every app build; not a secret) and
+   `app.json` points to it (`android.googleServicesFile`).
+2. The Firebase **service account key** (FCM V1) is uploaded to Expo with
+   `npx eas-cli@latest credentials` → Android → preview → Google Service Account → FCM V1.
+   That key is secret: it's stored only at Expo, never in the repo.
+
+After a new build (E3) and install:
+
+- App → **Settings → Delivery** says "Push notifications are on."
+- **Send test notification** → a notification arrives within seconds ("Sent by push").
+- Swipe the app closed, then Admin → **Broadcast** to your district → it arrives on the locked phone,
+  and the portal reports "… by push".
+
+If Settings still says in-app: open the app once with internet, check notifications are allowed
+(Android Settings → Apps → JagaSekitar → Notifications), then reopen Settings.
 
 ---
 

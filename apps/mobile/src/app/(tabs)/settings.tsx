@@ -10,7 +10,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { setLanguage, useLang, type Language } from '@/i18n';
 import { setBackgroundLocation } from '@/lib/background-location';
 import { fetchDistricts } from '@/lib/data';
-import { IS_EXPO_GO, setupNotificationChannel } from '@/lib/device';
+import { IS_EXPO_GO, sendTestNotification, setupNotificationChannel } from '@/lib/device';
 import { useApp } from '@/providers/app-provider';
 
 const ACCENT = '#0E7490';
@@ -23,7 +23,24 @@ const QUIET_PRESETS = [
 export default function SettingsScreen() {
   const { t, lang } = useLang();
   const theme = useTheme();
-  const { prefs, setPrefs, pushStatus, refreshPush, resetAll, location, setSimulated } = useApp();
+  const { prefs, setPrefs, pushStatus, pushToken, refreshPush, resetAll, location, setSimulated } =
+    useApp();
+  const [testNote, setTestNote] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const sendTest = async () => {
+    setTesting(true);
+    try {
+      const how = await sendTestNotification(pushStatus === 'push' ? pushToken : null, {
+        title: t('settings.testTitle'),
+        body: t('settings.testBody'),
+      });
+      setTestNote(how === 'push' ? t('settings.testSentPush') : t('settings.testSentLocal'));
+    } catch (e) {
+      setTestNote(t('settings.testFailed', { error: (e as Error).message }));
+    } finally {
+      setTesting(false);
+    }
+  };
   const [bgNote, setBgNote] = useState<string | null>(null);
   const [devTaps, setDevTaps] = useState(0);
   const districts = useRemote(devTaps >= 5 ? 'districts' : null, fetchDistricts);
@@ -82,6 +99,17 @@ export default function SettingsScreen() {
             <Text style={styles.buttonText}>{t('settings.enableNotifications')}</Text>
           </Pressable>
         )}
+        {pushStatus !== 'denied' && (
+          <Pressable
+            style={[styles.button, testing && { opacity: 0.6 }]}
+            onPress={() => void sendTest()}
+            disabled={testing}
+            accessibilityRole="button"
+          >
+            <Text style={styles.buttonText}>{t('settings.testNotification')}</Text>
+          </Pressable>
+        )}
+        {testNote && <Paragraph>{testNote}</Paragraph>}
       </Section>
 
       <Section title={t('settings.hazards')}>

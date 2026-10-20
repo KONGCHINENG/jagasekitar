@@ -124,6 +124,14 @@ const ms: Strings = {
     deliveryInApp:
       'Amaran dipaparkan semasa aplikasi dibuka atau di latar belakang (notifikasi tolak memerlukan aplikasi yang dipasang).',
     deliveryDenied: 'Notifikasi dimatikan. Hidupkan untuk menerima amaran.',
+    testNotification: 'Hantar notifikasi ujian',
+    testTitle: '✅ Ujian JagaSekitar',
+    testBody: 'Notifikasi berfungsi pada telefon ini.',
+    testSentPush:
+      'Dihantar melalui push. Ia patut muncul dalam beberapa saat, walaupun aplikasi ditutup.',
+    testSentLocal:
+      'Dipaparkan pada telefon ini (mod dalam aplikasi: push memerlukan aplikasi yang dipasang).',
+    testFailed: 'Ujian gagal: {{error}}',
     enableNotifications: 'Hidupkan notifikasi',
     privacy: 'Privasi',
     privacyText:
