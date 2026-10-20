@@ -94,15 +94,17 @@ close the other window (or the Claude browser preview), then run it again.
 ### Window C: phone app
 
 ```bat
-cd /d C:\Users\User\Desktop\jagasekitar
+cd /d C:\Users\User\Desktop\jagasekitar\apps\mobile
 nvm use 24.21.0
-npm run dev:mobile -- --clear
+npx expo start --clear
 ```
+
+(`npm run dev:mobile` from the repo root also starts it, but npm swallows extra flags such as `--clear`.)
 
 On the phone (same Wi-Fi or hotspot as the laptop), open **Expo Go** (SDK 57) and scan the QR code.
 
-- Different networks or the QR won't connect: stop with `Ctrl+C` and run
-  `cd apps\mobile` then `npx expo start --tunnel` (needs `npx expo login` first).
+- Different networks or the QR won't connect: stop with `Ctrl+C` and run `npx expo start --tunnel` in the same
+  window (needs `npx expo login` first).
 - Reload the app after code changes: press `r` in window C, or shake the phone → **Reload**.
 
 ---
@@ -129,13 +131,13 @@ Sign in with the **demo admin** account (email/password from `DEMO_ADMIN_*` in `
 
 Sign out, then sign in with the **demo staff** account (`DEMO_STAFF_*` in `.env`).
 
-| #   | Page      | Do                                           | Pass                                                     |
-| --- | --------- | -------------------------------------------- | -------------------------------------------------------- |
-| 4.1 | Dashboard | Open                                         | Your facility name, recent totals, no error overlay      |
-| 4.2 | Report    | Enter today's **Dengue = 30** → submit       | **Spike warning** appears first; after confirming, saved |
-| 4.3 | Upload    | Download `template.csv`, fill 2 rows, upload | "2 rows saved" (or the errors explained per row)         |
-| 4.4 | History   | Edit one of today's reports                  | Saved; reports older than 48 h can't be edited           |
-| 4.5 | Map       | Open                                         | District map loads (no "Worker failed to load")          |
+| #   | Page      | Do                                           | Pass                                                      |
+| --- | --------- | -------------------------------------------- | --------------------------------------------------------- |
+| 4.1 | Dashboard | Open                                         | Your facility name, recent totals, no error overlay       |
+| 4.2 | Report    | Enter today's **Dengue = 30** → submit       | **Spike warning** appears first; after confirming, saved  |
+| 4.3 | Upload    | Download `template.csv`, fill 2 rows, upload | Success message for both rows (or each bad row explained) |
+| 4.4 | History   | Edit one of today's reports                  | Saved; reports older than 48 h can't be edited            |
+| 4.5 | Map       | Open                                         | District map loads (no "Worker failed to load")           |
 
 Then on the phone: **Illness map** → your facility's district turns pink/red within ~1 minute (after window A runs
 the next prediction). Tap the district: the dengue numbers and the "why" text appear.
@@ -209,7 +211,7 @@ First time only, if it asks for browsers:
 npx playwright install chromium
 ```
 
-**Pass:** all tests `passed`. It uses the demo staff account from `.env`.
+**Pass:** all tests `passed`. It signs in with the demo staff account from `.env` and reuses the portal in window B if it is running.
 
 ---
 
