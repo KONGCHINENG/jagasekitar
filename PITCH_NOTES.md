@@ -47,6 +47,13 @@ they're going_, explains why, and tells them what to do, in English and Bahasa M
 
 Rehearse without phones: `npm run demo:check -w @jagasekitar/worker`.
 
+## AI agent (drafts only)
+
+Admin → AI briefing: an AI agent (NVIDIA-hosted open model) reads the live zones, official alerts,
+hospital totals and data health through read-only tools and drafts a briefing in English and
+Bahasa Melayu with suggested broadcasts. An admin reviews and sends; the AI never sends anything,
+gets no personal data, and must back every claim with the data it checked.
+
 ## Honest limitations
 
 - Predictions are **indicative**. The haze model is a simplified puff model (no terrain, vertical mixing or

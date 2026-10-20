@@ -340,6 +340,29 @@ npx playwright install chromium
 npm run e2e -w @jagasekitar/web
 ```
 
+## AI briefing agent (`/admin/briefing`)
+
+An LLM drafts a situation briefing for admins; it never sends anything.
+
+- **Where it runs:** in the worker (`worker/src/ai`), so there's no Vercel time limit and the API
+  key never reaches Vercel or the app. Admins queue a briefing from the page ("Generate briefing
+  now"); a morning briefing is also queued automatically (Thresholds → `ai`: on/off, hour, daily
+  cap).
+- **Provider:** any OpenAI-compatible API. Default NVIDIA (`NVIDIA_API_KEY`, build.nvidia.com) with
+  `openai/gpt-oss-20b`: it supports tool calling and writes Malaysian Malay when given a glossary.
+  Override with `AI_BASE_URL`, `AI_MODEL`, `AI_API_KEY` (e.g. DeepSeek). Tested 2026-10-21:
+  several listed NVIDIA models return 404 for free accounts; Gemma 4 wrote the best Malay but took
+  over 4 minutes per answer.
+- **Tools (read-only):** districts, active zones, official alerts, disease totals per district,
+  data-source health, broadcasts in the last 48 h. No user locations, devices or personal data.
+- **Guardrails:** the reply must match a JSON schema (summary EN/BM + up to 5 suggestions with valid
+  levels); unknown districts are dropped; if the model answers without checking a data source,
+  the worker fetches it, shows it and asks for a revised answer (it once claimed "all data are
+  fresh" without checking); model quirks such as `<|channel|>` in tool names are cleaned.
+- **Using a suggestion:** "Review & send as broadcast" opens the Broadcast page pre-filled; the
+  admin edits, previews recipients and sends as usual (audited).
+- A real run takes 1–6 minutes on the free tier (one tool per step, 6–9 model calls).
+
 ## Calibration from past floods (`/admin/calibration`)
 
 Thresholds are tuned against what really happened, not guessed:

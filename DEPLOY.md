@@ -128,14 +128,15 @@ are due, re-runs predictions and sends alerts. It needs secrets, which GitHub st
 GitHub repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**.
 Add each one (name exactly as shown, value from your `.env`):
 
-| Secret name                 | From `.env`                         |
-| --------------------------- | ----------------------------------- |
-| `SUPABASE_URL`              | `SUPABASE_URL`                      |
-| `SUPABASE_SERVICE_ROLE_KEY` | `SUPABASE_SERVICE_ROLE_KEY`         |
-| `FIRMS_MAP_KEY`             | `FIRMS_MAP_KEY`                     |
-| `WAQI_TOKEN`                | `WAQI_TOKEN`                        |
-| `NOMINATIM_USER_AGENT`      | `NOMINATIM_USER_AGENT`              |
-| `EXPO_ACCESS_TOKEN`         | `EXPO_ACCESS_TOKEN` (skip if empty) |
+| Secret name                 | From `.env`                              |
+| --------------------------- | ---------------------------------------- |
+| `SUPABASE_URL`              | `SUPABASE_URL`                           |
+| `SUPABASE_SERVICE_ROLE_KEY` | `SUPABASE_SERVICE_ROLE_KEY`              |
+| `FIRMS_MAP_KEY`             | `FIRMS_MAP_KEY`                          |
+| `WAQI_TOKEN`                | `WAQI_TOKEN`                             |
+| `NOMINATIM_USER_AGENT`      | `NOMINATIM_USER_AGENT`                   |
+| `EXPO_ACCESS_TOKEN`         | `EXPO_ACCESS_TOKEN` (skip if empty)      |
+| `NVIDIA_API_KEY`            | `NVIDIA_API_KEY` (AI briefing; optional) |
 
 ### D2. Run it once by hand
 
