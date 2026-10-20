@@ -1,7 +1,14 @@
 const en = {
   appName: 'JagaSekitar',
   tabs: { map: 'Map', alerts: 'Alerts', places: 'Places', settings: 'Settings' },
-  hazard: { haze: 'Haze', flood: 'Flood', disease: 'Illness' },
+  hazard: {
+    haze: 'Haze',
+    flood: 'Flood',
+    disease: 'Illness',
+    earthquake: 'Earthquake',
+    tsunami: 'Tsunami',
+    landslide: 'Landslide',
+  },
   hazardMap: { haze: 'Haze map', flood: 'Flood map', disease: 'Illness map' },
   common: {
     loading: 'Loading…',
@@ -110,6 +117,11 @@ const en = {
       'Lets alerts follow you when the app is closed. Only your last location is kept.',
     backgroundUnsupported: 'Needs the installed app (development build); not available in Expo Go.',
     backgroundDenied: 'Location permission was not given.',
+    showHazards: 'Hazards to show',
+    showHazardsHelp:
+      'Hidden hazards disappear from the map, "Your area" and destination checks. Alerts follow "Notify me about" below.',
+    comingSoon: 'Coming soon',
+    keepOne: 'Keep at least one hazard on.',
     delivery: 'Delivery',
     deliveryPush: 'Push notifications are on.',
     deliveryInApp:

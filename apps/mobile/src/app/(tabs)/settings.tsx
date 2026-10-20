@@ -11,6 +11,8 @@ import { setLanguage, useLang, type Language } from '@/i18n';
 import { setBackgroundLocation } from '@/lib/background-location';
 import { fetchDistricts } from '@/lib/data';
 import { IS_EXPO_GO, sendTestNotification, setupNotificationChannel } from '@/lib/device';
+import { HazardIcon } from '@/components/risk';
+import { HAZARD_OPTIONS } from '@/lib/hazards';
 import { useApp } from '@/providers/app-provider';
 
 const ACCENT = '#0E7490';
@@ -23,8 +25,18 @@ const QUIET_PRESETS = [
 export default function SettingsScreen() {
   const { t, lang } = useLang();
   const theme = useTheme();
-  const { prefs, setPrefs, pushStatus, pushToken, refreshPush, resetAll, location, setSimulated } =
-    useApp();
+  const {
+    prefs,
+    setPrefs,
+    pushStatus,
+    pushToken,
+    refreshPush,
+    resetAll,
+    location,
+    setSimulated,
+    visibleHazards,
+    setVisibleHazards,
+  } = useApp();
   const [testNote, setTestNote] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
   const sendTest = async () => {
@@ -80,6 +92,45 @@ export default function SettingsScreen() {
           onChange={(l) => void setLanguage(l)}
           accent={ACCENT}
         />
+      </Section>
+
+      <Section title={t('settings.showHazards')}>
+        <Paragraph>{t('settings.showHazardsHelp')}</Paragraph>
+        {HAZARD_OPTIONS.map((o) => {
+          if (!o.available) {
+            return (
+              <View key={o.id} style={[styles.row, styles.soon]}>
+                <View style={styles.hazardLabel}>
+                  <HazardIcon hazard={o.id} size={20} color="#9CA3AF" />
+                  <Text style={[styles.rowLabel, styles.soonText]}>{t(`hazard.${o.id}`)}</Text>
+                </View>
+                <Text style={styles.soonText}>{t('settings.comingSoon')}</Text>
+              </View>
+            );
+          }
+          const on = visibleHazards.includes(o.id);
+          const last = on && visibleHazards.length === 1;
+          return (
+            <View key={o.id} style={styles.row}>
+              <View style={styles.hazardLabel}>
+                <HazardIcon hazard={o.id} size={20} />
+                <Text style={[styles.rowLabel, { color: theme.text }]}>{t(`hazard.${o.id}`)}</Text>
+              </View>
+              <Switch
+                value={on}
+                disabled={last}
+                accessibilityLabel={t(`hazard.${o.id}`)}
+                accessibilityHint={last ? t('settings.keepOne') : undefined}
+                onValueChange={(v) =>
+                  setVisibleHazards(
+                    v ? [...visibleHazards, o.id] : visibleHazards.filter((h) => h !== o.id),
+                  )
+                }
+              />
+            </View>
+          );
+        })}
+        {visibleHazards.length === 1 && <Paragraph>{t('settings.keepOne')}</Paragraph>}
       </Section>
 
       <Section title={t('settings.delivery')}>
@@ -248,6 +299,9 @@ const styles = StyleSheet.create({
   heading: { fontSize: 18, fontWeight: '700' },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   rowLabel: { fontSize: 16, flex: 1 },
+  hazardLabel: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  soon: { opacity: 0.7 },
+  soonText: { fontSize: 15, color: '#9CA3AF' },
   button: {
     borderWidth: 2,
     borderColor: ACCENT,

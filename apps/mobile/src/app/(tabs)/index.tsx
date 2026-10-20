@@ -2,16 +2,10 @@
 // bottom doubles as the layer switcher (tap a hazard to show only its zones, tap again for all).
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { assessPoint } from '@jagasekitar/engine';
-import {
-  HAZARD_PALETTES,
-  HAZARDS,
-  RISK_COLORS,
-  RISK_ICONS,
-  type Hazard,
-} from '@jagasekitar/shared';
+import { HAZARD_PALETTES, RISK_COLORS, RISK_ICONS, type Hazard } from '@jagasekitar/shared';
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RefreshFab, useRefreshAll } from '@/components/map/refresh-button';
 import { MapCredit, WebMap, type WebMapHandle } from '@/components/map/web-map';
@@ -38,7 +32,7 @@ export default function HomeMap() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const map = useRef<WebMapHandle>(null);
-  const { location, error: appError } = useApp();
+  const { location, error: appError, visibleHazards } = useApp();
   const { coords, status, simulated } = location;
   const zones = useZones();
   const demo = useDemoMode();
@@ -57,21 +51,29 @@ export default function HomeMap() {
     }
   }, [coords, status]);
 
+  // Only the hazards chosen in Settings → "Hazards to show".
+  const shownZones = useMemo(
+    () => (zones.data ?? []).filter((z) => visibleHazards.includes(z.hazard)),
+    [zones.data, visibleHazards],
+  );
+  const activeLayer = layer && visibleHazards.includes(layer) ? layer : null;
   const here = useMemo(
-    () => assessPoint(coords.latitude, coords.longitude, zones.data ?? []),
-    [coords, zones.data],
+    () => assessPoint(coords.latitude, coords.longitude, shownZones),
+    [coords, shownZones],
   );
   const polygons = useMemo(
     () =>
       zonePolygons(
-        (zones.data ?? []).filter((z) => !layer || z.hazard === layer),
-        { mode: layer ? 'hazard' : 'neutral' },
+        shownZones.filter((z) => !activeLayer || z.hazard === activeLayer),
+        { mode: activeLayer ? 'hazard' : 'neutral' },
       ),
-    [zones.data, layer],
+    [shownZones, activeLayer],
   );
   const user = status === 'granted' && !simulated ? coords : null;
 
-  const bottomOffset = BottomTabInset + insets.bottom + 8;
+  // Android: this screen already ends above the tab bar, so only a small gap is needed. iOS native
+  // tabs float over the content, so leave room for them.
+  const bottomOffset = Platform.OS === 'android' ? 12 : BottomTabInset + insets.bottom + 8;
   const notice =
     (simulated && t('settings.simulating', { name: simulated.name })) ||
     (status === 'locating' && t('home.locating')) ||
@@ -154,8 +156,8 @@ export default function HomeMap() {
           </View>
 
           <View style={styles.tiles} accessibilityRole="tablist">
-            {HAZARDS.map((h) => {
-              const active = layer === h;
+            {visibleHazards.map((h) => {
+              const active = activeLayer === h;
               const palette = HAZARD_PALETTES[h];
               return (
                 <Pressable
@@ -189,20 +191,20 @@ export default function HomeMap() {
             })}
           </View>
 
-          {layer ? (
+          {activeLayer ? (
             <>
-              <RiskLegend hazard={layer} bare credit={false} />
+              <RiskLegend hazard={activeLayer} bare credit={false} />
               <Pressable
-                onPress={() => router.push(ROUTE[layer])}
+                onPress={() => router.push(ROUTE[activeLayer])}
                 accessibilityRole="button"
                 style={({ pressed }) => [
                   styles.details,
-                  { backgroundColor: HAZARD_PALETTES[layer].base },
+                  { backgroundColor: HAZARD_PALETTES[activeLayer].base },
                   pressed && styles.pressed,
                 ]}
               >
                 <Text style={styles.detailsText}>
-                  {t('home.details', { hazard: t(`hazard.${layer}`) })}
+                  {t('home.details', { hazard: t(`hazard.${activeLayer}`) })}
                 </Text>
                 <MaterialCommunityIcons name="chevron-right" size={20} color="#fff" />
               </Pressable>

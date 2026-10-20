@@ -20,7 +20,7 @@ import { RiskBadge } from '@/components/risk';
 import { useNow } from '@/hooks/use-now';
 import { useRemote } from '@/hooks/use-remote';
 import { useLang } from '@/i18n';
-import { fetchDistricts, fetchZones, PENINSULA } from '@/lib/data';
+import { fetchDistricts, fetchZones, PENINSULA, type AppZone } from '@/lib/data';
 import { fetchRoute, savePlace, searchPlaces, type PlaceResult } from '@/lib/places';
 import { useApp } from '@/providers/app-provider';
 
@@ -31,7 +31,10 @@ const ROUTE_CLEAR = '#2563EB';
 export default function Destination() {
   const { t, lang } = useLang();
   const insets = useSafeAreaInsets();
-  const { location } = useApp();
+  const { location, visibleHazards } = useApp();
+  // Only the hazards chosen in Settings → "Hazards to show".
+  const shown = (zones: AppZone[] | null | undefined) =>
+    (zones ?? []).filter((z) => visibleHazards.includes(z.hazard));
   const params = useLocalSearchParams<{ lat?: string; lon?: string; label?: string }>();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PlaceResult[] | null>(null);
@@ -90,7 +93,7 @@ export default function Destination() {
   const { refresh, loading: refreshing } = useRefreshAll([zonesNow, zonesAtArrival, route]);
 
   const atDest = dest
-    ? assessPoint(dest.lat, dest.lon, zonesAtArrival.data ?? [], { time: arrival })
+    ? assessPoint(dest.lat, dest.lon, shown(zonesAtArrival.data), { time: arrival })
     : null;
   const places = useMemo(
     () =>
@@ -102,8 +105,15 @@ export default function Destination() {
     [districts.data],
   );
   const along = useMemo(
-    () => (route.data ? riskAlongRoute(route.data.coords, zonesNow.data ?? [], { places }) : null),
-    [route.data, zonesNow.data, places],
+    () =>
+      route.data
+        ? riskAlongRoute(
+            route.data.coords,
+            (zonesNow.data ?? []).filter((z) => visibleHazards.includes(z.hazard)),
+            { places },
+          )
+        : null,
+    [route.data, zonesNow.data, places, visibleHazards],
   );
 
   const save = async (notify: boolean) => {
@@ -235,7 +245,7 @@ export default function Destination() {
             atDest && (
               <>
                 <Text style={styles.body}>
-                  {(['haze', 'flood', 'disease'] as const)
+                  {visibleHazards
                     .map(
                       (h) =>
                         `${HAZARD_PALETTES[h].icon} ${t(`hazard.${h}`)}: ${t(`risk.${atDest[h]}`)}`,

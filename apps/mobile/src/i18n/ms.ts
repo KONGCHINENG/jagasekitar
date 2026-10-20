@@ -3,7 +3,14 @@ import type { Strings } from './en';
 const ms: Strings = {
   appName: 'JagaSekitar',
   tabs: { map: 'Peta', alerts: 'Amaran', places: 'Tempat', settings: 'Tetapan' },
-  hazard: { haze: 'Jerebu', flood: 'Banjir', disease: 'Penyakit' },
+  hazard: {
+    haze: 'Jerebu',
+    flood: 'Banjir',
+    disease: 'Penyakit',
+    earthquake: 'Gempa bumi',
+    tsunami: 'Tsunami',
+    landslide: 'Tanah runtuh',
+  },
   hazardMap: { haze: 'Peta jerebu', flood: 'Peta banjir', disease: 'Peta penyakit' },
   common: {
     loading: 'Memuatkan…',
@@ -119,6 +126,11 @@ const ms: Strings = {
     backgroundUnsupported:
       'Memerlukan aplikasi yang dipasang (development build); tidak tersedia dalam Expo Go.',
     backgroundDenied: 'Kebenaran lokasi tidak diberikan.',
+    showHazards: 'Bahaya yang dipaparkan',
+    showHazardsHelp:
+      'Bahaya yang disembunyikan hilang daripada peta, "Kawasan anda" dan semakan destinasi. Amaran mengikut "Maklumkan saya tentang" di bawah.',
+    comingSoon: 'Akan datang',
+    keepOne: 'Sekurang-kurangnya satu bahaya mesti dihidupkan.',
     delivery: 'Penghantaran',
     deliveryPush: 'Notifikasi tolak dihidupkan.',
     deliveryInApp:

@@ -1,6 +1,7 @@
 // App-wide state: onboarding, anonymous session, device registration, location (real or
 // simulated for demos), alert preferences, push/in-app delivery and notification deep links.
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { HAZARDS, type Hazard } from '@jagasekitar/shared';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import {
@@ -14,6 +15,7 @@ import {
   type ReactNode,
 } from 'react';
 import { AppState } from 'react-native';
+import { parseVisibleHazards, VISIBLE_HAZARDS_KEY } from '@/lib/hazards';
 import { useUserLocation, type LocationStatus } from '@/hooks/use-user-location';
 import { useLang } from '@/i18n';
 import {
@@ -61,6 +63,9 @@ interface AppContextValue {
   setSimulated: (s: SimulatedLocation | null) => void;
   prefs: AlertPrefs;
   setPrefs: (p: AlertPrefs) => void;
+  /** Hazards the user chose to see (Settings → Hazards to show); never empty. */
+  visibleHazards: Hazard[];
+  setVisibleHazards: (h: Hazard[]) => void;
   pushStatus: PushStatus;
   /** Expo push token of this install, when push is available. */
   pushToken: string | null;
@@ -87,6 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [prefs, setPrefsState] = useState<AlertPrefs>(DEFAULT_PREFS);
   const [simulated, setSimulatedState] = useState<SimulatedLocation | null>(null);
+  const [visibleHazards, setVisibleHazardsState] = useState<Hazard[]>([...HAZARDS]);
   const [push, setPush] = useState<{ token: string | null; status: PushStatus }>({
     token: null,
     status: 'denied',
@@ -98,12 +104,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Load local state.
   useEffect(() => {
     (async () => {
-      const [flag, loaded, sim] = await Promise.all([
+      const [flag, loaded, sim, shown] = await Promise.all([
         AsyncStorage.getItem(ONBOARDED_KEY).catch(() => null),
         loadPrefs(),
         AsyncStorage.getItem(SIMULATED_KEY).catch(() => null),
+        AsyncStorage.getItem(VISIBLE_HAZARDS_KEY).catch(() => null),
       ]);
       setPrefsState(loaded);
+      setVisibleHazardsState(parseVisibleHazards(shown));
       if (sim) setSimulatedState(JSON.parse(sim) as SimulatedLocation);
       setOnboarded(flag === '1');
     })();
@@ -241,6 +249,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPrefsState(p);
         void savePrefs(p);
       },
+      visibleHazards,
+      setVisibleHazards: (h) => {
+        const clean = parseVisibleHazards(JSON.stringify(h));
+        setVisibleHazardsState(clean);
+        void AsyncStorage.setItem(VISIBLE_HAZARDS_KEY, JSON.stringify(clean)).catch(() => {});
+      },
       pushStatus: push.status,
       pushToken: push.token,
       refreshPush,
@@ -256,6 +270,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setDeviceId(null);
         setPrefsState(DEFAULT_PREFS);
         setSimulatedState(null);
+        setVisibleHazardsState([...HAZARDS]);
         setOnboarded(false);
       },
     }),
@@ -267,6 +282,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       simulated,
       real.status,
       prefs,
+      visibleHazards,
       push.status,
       push.token,
       refreshPush,
