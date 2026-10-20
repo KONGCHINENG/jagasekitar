@@ -573,6 +573,47 @@ describe('hospital portal: edit requests and profile', () => {
 });
 
 describe('admin RPCs', () => {
+  it('admins verify or reject flagged reports; staff cannot change a status', async () => {
+    const rep = await db.query<{ id: string }>(
+      `insert into case_reports (facility_id, disease_code, report_date, new_cases, flagged)
+       values ($1, 'DIARR', current_date, 0, true) returning id`,
+      [bainunId],
+    );
+    const id = rep.rows[0]!.id;
+    const read = () =>
+      db.query<{ status: string; flagged: boolean }>(
+        'select status, flagged from case_reports where id = $1',
+        [id],
+      );
+
+    await asRole(db, 'authenticated', adminId, () =>
+      db.query(`select admin_review_report($1, 'verified')`, [id]),
+    );
+    expect((await read()).rows[0]).toEqual({ status: 'verified', flagged: false });
+    await asRole(db, 'authenticated', adminId, () =>
+      db.query(`select admin_review_report($1, 'rejected')`, [id]),
+    );
+    expect((await read()).rows[0]!.status).toBe('rejected');
+
+    await expect(
+      asRole(db, 'authenticated', staffId, () =>
+        db.query(`select admin_review_report($1, 'verified')`, [id]),
+      ),
+    ).rejects.toThrow(/Admins only/);
+    // Staff can't set a status directly either (column privilege), which is why admins need the RPC.
+    await expect(
+      asRole(db, 'authenticated', staffId, () =>
+        db.query(`update case_reports set status = 'verified' where id = $1`, [id]),
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asRole(db, 'authenticated', adminId, () =>
+        db.query(`select admin_review_report($1, 'submitted')`, [id]),
+      ),
+    ).rejects.toThrow(/only be verified or rejected/);
+    await db.query('delete from case_reports where id = $1', [id]);
+  });
+
   it('only admins can list users, and see emails', async () => {
     const res = await asRole(db, 'authenticated', adminId, () =>
       db.query<{ email: string; role: string }>('select email, role from admin_list_users()'),

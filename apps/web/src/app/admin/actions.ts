@@ -181,11 +181,9 @@ export async function reviewReport(
   status: 'verified' | 'rejected',
 ): Promise<ActionResult> {
   const supabase = await admin();
-  const { error } = await supabase
-    .from('case_reports')
-    .update({ status, flagged: false })
-    .eq('id', id);
-  return error ? fail(error.message) : ok();
+  // Through an admin-checked function: the table only lets portal users change counts and notes.
+  const { error } = await supabase.rpc('admin_review_report', { p_report: id, p_status: status });
+  return error ? fail(error.message) : ok(status === 'verified' ? 'Verified' : 'Rejected');
 }
 
 export async function reviewEdit(id: string, approve: boolean): Promise<ActionResult> {
