@@ -100,6 +100,31 @@ async function predictionRequested(ctx: SourceContext): Promise<boolean> {
   return !data || Date.parse(req.predict_at) > Date.parse(data.started_at);
 }
 
+/**
+ * A hospital report was submitted, uploaded or edited after the last disease prediction started.
+ * Reports don't come from a source adapter, so without this an edit (e.g. a mistake corrected to 0)
+ * only showed on the map after the next unrelated ingest.
+ */
+async function reportsChanged(ctx: SourceContext): Promise<boolean> {
+  const [report, run] = await Promise.all([
+    ctx.db
+      .from('case_reports')
+      .select('updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    ctx.db
+      .from('prediction_runs')
+      .select('started_at')
+      .eq('hazard', 'disease')
+      .order('started_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  if (!report.data) return false;
+  return !run.data || Date.parse(report.data.updated_at) > Date.parse(run.data.started_at);
+}
+
 interface TickResult {
   sources: SourceRunResult[];
   predictions: PredictionSummary[];
@@ -158,9 +183,11 @@ async function tick(force: boolean): Promise<TickResult> {
       log.error('stations', err instanceof Error ? err.message : String(err));
     }
   }
-  // Re-predict whenever new data landed, or when an admin asked for it.
+  // Re-predict whenever new data landed, a hospital report changed, or an admin asked for it.
   const predictions =
-    results.some((r) => r.written > 0) || (await predictionRequested(ctx))
+    results.some((r) => r.written > 0) ||
+    (await reportsChanged(ctx)) ||
+    (await predictionRequested(ctx))
       ? await runPredictions(ctx)
       : [];
   if (predictions.length) await notifySafely(ctx);
