@@ -131,7 +131,7 @@ describe('runFloodEngine', () => {
     },
   };
 
-  it('turns the demo flash-flood scenario into a severe zone with the reasons', () => {
+  it('turns a flash-flood situation into a severe zone with the reasons', () => {
     const result = runFloodEngine({
       now: NOW,
       rain: [rain({ rain3h: 72 })],

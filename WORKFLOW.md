@@ -8,15 +8,15 @@ the parts work together, step by step, and what each kind of user does.
 
 ## 1. The parts
 
-| Part | What it is | Who uses it | Where it runs |
-| ---- | ---------- | ----------- | ------------- |
-| **Phone app** | Maps, "Your area" risk, destination check, alerts, saved places (English and Bahasa Melayu) | The public | Android APK (Expo / EAS build) |
-| **Web portal** | `/hospital` for hospital and clinic staff, `/admin` for state officials | Staff and admins | Vercel (jagasekitar-web.vercel.app) |
-| **Database** | All data, zones, reports, settings and the audit log, with row-level security | Everything | Supabase (cloud) |
-| **Data worker** | Collects data, runs the prediction engines, sends alerts, writes AI briefings | Runs by itself | Laptop (`npm run worker:dev`, every 30 s) and GitHub Actions (hourly) |
-| **Prediction engines** | Transparent rules for haze, flood and disease | Called by the worker | Inside the worker |
-| **AI briefing agent** | Drafts a bilingual situation summary and broadcast suggestions | Admins | Inside the worker (NVIDIA-hosted model) |
-| **Push service** | Delivers notifications to phones | Called by the worker and portal | Expo push service → Firebase Cloud Messaging |
+| Part                   | What it is                                                                                  | Who uses it                     | Where it runs                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------- |
+| **Phone app**          | Maps, "Your area" risk, destination check, alerts, saved places (English and Bahasa Melayu) | The public                      | Android APK (Expo / EAS build)                                        |
+| **Web portal**         | `/hospital` for hospital and clinic staff, `/admin` for state officials                     | Staff and admins                | Vercel (jagasekitar-web.vercel.app)                                   |
+| **Database**           | All data, zones, reports, settings and the audit log, with row-level security               | Everything                      | Supabase (cloud)                                                      |
+| **Data worker**        | Collects data, runs the prediction engines, sends alerts, writes AI briefings               | Runs by itself                  | Laptop (`npm run worker:dev`, every 30 s) and GitHub Actions (hourly) |
+| **Prediction engines** | Transparent rules for haze, flood and disease                                               | Called by the worker            | Inside the worker                                                     |
+| **AI briefing agent**  | Drafts a bilingual situation summary and broadcast suggestions                              | Admins                          | Inside the worker (NVIDIA-hosted model)                               |
+| **Push service**       | Delivers notifications to phones                                                            | Called by the worker and portal | Expo push service → Firebase Cloud Messaging                          |
 
 ---
 
@@ -42,15 +42,15 @@ work when something is due or has changed.
 
 ### Data sources and how often they update
 
-| Source | What it gives | Default refresh |
-| ------ | ------------- | --------------- |
-| NASA FIRMS | Fire hotspots from satellites (Sumatra, Borneo, Peninsula) | 3 h |
-| Open-Meteo | Wind (for smoke), PM2.5 forecast, rain forecast | 1 h |
-| JPS Infobanjir | Rain at 47 stations, 28 river levels, official JPS alerts | 15 min |
-| MetMalaysia (data.gov.my) | Thunderstorm and continuous-rain warnings by district | 30 min |
-| GloFAS (Open-Meteo Flood API) | River-flow forecast per gauge, against 2/5/20-year flood levels | 6 h |
-| WAQI | Measured PM2.5 at Department of Environment stations | 1 h |
-| Hospital portal | Daily case counts per facility and disease (no patient data) | When staff submit |
+| Source                        | What it gives                                                   | Default refresh   |
+| ----------------------------- | --------------------------------------------------------------- | ----------------- |
+| NASA FIRMS                    | Fire hotspots from satellites (Sumatra, Borneo, Peninsula)      | 3 h               |
+| Open-Meteo                    | Wind (for smoke), PM2.5 forecast, rain forecast                 | 1 h               |
+| JPS Infobanjir                | Rain at 47 stations, 28 river levels, official JPS alerts       | 15 min            |
+| MetMalaysia (data.gov.my)     | Thunderstorm and continuous-rain warnings by district           | 30 min            |
+| GloFAS (Open-Meteo Flood API) | River-flow forecast per gauge, against 2/5/20-year flood levels | 6 h               |
+| WAQI                          | Measured PM2.5 at Department of Environment stations            | 1 h               |
+| Hospital portal               | Daily case counts per facility and disease (no patient data)    | When staff submit |
 
 ### Alert rules (step 4)
 
@@ -160,28 +160,21 @@ official broadcasts. See the **Admin manual** for every page; the daily routine 
 4. Admin → Calibration shows current and suggested thresholds with their scores. An admin decides
    and clicks **Apply**, which updates the flood thresholds and is recorded in the audit log.
 
-### 5.5 Demo mode
-
-1. Admin → Demo mode: choose a scenario (flash flood in Kerian, post-flood leptospirosis and
-   dengue, or Riau fires drifting to Perak) and a speed.
-2. The worker replays the scenario every 30 seconds instead of live data; every app shows it.
-3. **Stop** returns to live data on the next tick. Use it only for presentations.
-
 ---
 
 ## 6. Where everything runs (operations)
 
-| Piece | Service | Updated by |
-| ----- | ------- | ---------- |
-| Code | GitHub (private repository) | `git push` |
-| Automatic checks | GitHub Actions **CI**: typecheck, lint, all tests | Every push |
-| Web portal | Vercel | Deploys automatically on every push that changes the portal |
-| Database changes | Supabase | `npm run db:push` from the laptop |
-| Data worker (hourly) | GitHub Actions **Data worker** | Uses the latest code automatically |
-| Data worker (live, 30 s) | Laptop: `npm run worker:dev` | Restart after changes |
-| Phone app | EAS build → APK link | `npx eas-cli@latest build --platform android --profile preview` |
-| Push notifications | Expo push service + Firebase (project jagasekitar-c848e) | Set up once |
-| AI model | NVIDIA (build.nvidia.com), `openai/gpt-oss-20b` by default | Key in `.env` / GitHub secret |
+| Piece                    | Service                                                    | Updated by                                                      |
+| ------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------- |
+| Code                     | GitHub (private repository)                                | `git push`                                                      |
+| Automatic checks         | GitHub Actions **CI**: typecheck, lint, all tests          | Every push                                                      |
+| Web portal               | Vercel                                                     | Deploys automatically on every push that changes the portal     |
+| Database changes         | Supabase                                                   | `npm run db:push` from the laptop                               |
+| Data worker (hourly)     | GitHub Actions **Data worker**                             | Uses the latest code automatically                              |
+| Data worker (live, 30 s) | Laptop: `npm run worker:dev`                               | Restart after changes                                           |
+| Phone app                | EAS build → APK link                                       | `npx eas-cli@latest build --platform android --profile preview` |
+| Push notifications       | Expo push service + Firebase (project jagasekitar-c848e)   | Set up once                                                     |
+| AI model                 | NVIDIA (build.nvidia.com), `openai/gpt-oss-20b` by default | Key in `.env` / GitHub secret                                   |
 
 Secrets (database service key, FIRMS, WAQI, NVIDIA) live only in the laptop's `.env` and in GitHub's
 encrypted secrets, never in the code, the app or Vercel.
@@ -202,11 +195,11 @@ encrypted secrets, never in the code, the app or Vercel.
 
 ## 8. Timing cheat-sheet
 
-| Event | Reaches the phones in about |
-| ----- | --------------------------- |
-| JPS river level or alert change | 15–16 minutes (source refresh + next tick) |
-| Hospital report or correction | 30 seconds (laptop worker running) |
-| Admin broadcast | Seconds |
-| Threshold change (after **Re-run predictions**) | 30 seconds |
-| AI briefing | 1–6 minutes to write; nothing reaches phones until an admin sends |
-| Without the laptop worker | Up to 1 hour (GitHub hourly run) |
+| Event                                           | Reaches the phones in about                                       |
+| ----------------------------------------------- | ----------------------------------------------------------------- |
+| JPS river level or alert change                 | 15–16 minutes (source refresh + next tick)                        |
+| Hospital report or correction                   | 30 seconds (laptop worker running)                                |
+| Admin broadcast                                 | Seconds                                                           |
+| Threshold change (after **Re-run predictions**) | 30 seconds                                                        |
+| AI briefing                                     | 1–6 minutes to write; nothing reaches phones until an admin sends |
+| Without the laptop worker                       | Up to 1 hour (GitHub hourly run)                                  |

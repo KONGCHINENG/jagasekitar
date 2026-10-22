@@ -171,33 +171,6 @@ Notes:
 
 ---
 
-## Part 6 — Demo mode rehearsal
-
-### 6.1 Dry run without the phone (fourth window)
-
-```bat
-cd /d C:\Users\User\Desktop\jagasekitar
-npm run demo:check -w @jagasekitar/worker
-```
-
-**Pass:** it walks through the flood → disease → haze scenarios and ends with
-`demo off; demo rows left: hotspots 0, rain 0, reports 0`.
-
-### 6.2 Live run with the phone (window A must be running)
-
-1. Admin → **Demo mode** → scenario **Monsoon flash flood**, speed **×4** → Start.
-2. Phone: **Settings** → tap the version number **5 times** → simulate location **Kerian**.
-3. Watch the Flood map: Kerian goes Alert → **Severe**; an in-app alert arrives ("Flood risk SEVERE near Kerian…").
-4. Admin → switch scenario to **Post-flood leptospirosis + dengue** → Illness map shows Kerian severe.
-5. Switch to **Riau fires → Perak haze** → Haze map, slide Now → +24 h → +48 h: smoke crosses to Manjung/Kinta.
-6. Admin → **Broadcast** to Kerian → phone shows it.
-7. Admin → **Stop demo**. Phone: Settings → stop simulating location.
-
-**Pass:** each step shows on the phone within ~30 s. After Stop, the next worker run restores live data.
-Full spoken script: [PITCH_NOTES.md](PITCH_NOTES.md).
-
----
-
 ## Part 7 — Portal smoke test (Playwright)
 
 ```bat

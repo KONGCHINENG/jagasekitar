@@ -193,19 +193,7 @@ Changes reach the maps within ~30 s (the worker re-runs predictions when a repor
 Keep admins to the minimum needed. Your own row is marked **You**, and its role and active
 switches are locked, so you can't lock yourself out.
 
-### 4.11 Demo mode
-
-Replays prepared scenarios instead of live data, so a presentation works in any weather.
-
-1. Choose a **Scenario** (Monsoon flash flood, Post-flood leptospirosis + dengue, Riau fires → Perak
-   haze) and a **speed** → **Start demo mode**.
-2. Fast-forward with **⏩ +30 min / +3 h / +12 h**.
-3. **Stop** (asks "Switch back to live data?") — live data returns on the next worker tick.
-
-While demo mode is on, **everyone's app shows the demo**. Use it only for presentations, and
-stop it afterwards. Needs the laptop worker (it advances every 30 s).
-
-### 4.12 Audit log
+### 4.11 Audit log
 
 Every change to reports, facilities, users, settings, broadcasts, stations, calibration and AI
 briefings: **When, who, Action, Entity, Change**. Use it to answer "who changed this and when?".
@@ -258,5 +246,4 @@ worse create a haze zone for the next 3 hours.
 - **AI drafts, humans decide.** Never send an AI suggestion without reading it and checking the map.
 - **No personal data** in broadcasts, report notes or flood-event descriptions.
 - **One change at a time** in Thresholds; write down why.
-- **Stop demo mode** after every presentation.
 - **Protect your account:** don't share passwords; sign out on shared computers.

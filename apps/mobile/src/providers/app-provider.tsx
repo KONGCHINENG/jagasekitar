@@ -1,5 +1,5 @@
 // App-wide state: onboarding, anonymous session, device registration, location (real or
-// simulated for demos), alert preferences, push/in-app delivery and notification deep links.
+// simulated for testing), alert preferences, push/in-app delivery and notification deep links.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HAZARDS, type Hazard } from '@jagasekitar/shared';
 import * as Notifications from 'expo-notifications';

@@ -19,7 +19,6 @@ check risk at a destination and along the route.
 | 6     | User app: location, destination, notifications             | ✅ Done |
 | 7     | Hospital portal                                            | ✅ Done |
 | 8     | Admin panel (`/admin`)                                     | ✅ Done |
-| 9     | Demo mode: replayable scenarios                            | ✅ Done |
 | 10    | Hardening and docs                                         | ✅ Done |
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the data-flow diagram and design decisions, and
@@ -123,10 +122,9 @@ admin panel later). Run a single source with `npx tsx src/index.ts --once --sour
 
 Every adapter (`worker/sources/<name>/`) has a **timeout + retry with back-off**, a **file cache**
 (`worker/.cache`, which also serves stale data if the network fails), and a **mock fallback**
-(`mock.json`, with times shifted to "now" so the demo never looks stale). A failing source never
+(`mock.json`, with times shifted to "now" so fallback data never looks stale). A failing source never
 stops the others. Its outcome (live/mock, record count, last error, a sample payload) goes to
 `data_source_status` for the admin overview. Set `USE_MOCKS=true` to run entirely offline.
-While demo mode is on, the worker pauses live adapters.
 
 **Infobanjir notes** (endpoints found by inspecting the site; saved responses live in
 `worker/sources/infobanjir/fixtures/` for the parser tests):
@@ -387,32 +385,6 @@ most of the weight. Caveats (shown on the page): ERA5 smooths storms, the next d
 stands in for the forecast, JPS gauge rules can't be replayed (no public history), and one
 point per district can miss local storms. Haze calibration needs historical PM2.5 (e.g. the free
 Copernicus CAMS archive) and is not built yet.
-
-## Demo mode (`/admin/demo`)
-
-Live hazards may not be happening on pitch day, so the admin panel can replay one of three
-scenarios defined in [`supabase/seed/demo/`](supabase/seed/demo):
-
-| Scenario                          | What happens                                                                                                                      |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Riau fires → Perak haze           | ~300 hotspots in Riau/Jambi; wind turns south-south-westerly 6 h in; smoke reaches Manjung and Kinta in 24–48 h                   |
-| Monsoon flash flood               | Real JPS stations in Kerian and Kuala Kangsar: rain past 60 mm/3 h, rivers Normal → Alert → Warning → Danger in ~1 h of demo time |
-| Post-flood leptospirosis + dengue | Clinic reports in Kerian and Kinta climb to many times the baseline; flood linkage shown                                          |
-
-How it runs: keep `npm run worker:dev` running. While demo mode is on, the worker pauses live
-adapters and every 30 s advances the scenario on its own clock (real time × speed, plus
-fast-forward), re-runs the engines and sends alerts. The app shows "Demo scenario running". To put
-a phone in the action: Settings → tap the version 5 times → **Simulate my location at…**.
-**Stop demo** deletes every demo-tagged row (`source = 'demo'`, `raw.demo`, `notes = 'demo
-scenario'`) and asks the worker to refresh live data.
-
-Rehearse without pinging phones (runs every scenario at key moments, prints the zones, cleans up):
-
-```bash
-npm run demo:check -w @jagasekitar/worker
-```
-
-The full 3-minute script is in [PITCH_NOTES.md](PITCH_NOTES.md#3-minute-demo-script).
 
 ## Run
 

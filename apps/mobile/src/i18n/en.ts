@@ -26,7 +26,6 @@ const en = {
     stale: 'Data is more than 2 hours old. Pull new data or check your connection.',
     notConfigured: 'Not connected to the data server. Showing saved data only.',
     simulated: 'Simulated data',
-    demo: 'Demo scenario running: zones and alerts are simulated',
     disclaimer:
       'Predictions are estimates. Always follow official advice from JPS, MetMalaysia, NADMA and KKM.',
     noData: 'No data yet',

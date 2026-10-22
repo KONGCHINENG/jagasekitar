@@ -4,7 +4,6 @@
 #
 # Minutes: a run takes ~2 min. Private repos get 2,000 free minutes a month, so the default is
 # hourly (~1,500 min). On a public repo, minutes are free: switch to every 15 minutes.
-# Demo mode needs a tick every 30 s, so run demos with the laptop worker (`npm run worker:dev`).
 name: Data worker
 
 on:

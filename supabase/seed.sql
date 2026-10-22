@@ -64,9 +64,7 @@ on conflict (name, district) do nothing;
 -- Settings: every engine threshold is admin-configurable (Sections 4 and 8).
 -- ---------------------------------------------------------------------------
 insert into public.settings (key, value, description) values
-  ('demo_mode', '{"enabled": false, "scenario": null, "speed": 1, "started_at": null}',
-    'Replay seeded scenarios instead of live data'),
-  ('refresh_minutes', '{"firms": 180, "open_meteo": 60, "open_meteo_aq": 60, "infobanjir_rain": 15, "infobanjir_water_level": 15, "infobanjir_alerts": 15, "demo_predictions_seconds": 30}',
+  ('refresh_minutes', '{"firms": 180, "open_meteo": 60, "open_meteo_aq": 60, "infobanjir_rain": 15, "infobanjir_water_level": 15, "infobanjir_alerts": 15}',
     'Data source and prediction refresh intervals'),
   ('haze', '{
       "cluster_radius_km": 10,

@@ -214,59 +214,6 @@ export async function setUser(
 }
 
 // ---------------------------------------------------------------------------
-// Demo mode (scenario replay is implemented by the worker)
-// ---------------------------------------------------------------------------
-const demoSchema = z.object({
-  enabled: z.boolean(),
-  scenario: z.enum(['riau_haze', 'kerian_flood', 'post_flood_disease']).nullable(),
-  speed: z.number().int().min(1).max(120),
-});
-
-export async function setDemoMode(input: unknown): Promise<ActionResult> {
-  const parsed = demoSchema.safeParse(input);
-  if (!parsed.success) return fail(parsed.error.issues[0]!.message);
-  const supabase = await admin();
-  const { data: current } = await supabase
-    .from('settings')
-    .select('value')
-    .eq('key', 'demo_mode')
-    .single();
-  const prev = (current?.value ?? {}) as {
-    enabled?: boolean;
-    scenario?: string | null;
-    offset_minutes?: number;
-  };
-  // Starting or switching a scenario restarts its clock.
-  const restart = parsed.data.enabled && (!prev.enabled || prev.scenario !== parsed.data.scenario);
-  const value = {
-    ...prev,
-    ...parsed.data,
-    started_at: restart
-      ? new Date().toISOString()
-      : ((prev as { started_at?: string }).started_at ?? null),
-    offset_minutes: restart ? 0 : (prev.offset_minutes ?? 0),
-  };
-  const { error } = await supabase.from('settings').update({ value }).eq('key', 'demo_mode');
-  return error ? fail(error.message) : ok(parsed.data.enabled ? 'Demo mode on' : 'Demo mode off');
-}
-
-export async function fastForwardDemo(minutes: number): Promise<ActionResult> {
-  const supabase = await admin();
-  const { data } = await supabase.from('settings').select('value').eq('key', 'demo_mode').single();
-  const v = (data?.value ?? {}) as { enabled?: boolean; offset_minutes?: number };
-  if (!v.enabled) return fail('Turn demo mode on first');
-  const offset = Math.min(
-    (v.offset_minutes ?? 0) + Math.max(0, Math.min(minutes, 24 * 60)),
-    7 * 24 * 60,
-  );
-  const { error } = await supabase
-    .from('settings')
-    .update({ value: { ...v, offset_minutes: offset } })
-    .eq('key', 'demo_mode');
-  return error ? fail(error.message) : ok(`Demo clock +${offset} min`);
-}
-
-// ---------------------------------------------------------------------------
 // Broadcast alert
 // ---------------------------------------------------------------------------
 const broadcastSchema = z.object({

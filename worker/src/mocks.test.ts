@@ -1,4 +1,4 @@
-// Every source must have a working mock fallback whose times look current (demo-day safety).
+// Every source must have a working mock fallback whose times look current (so a failed source never shows stale data).
 import { describe, expect, it } from 'vitest';
 import { firmsSource } from '../sources/firms';
 import { alertsSource, rainSource, waterLevelSource } from '../sources/infobanjir';

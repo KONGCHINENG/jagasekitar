@@ -120,7 +120,7 @@ async function recordStatus(
 
 /**
  * Shift timestamps so the newest one in the set is "now" (rounded down to 15 min). Mock data
- * then always looks current, so the demo never shows stale-data banners.
+ * then always looks current, so fallback data never shows stale-data banners.
  */
 export function rebaseTimes<T>(records: T[], fields: (keyof T)[], now: Date): T[] {
   let max = -Infinity;

@@ -161,7 +161,6 @@ Add each one (name exactly as shown, value from your `.env`):
   `cron: '7 * * * *'` to `cron: '*/15 * * * *'` (every 15 min), commit, push.
 - GitHub may start scheduled runs a few minutes late, and skips them on repos with no activity for
   60 days.
-- **Demo mode** needs a tick every 30 seconds: during demos, also run `npm run worker:dev` on the laptop.
 
 To stop it: Actions → Data worker → **⋯** → **Disable workflow**.
 

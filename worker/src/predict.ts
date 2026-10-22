@@ -64,15 +64,13 @@ async function loadDistricts(db: SupabaseClient, state: string): Promise<Distric
   }));
 }
 
-/** In demo mode only the scenario's own fires count, so live FIRMS data can't change the script. */
-async function loadHotspots(db: SupabaseClient, since: Date, demo: boolean): Promise<Hotspot[]> {
+async function loadHotspots(db: SupabaseClient, since: Date): Promise<Hotspot[]> {
   const out: Hotspot[] = [];
   for (let from = 0; ; from += PAGE) {
-    let query = db
+    const query = db
       .from('fire_hotspots')
       .select('lat, lon, frp, confidence, acquired_at')
       .gte('acquired_at', since.toISOString());
-    if (demo) query = query.eq('source', 'demo');
     const { data, error } = await query.order('id').range(from, from + PAGE - 1);
     if (error) throw new Error(`fire_hotspots: ${error.message}`);
     for (const h of data ?? []) {
@@ -133,14 +131,13 @@ async function writeZones(
 
 async function withRun(
   ctx: SourceContext,
-  demo: boolean,
   hazard: Hazard,
   run: (runId: string) => Promise<{ zones: number; stats: unknown }>,
 ): Promise<PredictionSummary> {
   const started = Date.now();
   const { data, error } = await ctx.db
     .from('prediction_runs')
-    .insert({ hazard, status: 'running', demo })
+    .insert({ hazard, status: 'running' })
     .select('id')
     .single();
   if (error) throw new Error(`prediction_runs insert: ${error.message}`);
@@ -173,23 +170,19 @@ async function withRun(
   }
 }
 
-export async function runPredictions(
-  ctx: SourceContext,
-  opts: { demo?: boolean } = {},
-): Promise<PredictionSummary[]> {
-  const demo = opts.demo ?? false;
+export async function runPredictions(ctx: SourceContext): Promise<PredictionSummary[]> {
   const { db, now, state } = ctx;
   const districts = await loadDistricts(db, state);
   const places = districts.map((d) => ({ name: d.name, lat: d.centroid.lat, lon: d.centroid.lon }));
   const results: PredictionSummary[] = [];
 
   results.push(
-    await withRun(ctx, demo, 'haze', async (runId) => {
+    await withRun(ctx, 'haze', async (runId) => {
       const config = fromSettings(DEFAULT_HAZE, await settingsRow(db, 'haze'));
       const from = new Date(now.getTime() - 3 * HOUR).toISOString();
       const to = new Date(now.getTime() + (config.trajectoryHours + 3) * HOUR).toISOString();
       const [hotspots, wind, pm25, measuredRes] = await Promise.all([
-        loadHotspots(db, new Date(now.getTime() - 48 * HOUR), demo),
+        loadHotspots(db, new Date(now.getTime() - 48 * HOUR)),
         rpc<WindSample[]>(db, 'engine_weather', {
           p_kind: 'wind',
           p_from: from,
@@ -213,20 +206,17 @@ export async function runPredictions(
       ]);
       if (measuredRes.error) throw new Error(`v_air_quality_latest: ${measuredRes.error.message}`);
       const result = runHazeEngine({ now, hotspots, wind, pm25, places, config });
-      // Demo scenarios stay reproducible: no live measurements mixed in.
-      const measured = demo
-        ? []
-        : measuredHazeZones(
-            (measuredRes.data ?? []).map((o) => ({
-              name: o.name,
-              lat: o.lat,
-              lon: o.lon,
-              pm25: o.pm25,
-              observedAt: o.observed_at,
-            })),
-            now,
-            { bands: config.pm25Bands },
-          );
+      const measured = measuredHazeZones(
+        (measuredRes.data ?? []).map((o) => ({
+          name: o.name,
+          lat: o.lat,
+          lon: o.lon,
+          pm25: o.pm25,
+          observedAt: o.observed_at,
+        })),
+        now,
+        { bands: config.pm25Bands },
+      );
       const zones = await writeZones(db, 'haze', runId, [...result.zones, ...measured]);
       return {
         zones,
@@ -236,7 +226,7 @@ export async function runPredictions(
   );
 
   results.push(
-    await withRun(ctx, demo, 'flood', async (runId) => {
+    await withRun(ctx, 'flood', async (runId) => {
       const config = fromSettings(DEFAULT_FLOOD, await settingsRow(db, 'flood'));
       // Forecast grid limited to the state (plus a margin) for speed.
       const boxes = districts.filter((d) => d.geometry).map((d) => areaBbox(d.geometry!));
@@ -270,20 +260,17 @@ export async function runPredictions(
       ]);
       if (alertsRes.error) throw new Error(`official_alerts: ${alertsRes.error.message}`);
       if (flowRes.error) throw new Error(`river_flow_forecasts: ${flowRes.error.message}`);
-      const alerts: OfficialAlertInput[] = (alertsRes.data ?? [])
-        .filter((a) => !demo || a.source !== 'metmalaysia')
-        .map((a) => ({
-          source: a.source,
-          stationId: a.station_id,
-          title: a.title,
-          titleMs: (a.raw as { title_ms?: string } | null)?.title_ms,
-          level: a.level,
-          district: a.district,
-          lat: (a.raw as { lat?: number } | null)?.lat ?? null,
-          lon: (a.raw as { lon?: number } | null)?.lon ?? null,
-        }));
-      // Demo scenarios stay reproducible: no live GloFAS forecasts or MetMalaysia warnings.
-      const riverFlow: RiverFlowInput[] = (demo ? [] : (flowRes.data ?? [])).map((r) => ({
+      const alerts: OfficialAlertInput[] = (alertsRes.data ?? []).map((a) => ({
+        source: a.source,
+        stationId: a.station_id,
+        title: a.title,
+        titleMs: (a.raw as { title_ms?: string } | null)?.title_ms,
+        level: a.level,
+        district: a.district,
+        lat: (a.raw as { lat?: number } | null)?.lat ?? null,
+        lon: (a.raw as { lon?: number } | null)?.lon ?? null,
+      }));
+      const riverFlow: RiverFlowInput[] = (flowRes.data ?? []).map((r) => ({
         stationId: r.station_id,
         peak: r.peak,
         peakDate: r.peak_date,
@@ -316,7 +303,7 @@ export async function runPredictions(
   );
 
   results.push(
-    await withRun(ctx, demo, 'disease', async (runId) => {
+    await withRun(ctx, 'disease', async (runId) => {
       const config = fromSettings(DEFAULT_DISEASE, await settingsRow(db, 'disease'));
       const [summaryRes, typesRes, hazardZones] = await Promise.all([
         db

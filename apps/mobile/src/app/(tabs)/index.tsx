@@ -15,7 +15,6 @@ import { HazardIcon, RiskBadge } from '@/components/risk';
 import { ZoneSheet } from '@/components/zone-sheet';
 import { BottomTabInset } from '@/constants/theme';
 import { useApp } from '@/providers/app-provider';
-import { useDemoMode } from '@/hooks/use-demo-mode';
 import { useZones } from '@/hooks/use-zones';
 import { useLang } from '@/i18n';
 import type { AppZone } from '@/lib/data';
@@ -35,7 +34,6 @@ export default function HomeMap() {
   const { location, error: appError, visibleHazards } = useApp();
   const { coords, status, simulated } = location;
   const zones = useZones();
-  const demo = useDemoMode();
   const [selected, setSelected] = useState<AppZone | null>(null);
   const [layer, setLayer] = useState<Hazard | null>(null);
   const [cardHeight, setCardHeight] = useState(200);
@@ -111,7 +109,6 @@ export default function HomeMap() {
           </Text>
         </Pressable>
         <View style={styles.pills} pointerEvents="none">
-          {demo?.enabled && <Text style={[styles.pill, styles.demoPill]}>{t('common.demo')}</Text>}
           {notice ? <Text style={[styles.pill, styles.noticePill]}>{notice}</Text> : null}
         </View>
       </View>
@@ -255,7 +252,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     overflow: 'hidden',
   },
-  demoPill: { color: '#92400E', backgroundColor: '#FEF3C7' },
   noticePill: { color: '#9A3412', backgroundColor: '#FFF7ED' },
   fabs: { position: 'absolute', left: 16, right: 16, alignItems: 'flex-end', gap: 8 },
   fab: {

@@ -26,7 +26,7 @@ export default function Home() {
         >
           <h2 className="text-lg font-medium">Admin panel</h2>
           <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-            Manage data sources, thresholds, facilities, alerts and demo mode.
+            Manage data sources, thresholds, facilities, alerts and broadcasts.
           </p>
         </Link>
       </div>

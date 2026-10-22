@@ -13,13 +13,13 @@ they're going_, explains why, and tells them what to do, in English and Bahasa M
 
 ## What we built
 
-| For       | Feature                                                                                                                         |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Public    | "Your area" risk card, three hazard maps with their own look, zone sheet with _why_ and _what to do_, EN/BM                     |
-| Public    | Destination check: risk at arrival time + route coloured by risk ("flood risk near Kuala Kangsar")                              |
-| Public    | Alerts for current location and saved places (Home, Kampung): dedupe, quiet hours, severe always gets through                   |
-| Hospitals | Daily aggregate case entry, CSV upload, spike warnings, 48 h edits, district map; no patient data, enforced in app and database |
-| Admins    | Data-source health, thresholds for every engine, station pins, approvals, moderation, district broadcast, audit log, demo mode  |
+| For       | Feature                                                                                                                          |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Public    | "Your area" risk card, three hazard maps with their own look, zone sheet with _why_ and _what to do_, EN/BM                      |
+| Public    | Destination check: risk at arrival time + route coloured by risk ("flood risk near Kuala Kangsar")                               |
+| Public    | Alerts for current location and saved places (Home, Kampung): dedupe, quiet hours, severe always gets through                    |
+| Hospitals | Daily aggregate case entry, CSV upload, spike warnings, 48 h edits, district map; no patient data, enforced in app and database  |
+| Admins    | Data-source health, thresholds for every engine, station pins, approvals, moderation, district broadcast, AI briefing, audit log |
 
 **Engines** (all thresholds editable by admins):
 
@@ -33,19 +33,13 @@ they're going_, explains why, and tells them what to do, in English and Bahasa M
 
 ## 3-minute demo script
 
-1. **(0:00) Phone, main map.** "This is Ipoh right now: real JPS rain and river data, real wind." Tap _Flood_.
-2. **(0:30) Admin → Demo mode → "Monsoon flash flood".** Speed ×4. In the app, Settings → tap version ×5 → simulate
-   **Kerian**. As the demo clock passes 15 → 30 → 60 min, the flood map turns Alert → severe and an alert arrives:
-   "🌊 Flood risk SEVERE near Kerian: 66 mm rain in 3 hours … Sg. Kurau is rising". Tap it → map opens on the zone.
-3. **(1:15) Destination check:** "Going to Kuala Kangsar this afternoon?" Route turns red near the river.
-4. **(1:40) Switch to "Post-flood leptospirosis + dengue".** Illness map: Kerian severe, "Flooding in Kerian → higher
-   leptospirosis risk". Show the hospital portal: aggregate counts, spike warning.
-5. **(2:15) Switch to "Riau fires → Perak haze".** Haze map: fires over Sumatra, wind turning; slide the time slider
-   Now → +24 h → +48 h and watch the smoke cross the Strait to Manjung and Kinta. PM2.5 band: unhealthy for sensitive groups or worse.
-6. **(2:45) Admin → Broadcast:** pick Kerian, send "Evacuation centre open at SK Bagan Serai". Phone receives it.
-   **Stop demo** → live data returns.
-
-Rehearse without phones: `npm run demo:check -w @jagasekitar/worker`.
+1. **(0:00) Phone, main map.** "This is Perak right now: real JPS rain and river data, real wind, real fire hotspots."
+   Tap _Flood_, then _Haze_, and tap a zone to show its "why".
+2. **(0:40) Destination check:** "Going to Kuala Kangsar this afternoon?" Show the risk at arrival time and along the route.
+3. **(1:10) Hospital portal:** submit today's counts for a clinic; show the spike warning. Within ~30 s the Illness map
+   updates, with the flood or haze link explained.
+4. **(1:50) Admin → AI briefing:** the bilingual situation summary and suggested broadcasts, each backed by data.
+5. **(2:20) Admin → Broadcast:** pick a district, send a message. The phone receives it with **📍 Area: …**.
 
 ## AI agent (drafts only)
 
@@ -67,7 +61,7 @@ gets no personal data, and must back every claim with the data it checked.
 - **Remote push needs a development build** (EAS). In Expo Go, alerts arrive in-app over Realtime. Background
   location also needs a development build.
 - Perak only (districts, facilities, rain-forecast grid); other states need their district data and facilities.
-- Hospital reports and demo scenarios are synthetic; no real patient or facility data was used.
+- Test hospital reports are synthetic; no real patient data was used.
 
 ## Built / mocked / not built
 
@@ -84,6 +78,5 @@ gets no personal data, and must back every claim with the data it checked.
 | Notifications                 | ✅ In-app over Realtime (Expo Go); ◐ remote push needs a dev build + EAS project ID      |
 | Hospital portal               | ✅ Built; ◐ Playwright smoke test written, run it with `npm run e2e -w @jagasekitar/web` |
 | Admin panel                   | ✅ Built                                                                                 |
-| Demo mode                     | ✅ Three scenarios, fast-forward, simulate location, clean stop                          |
 | APIMS (official API)          | ✗ Not built (no public API); Open-Meteo PM2.5 used instead                               |
 | Polygon drawing for broadcast | ✗ District selection instead                                                             |
